@@ -1,0 +1,10 @@
+# Third-party app binaries and anything extracted from them: never commit (copyright, size)
+*.xapk
+*.apk
+_extract/
+
+# Screenshots of the original app: local reference only (this repo is public)
+replica/screens/
+tools/adb/shots/
+
+__pycache__/

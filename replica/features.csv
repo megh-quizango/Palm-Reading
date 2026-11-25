@@ -1,0 +1,69 @@
+feature,area,priority,original,clone,notes
+Language picker on first run,onboarding,must,yes,no,S02; A/B alt variant
+3-page onboarding,onboarding,should,yes,no,S03
+Name + gender capture,onboarding,must,yes,no,S04
+DOB / birth time capture,onboarding,must,yes,no,S05
+Home hub with time-of-day greeting,home,must,yes,no,S06
+What's-new carousel,home,could,yes,no,S06
+Exit confirmation dialog,home,could,yes,no,S06
+Left/right hand selection + photo requirements,palm,must,yes,no,S07
+Live camera with on-device hand guidance,palm,must,yes,no,S08 MediaPipe
+Gallery import + flash,palm,must,yes,no,S08
+Server palm analysis (async job),palm,must,yes,no,S09
+Photo quality rejection reasons (7),palm,must,yes,no,blurry/far/jewelry/bent/tight/incomplete/no lines
+Line overlay drawn on photo,palm,must,yes,no,polyline traces per line
+Result tabs Palm/Love/Career,palm,must,yes,no,S10
+Five lines heart/head/life/fate/sun,palm,must,yes,no,
+Saved palm readings,palm,should,yes,no,Room
+Share reading,palm,should,yes,no,
+AI chat with persona (SSE streaming),chat,must,yes,no,S11; own persona
+Palm + profile context in chat,chat,must,yes,no,
+Suggested questions + follow-ups,chat,should,yes,no,
+Scan-my-palm card in chat,chat,should,yes,no,
+Chat daily quota + error states,chat,must,yes,no,no quota hit in 6 msgs
+Chat history list + delete,chat,should,yes,no,S13
+Read aloud (TTS),chat,could,yes,no,
+Report AI answer,chat,must,yes,no,
+Tarot 78-card deck,tarot,must,yes,no,own texts + PD/original art
+Tarot 6 topics,tarot,must,yes,no,love/luck/business/financial/health/protection
+Single-card pick + flip + explanation (do/avoid),tarot,must,yes,no,S15-S17
+Free tarot draw counter,tarot,must,yes,no,
+Horoscope 12 signs daily,horoscope,must,yes,no,own LLM pipeline
+On-device translation fallback,horoscope,could,yes,no,ML Kit
+Vedic chart on device (9 grahas + Lagna),astrology,must,yes,no,Astronomy Engine + Lahiri
+Current Vimshottari dasha,astrology,should,yes,no,
+Chart styles North/South Indian/Western,astrology,should,yes,no,S24
+Birth place search (geocoding),astrology,must,yes,no,commercial-licensed geocoder
+Other person's chart profile,astrology,could,yes,no,
+Moon sign profile (12 x 6 sections),content,should,yes,no,"device: 5 sections, all free; tropical sign (inconsistent with Vedic chart)"
+Soul energy profile (12 x 7 sections),content,should,yes,no,device: 7 sections all free; Vedic sun sign
+Love test by names (7 bands),love,must,yes,no,"verified deterministic, order- and gender-independent (Alex/Sam=80%)"
+Daily report lucky number/colour/strength/weakness,daily,must,yes,no,deterministic per day
+Paywall weekly/monthly/lifetime,monetisation,must,code only,no,"not shown on device (India, fresh user); remote-gated"
+Special offer paywall,monetisation,should,code only,no,not shown on device
+Paywall type variants via remote config,monetisation,should,code only,no,not shown on device
+Restore purchase,monetisation,must,code only,no,no entry in settings
+Server receipt verification + RTDN,monetisation,must,unknown,no,not visible client-side
+Free-usage counters per feature,monetisation,must,yes,no,
+Rewarded ad to unlock one use,monetisation,should,yes,no,"verified: scan, horoscope (1 free), tarot (pod of up to 3)"
+App-open ad,monetisation,should,yes,no,
+Interstitials with frequency caps,monetisation,should,yes,no,"verified: onboarding, back nav, tarot explain, chat every 3rd msg; original uncapped"
+Native ads on feed screens,monetisation,could,yes,no,fewer than original
+UMP consent,monetisation,must,yes,no,
+Daily notification,retention,must,yes,no,
+Shortcut / win-back / unfinished-tarot notifications,retention,should,yes,no,
+Pinned quick-access notification,retention,could,yes,no,opt-in
+Boot reschedule,retention,must,yes,no,
+FCM remote campaigns,retention,should,yes,no,
+Rating flow with negative-feedback branch,feedback,should,yes,no,device: shown after every result screen; cap it in rebuild
+Report reading content,feedback,must,yes,no,
+Settings + legal webviews + OSS licenses,settings,must,yes,no,
+49-locale localisation,i18n,should,yes,no,launch with 10
+Remote config + A/B testing,platform,must,yes,no,Firebase
+Analytics + attribution,platform,must,yes,no,
+Crash + perf monitoring,platform,must,yes,no,
+Lock-screen full-screen activity,retention,skip,yes,no,policy risk (USE_FULL_SCREEN_INTENT)
+Lock-screen ads,monetisation,skip,yes,no,Play disruptive-ads policy
+Misleading kill-app notification copy,retention,skip,yes,no,deceptive; send only real results
+Original texts/persona/art/backend,content,skip,yes,no,owned by original; clean-room
+Face reading,palm,skip,no,no,backend name hints at it; not in client
