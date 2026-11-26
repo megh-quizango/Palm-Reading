@@ -257,7 +257,7 @@ Walk the JSON recursively. A node is a token when it has `$value`, and tokens si
 | dimension (px = dp per `$description`) | `"2": { "$value": "2px", "$type": "dimension" }` [VERIFIED: :136-139]; `"pill": { "$value": "999px",` [VERIFIED: :194-196] | `val Space2 = 2.dp` (digit-leading keys need a prefix); pill → map to `RoundedCornerShape(50)` in the theme, not 999.dp |
 | typography | Overline: `"fontWeight": 700, "fontSize": "12px", "lineHeight": "16px", "letterSpacing": "0.12em"` [VERIFIED: :335-343]; `"fontFamily": "{font.family.display}",` [VERIFIED: :231] | `TextStyle(fontFamily = <role>, fontWeight = FontWeight(700), fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.12.em)` |
 | shadow | `"Primary": ... "color": "#6A4CF573", "offsetX": "0px", "offsetY": "8px", "blur": "24px", "spread": "0px"` [VERIFIED: :348-356] | Emit a plain `NocturneShadow(color, offsetX, offsetY, blur, spread)` data class. The theme converts it to Compose `Shadow(radius = blur, spread, color, offset = DpOffset(...))`. Keep the generated file independent of the shadow API. |
-| gradient | `"foil-border"`: stops `"#C9BCFFBF"` @0, `"#F2C66D8C"` @0.45, `"#A99BFF1F"` @1 [VERIFIED: :446-462] | `arrayOf(0f to Color(0xBFC9BCFF), 0.45f to ..., 1f to ...)` colour stops. Direction is not in the tokens; the component chooses it. |
+| gradient | `"foil-border"`: stops `"#C9BCFFBF"` @0, `"#F2C66D8C"` @0.45, `"#A99BFF1F"` @1 [VERIFIED: :446-462] | `arrayOf(0f to Color(0xBFC9BCFF), 0.45f to ..., 1f to ...)` colour stops. Direction is not in the tokens; angles are fixed in Open Questions 3 (RESOLVED). |
 | duration | `"instant": { "$value": "100ms", "$type": "duration" }` [VERIFIED: :495-497] | `const val Instant = 100` (ms) |
 | cubicBezier | `"standard": { "$value": [0.2, 0, 0, 1], "$type": "cubicBezier" }` [VERIFIED: :599-606] | `val Standard = CubicBezierEasing(0.2f, 0f, 0f, 1f)` |
 | semantic refs | `"primary": { "$value": "{color.brand.primary}", "$type": "color" }` [VERIFIED: :533-535] | `val Primary = BrandPrimary` |
@@ -747,18 +747,25 @@ class PalmReadingDtoTest {
 | A12 | MSYS rewrites leading-`/` adb arguments in Git Bash | Pattern 8 | Script paths break. `MSYS_NO_PATHCONV=1` is harmless either way. |
 | A13 | Gradle builds from `E:/Palm Reading` (space) without AAPT2/KSP issues | Pitfall/Env | Only the wrapper was verified in a spaced path. The gate build is the real test. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Downloads consent (blocking for execution, not planning).**
-   - Known: Gradle needs AGP 9.5.3, Kotlin 2.4.21 and the AndroidX/Hilt/Room3 artifacts. The cache has AGP up to 9.3.1, Kotlin up to 2.4.10 and Hilt 2.60.1 only [VERIFIED: `~/.gradle/caches/modules-2` listing]. uv must download CPython 3.13.x. The fonts are ~2.8 MB from google/fonts. fontTools comes via uvx.
-   - Recommendation: one up-front `checkpoint:human-verify` that lists all four download groups plus the SUS PyPI list.
-2. **Launcher icon from Figma (D-09).**
-   - Known: the Figma MCP server needs authentication (`/mcp`) in this session, so the orb illustration cannot be exported automatically right now.
-   - Recommendation: the plan includes a checkpoint for the user to authorize Figma or drop an exported SVG/PNG of the orb into `design-system/`. Until then a vector placeholder adaptive icon (bg `#0B0820` + gold orb) keeps the build green. Keep the three-layer adaptive icon structure so the swap is asset-only.
-3. **Gradient directions.**
-   - Tokens give stops but no angle.
-   - Recommendation: vertical for `sky`/`card`, 135° for `primary`/`hero`/`hero-aurora`/`foil-border` [ASSUMED]. Confirm against Figma "1 · Foundations" during visual QA.
-4. **Font weights actually needed.** D-05/D-06 lists ui 400/500/600/700 + display 600. The tokens use exactly 400, 500, 600 and 700 for ui and 600 for display [VERIFIED: typography block]. No change needed.
+1. **Downloads consent** — RESOLVED: the user approved all four download groups in chat on 2026-11-26: Gradle artifacts (AGP 9.5.3, Kotlin 2.4.21, AndroidX/Hilt/Room 3 from Google Maven and Maven Central), CPython 3.13.x via uv, the google/fonts files from GitHub, and fontTools from PyPI. No up-front checkpoint; 01-01 Task 1 replaces the human legitimacy checkpoint with an automated PyPI source-repo check against the Package Legitimacy Audit table, and 01-04 Task 2 pins fontTools 4.68.0 and one google/fonts commit.
+   - Background: the Gradle cache has AGP up to 9.3.1, Kotlin up to 2.4.10 and Hilt 2.60.1 only [VERIFIED: `~/.gradle/caches/modules-2` listing]; the fonts are ~2.8 MB.
+2. **Launcher icon from Figma (D-09)** — RESOLVED: the user approved a placeholder vector [Guide] orb adaptive icon (background `nocturne_bg_base`, gold orb foreground, monochrome layer) on 2026-11-26; the real Figma asset replaces it later. 01-05 Task 2 builds the three-layer adaptive icon so the swap is asset-only.
+   - Background: the Figma MCP server needs authentication (`/mcp`) in this session, so the orb cannot be exported automatically.
+3. **Gradient directions** — RESOLVED: decided now, in CSS `linear-gradient` degrees (0° points up, angles turn clockwise; the gradient line passes through the centre with length |w·sin a| + |h·cos a|, so the corners get the first and last stops):
+
+   | Token | Angle | Direction (first stop -> last stop) |
+   |---|---|---|
+   | `gradient.primary` | 90° | left -> right |
+   | `gradient.hero` | 135° | top-left -> bottom-right |
+   | `gradient.sky` | 180° | top -> bottom |
+   | `gradient.card` | 135° | top-left -> bottom-right |
+   | `gradient.foil-border` | 135° | top-left -> bottom-right |
+   | `gradient.hero-aurora` | 135° | top-left -> bottom-right |
+
+   The tokens carry stops only, so these angles live in one hand-written place: `NocturneGradientAngles` in `core/designsystem/Effects.kt` (01-05 Task 1, with a JVM test of the angle-to-endpoint mapping). Visual QA against Figma "1 · Foundations" stays in the 01-05 phase-end human check; a mismatch is a one-constant change.
+4. **Font weights actually needed** — RESOLVED: as confirmed. D-05/D-06 list ui 400/500/600/700 + display 600, and the tokens use exactly 400, 500, 600 and 700 for ui and 600 for display [VERIFIED: typography block]. No change needed.
 
 ## Environment Availability
 
