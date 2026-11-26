@@ -57,7 +57,18 @@ Plans:
   5. A red-team set (death, illness, pregnancy, medical, legal, financial, injected text in the image; English and Hindi) never yields a forbidden directive in a returned reading, and a client over its rate limit or a tripped daily spend cap gets a clean "busy" response instead of a model call.
 
 **Research flag**: Needs deeper research and a spike (`/gsd-plan-phase` with research): palm model bake-off (default Sonnet 5.5 vs Haiku 5.5, Opus as quality ceiling only), polyline quality, multilingual denylist, Anthropic data-retention terms. Prerequisite: a consented palm photo set (20-40 labelled photos covering skin tones, henna, rings, blur, backlight), kept out of git. The winning model needs user sign-off (cost and latency trade).
-**Plans**: TBD
+**Plans:** 9 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Tracer: POST a palm photo, poll a contract-valid reading (Claude mocked at the SDK); package legitimacy checkpoint; input validation and EXIF strip (wave 1)
+- [ ] 02-02-PLAN.md — Lines validated against the landmarks, template fallback, required lines, template-first switch (wave 2)
+- [ ] 02-03-PLAN.md — Failure states: malformed retried once, refusal, busy/timeout/model_error, idempotency, single-flight, job expiry (wave 2)
+- [ ] 02-04-PLAN.md — Safety filter: en/hi/Hinglish denylist with field rewrite and a red-team gate (wave 3)
+- [ ] 02-05-PLAN.md — Install-scoped dHash result cache, blur/dark pre-gate, rate limit and daily spend cap (wave 3)
+- [ ] 02-06-PLAN.md — Privacy proof: no image on disk or in logs, no landmarks stored, after success, failure and timeout (wave 4)
+- [ ] 02-07-PLAN.md — Eval harness green in fake mode: bake-off metrics, MediaPipe landmarks tool, image red-team (wave 4)
+- [ ] 02-08-PLAN.md — User prerequisites, then the real-Claude bake-off and red-team; 02-EVAL.md (wave 5)
+- [ ] 02-09-PLAN.md — Model, template-first and threshold sign-off applied and recorded in STATE.md (wave 6)
 
 ### Phase 3: Client Shell
 
