@@ -11,7 +11,7 @@
 
 | Decision | Choice | Rationale |
 |---|---|---|
-| Framework (client) | Kotlin 2.4.21, AGP 9.5.3 built-in Kotlin (no standalone Kotlin Android plugin), Gradle 9.6.0, Compose BOM 2026.11.01 with Material 3 as primitives only. Documented fallback: Kotlin 2.3.21 / Room 2.8.5 / navigation-compose 2.10.2. Plan 01-01 Task 2 updates this row if a fallback wins. | STACK.md pins; AGP 9 is the current line; the fallback ladder is pre-approved in ROADMAP |
+| Framework (client) | Kotlin 2.4.21, AGP 9.5.3 built-in Kotlin (no standalone Kotlin Android plugin), Gradle 9.6.0, Compose BOM 2026.09.00 (Compose 1.12.1, material3 1.4.0) with Material 3 as primitives only. Built green on the target set in plan 01-01 with no fallback-ladder step; the BOM is held below 2026.11.01 because Compose 1.13 needs compileSdk 37.1+ and only platforms;android-37.0 is installed (move up after installing android-37.2). Documented fallback (unused): Kotlin 2.3.21 / Room 2.8.5 / navigation-compose 2.10.2. | STACK.md pins; AGP 9 is the current line; the fallback ladder is pre-approved in ROADMAP |
 | SDK levels | minSdk 26, targetSdk 36 (explicit), compileSdk 37 | Play requires 36 from 2026-08-31; 26 gives `java.time` and reaches Android 8-10 phones in the target markets |
 | DI | Hilt 2.60.1 + androidx.hilt 1.4.0 via KSP 2.3.14 (no other annotation processor) | KSP-only under AGP 9 built-in Kotlin |
 | Navigation | Navigation 3 1.2.2: `@Serializable` `NavKey`s, an owned back stack, `NavDisplay` with saveable-state and ViewModel-store entry decorators, `hiltViewModel()` inside entries | Roadmap decision; owned back stack suits onboarding resets and scan -> generating -> result |
@@ -26,11 +26,11 @@
 
 ## Stack Touched in Phase 1
 
-- [ ] Project scaffold: Gradle wrapper, version catalog, `:app` with Hilt/KSP/Room 3/Nav3; uv backend with pytest; JVM unit tests and one instrumented test (plan 01-01)
-- [ ] Routing: Navigation 3 `Showcase` key with a Hilt ViewModel entry (plan 01-01)
-- [ ] Database: Room 3 insert + read-by-id on the phone in `AppDatabaseTest` (plan 01-01 Task 2)
+- [x] Project scaffold: Gradle wrapper, version catalog, `:app` with Hilt/KSP/Room 3/Nav3; uv backend with pytest; JVM unit tests and one instrumented test (plan 01-01; the first JVM unit and pytest tests land with the contract and health plans)
+- [x] Routing: Navigation 3 `Showcase` key with a Hilt ViewModel entry (plan 01-01)
+- [x] Database: Room 3 insert + read-by-id on the phone in `AppDatabaseTest` (plan 01-01 Task 2)
 - [ ] UI wired to the API: backend status chip calling `GET /healthz`, with Retry (plans 01-01, 01-03)
-- [ ] Local full-stack run command (below) (plan 01-01)
+- [x] Local full-stack run command (below) (plan 01-01)
 
 ## Local Full-Stack Run
 

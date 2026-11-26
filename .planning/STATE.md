@@ -2,16 +2,16 @@
 gsd_state_version: "1.0"
 current_phase: 1
 current_phase_name: Foundations & Contract
-status: planning
+status: executing
 stopped_at: Phase 1 context gathered
-last_updated: "2026-11-26T09:16:10.944Z"
+last_updated: "2026-11-26T10:16:02.871Z"
 last_activity: 2026-11-26
-last_activity_desc: Roadmap created (6 phases, 42/42 requirements mapped)
-state_head: 98ba450ceea9aca494bfa170e9feecd157deb71f
+last_activity_desc: Phase 1 execution started
+state_head: 54d9084b81bbbdf12a423032c8101d35559e8190
 progress:
   total_phases: 6
   completed_phases: 0
-  total_plans: 0
+  total_plans: 5
   completed_plans: 0
   percent: 0
 ---
@@ -23,14 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-26)
 
 **Core value:** The palm scan moment: live on-device hand guidance, then a believable Palm / Love / Career reading with the detected lines drawn over the user's own photo, in under 30 seconds.
-**Current focus:** Phase 1 - Foundations & Contract
+**Current focus:** Phase 1 — Foundations & Contract
 
 ## Current Position
 
-Phase: 1 of 6 (Foundations & Contract)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-11-26 — Roadmap created (6 phases, 42/42 requirements mapped)
+Phase: 1 (Foundations & Contract) — EXECUTING
+Plan: 1 of 5
+Status: Executing Phase 1
+Last activity: 2026-11-26 — Phase 1 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -65,6 +65,8 @@ Recent decisions affecting current work:
 - [Roadmap]: Client uploads a palm crop at most 1280 px plus the 21 landmarks (sent transiently, never stored or logged); 24 h perceptual-hash result cache
 - [Roadmap]: Birth place deferred to the astrology milestone; report button and privacy notice / age check deferred to "required before public release" (REL-*); share card and reopen-last-reading are in M1
 - [Roadmap]: Phase 2 (backend) runs parallel to Phases 3-5 against a fake repository; Phase 6 wires them
+- [Phase 1] Toolchain gate: TARGET SET built and ran green on the Redmi (API 30), no fallback-ladder step used: AGP 9.5.3 built-in Kotlin, KGP/Kotlin 2.4.21 (buildscript classpath), KSP 2.3.14, Hilt 2.60.1 + androidx.hilt 1.4.0, Navigation 3 1.2.2, Room 3 3.0.3 + sqlite-bundled 2.7.1 (no @ConstructedBy, no kotlin-metadata-jvm override), Gradle 9.6.0, compileSdk 37.0. One deviation: Compose BOM 2026.09.00 (Compose 1.12.1, material3 1.4.0) instead of 2026.11.01, because Compose 1.13.0 requires compileSdk 37.1+ and only platforms;android-37.0 is installed (installing android-37.2 was not permitted in-session). Return to BOM 2026.11.01 once platforms;android-37.2 is installed and compileSdk is raised to 37.2
+- [Pre-release] applicationId app.palm.dev (debug app.palm.dev.debug) is a placeholder: replace it with the brand id before the first Play upload; it is one-way after that upload (D-08, REL-03)
 
 ### Pending Todos
 
@@ -72,7 +74,8 @@ None yet.
 
 ### Blockers/Concerns
 
-- [Phase 1]: Kotlin 2.4.21 + Hilt 2.60.1 + KSP 2.3.14 + Room 3 + AGP 9.5.3 may not build together; scaffold build is the first gate
+- ~~[Phase 1]: Kotlin 2.4.21 + Hilt 2.60.1 + KSP 2.3.14 + Room 3 + AGP 9.5.3 may not build together; scaffold build is the first gate~~ RESOLVED by plan 01-01 (target set green on device; Compose BOM held at 2026.09.00 until platforms;android-37.2 is installed)
+- [Phase 1]: MIUI on the Redmi asks "Install via USB?" for every adb install and auto-denies after about 10 s (INSTALL_FAILED_USER_RESTRICTED). Unattended installs need the user to tick "Remember my choice" once on that prompt
 - [Phase 2, 4]: No consented palm photo set exists yet (20-40 labelled photos, kept out of git); needed for the model bake-off and guidance calibration
 - [Phase 2]: Palm model winner (Sonnet 5.5 vs Haiku 5.5) needs user sign-off after the eval
 - [Phase 4]: Handedness and palm-facing thresholds need on-device calibration; verify MediaPipe 16 KB-aligned native libs
