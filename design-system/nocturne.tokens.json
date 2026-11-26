@@ -1,0 +1,636 @@
+{
+  "$schema": "https://design-tokens.org/schema.json",
+  "$description": "Nocturne design tokens for [AppName] (dark only). Exported from the Figma variables 'Nocturne / Color' and 'Nocturne / Dimension'. Dimensions are Android dp.",
+  "color": {
+    "bg": {
+      "base": {
+        "$value": "#0B0820",
+        "$type": "color"
+      },
+      "deep": {
+        "$value": "#07051A",
+        "$type": "color"
+      },
+      "raised": {
+        "$value": "#1A1240",
+        "$type": "color"
+      },
+      "camera": {
+        "$value": "#05040E",
+        "$type": "color"
+      }
+    },
+    "surface": {
+      "card": {
+        "$value": "#1C1645",
+        "$type": "color"
+      },
+      "card-hi": {
+        "$value": "#2A2160",
+        "$type": "color"
+      },
+      "scrim": {
+        "$value": "#000000",
+        "$type": "color"
+      }
+    },
+    "text": {
+      "primary": {
+        "$value": "#F4F1FF",
+        "$type": "color"
+      },
+      "muted": {
+        "$value": "#B4ACDB",
+        "$type": "color"
+      },
+      "on-primary": {
+        "$value": "#FFFFFF",
+        "$type": "color"
+      },
+      "on-accent": {
+        "$value": "#1A1233",
+        "$type": "color"
+      }
+    },
+    "brand": {
+      "primary": {
+        "$value": "#6A4CF5",
+        "$type": "color"
+      },
+      "primary-deep": {
+        "$value": "#5B3FE6",
+        "$type": "color"
+      },
+      "primary-hi": {
+        "$value": "#7A4EF2",
+        "$type": "color"
+      },
+      "link": {
+        "$value": "#A99BFF",
+        "$type": "color"
+      }
+    },
+    "accent": {
+      "gold": {
+        "$value": "#F2C66D",
+        "$type": "color"
+      }
+    },
+    "status": {
+      "error": {
+        "$value": "#FF8A8A",
+        "$type": "color"
+      },
+      "success": {
+        "$value": "#6EE7B7",
+        "$type": "color"
+      },
+      "warning": {
+        "$value": "#FFD27A",
+        "$type": "color"
+      }
+    },
+    "border": {
+      "hairline": {
+        "$value": "#A99BFF",
+        "$type": "color"
+      }
+    },
+    "focus": {
+      "ring": {
+        "$value": "#F2C66D",
+        "$type": "color"
+      }
+    },
+    "palm": {
+      "heart": {
+        "$value": "#FF7A9A",
+        "$type": "color"
+      },
+      "head": {
+        "$value": "#7CC4FF",
+        "$type": "color"
+      },
+      "life": {
+        "$value": "#6EE7B7",
+        "$type": "color"
+      },
+      "fate": {
+        "$value": "#F2C66D",
+        "$type": "color"
+      },
+      "sun": {
+        "$value": "#FFA94D",
+        "$type": "color"
+      }
+    },
+    "ad": {
+      "outline": {
+        "$value": "#B4ACDB",
+        "$type": "color"
+      }
+    }
+  },
+  "dimension": {
+    "space": {
+      "2": {
+        "$value": "2px",
+        "$type": "dimension"
+      },
+      "4": {
+        "$value": "4px",
+        "$type": "dimension"
+      },
+      "8": {
+        "$value": "8px",
+        "$type": "dimension"
+      },
+      "12": {
+        "$value": "12px",
+        "$type": "dimension"
+      },
+      "16": {
+        "$value": "16px",
+        "$type": "dimension"
+      },
+      "20": {
+        "$value": "20px",
+        "$type": "dimension"
+      },
+      "24": {
+        "$value": "24px",
+        "$type": "dimension"
+      },
+      "32": {
+        "$value": "32px",
+        "$type": "dimension"
+      },
+      "48": {
+        "$value": "48px",
+        "$type": "dimension"
+      }
+    },
+    "radius": {
+      "xs": {
+        "$value": "4px",
+        "$type": "dimension"
+      },
+      "sm": {
+        "$value": "8px",
+        "$type": "dimension"
+      },
+      "md": {
+        "$value": "16px",
+        "$type": "dimension"
+      },
+      "lg": {
+        "$value": "24px",
+        "$type": "dimension"
+      },
+      "xl": {
+        "$value": "32px",
+        "$type": "dimension"
+      },
+      "pill": {
+        "$value": "999px",
+        "$type": "dimension"
+      }
+    },
+    "size": {
+      "touch-min": {
+        "$value": "48px",
+        "$type": "dimension"
+      },
+      "button": {
+        "$value": "52px",
+        "$type": "dimension"
+      },
+      "icon": {
+        "$value": "24px",
+        "$type": "dimension"
+      }
+    }
+  },
+  "font": {
+    "family": {
+      "display": {
+        "$value": "Cormorant Garamond",
+        "$type": "fontFamily"
+      },
+      "ui": {
+        "$value": "Manrope",
+        "$type": "fontFamily"
+      }
+    }
+  },
+  "typography": {
+    "Display": {
+      "XL": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{font.family.display}",
+          "fontWeight": 600,
+          "fontSize": "40px",
+          "lineHeight": "44px",
+          "letterSpacing": "0.00em"
+        }
+      },
+      "L": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{font.family.display}",
+          "fontWeight": 600,
+          "fontSize": "32px",
+          "lineHeight": "38px",
+          "letterSpacing": "0.00em"
+        }
+      },
+      "M": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{font.family.display}",
+          "fontWeight": 600,
+          "fontSize": "26px",
+          "lineHeight": "32px",
+          "letterSpacing": "0.00em"
+        }
+      },
+      "S": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{font.family.display}",
+          "fontWeight": 600,
+          "fontSize": "22px",
+          "lineHeight": "28px",
+          "letterSpacing": "0.00em"
+        }
+      }
+    },
+    "Title": {
+      "M": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{font.family.ui}",
+          "fontWeight": 700,
+          "fontSize": "17px",
+          "lineHeight": "24px",
+          "letterSpacing": "0.00em"
+        }
+      }
+    },
+    "Body": {
+      "L": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{font.family.ui}",
+          "fontWeight": 500,
+          "fontSize": "15px",
+          "lineHeight": "22px",
+          "letterSpacing": "0.00em"
+        }
+      },
+      "M": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{font.family.ui}",
+          "fontWeight": 400,
+          "fontSize": "14px",
+          "lineHeight": "20px",
+          "letterSpacing": "0.00em"
+        }
+      }
+    },
+    "Label": {
+      "L": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{font.family.ui}",
+          "fontWeight": 700,
+          "fontSize": "16px",
+          "lineHeight": "20px",
+          "letterSpacing": "0.00em"
+        }
+      },
+      "M": {
+        "$type": "typography",
+        "$value": {
+          "fontFamily": "{font.family.ui}",
+          "fontWeight": 600,
+          "fontSize": "13px",
+          "lineHeight": "18px",
+          "letterSpacing": "0.00em"
+        }
+      }
+    },
+    "Caption": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.ui}",
+        "fontWeight": 400,
+        "fontSize": "12px",
+        "lineHeight": "16px",
+        "letterSpacing": "0.00em"
+      }
+    },
+    "Overline": {
+      "$type": "typography",
+      "$value": {
+        "fontFamily": "{font.family.ui}",
+        "fontWeight": 700,
+        "fontSize": "12px",
+        "lineHeight": "16px",
+        "letterSpacing": "0.12em"
+      }
+    }
+  },
+  "shadow": {
+    "Glow": {
+      "Primary": {
+        "$type": "shadow",
+        "$value": {
+          "color": "#6A4CF573",
+          "offsetX": "0px",
+          "offsetY": "8px",
+          "blur": "24px",
+          "spread": "0px"
+        }
+      },
+      "Card": {
+        "$type": "shadow",
+        "$value": {
+          "color": "#6A4CF538",
+          "offsetX": "0px",
+          "offsetY": "8px",
+          "blur": "28px",
+          "spread": "0px"
+        }
+      },
+      "Orb": {
+        "$type": "shadow",
+        "$value": {
+          "color": "#8B6CFF99",
+          "offsetX": "0px",
+          "offsetY": "0px",
+          "blur": "28px",
+          "spread": "0px"
+        }
+      }
+    },
+    "Elevation": {
+      "Sheet": {
+        "$type": "shadow",
+        "$value": {
+          "color": "#00000080",
+          "offsetX": "0px",
+          "offsetY": "-8px",
+          "blur": "32px",
+          "spread": "0px"
+        }
+      },
+      "Dialog": {
+        "$type": "shadow",
+        "$value": {
+          "color": "#0000008C",
+          "offsetX": "0px",
+          "offsetY": "16px",
+          "blur": "48px",
+          "spread": "0px"
+        }
+      }
+    }
+  },
+  "gradient": {
+    "primary": {
+      "$type": "gradient",
+      "$value": [
+        {
+          "color": "#5B3FE6",
+          "position": 0
+        },
+        {
+          "color": "#7A4EF2",
+          "position": 1
+        }
+      ]
+    },
+    "hero": {
+      "$type": "gradient",
+      "$value": [
+        {
+          "color": "#4B33C9",
+          "position": 0
+        },
+        {
+          "color": "#7A4EF2",
+          "position": 1
+        }
+      ]
+    },
+    "sky": {
+      "$type": "gradient",
+      "$value": [
+        {
+          "color": "#1A1240",
+          "position": 0
+        },
+        {
+          "color": "#0B0820",
+          "position": 0.55
+        },
+        {
+          "color": "#07051A",
+          "position": 1
+        }
+      ]
+    },
+    "foil-border": {
+      "$type": "gradient",
+      "$value": [
+        {
+          "color": "#C9BCFFBF",
+          "position": 0
+        },
+        {
+          "color": "#F2C66D8C",
+          "position": 0.45
+        },
+        {
+          "color": "#A99BFF1F",
+          "position": 1
+        }
+      ]
+    },
+    "card": {
+      "$type": "gradient",
+      "$value": [
+        {
+          "color": "#2A2066",
+          "position": 0
+        },
+        {
+          "color": "#150F38",
+          "position": 1
+        }
+      ]
+    },
+    "hero-aurora": {
+      "$type": "gradient",
+      "$value": [
+        {
+          "color": "#3420A8",
+          "position": 0
+        },
+        {
+          "color": "#6A4CF5",
+          "position": 0.55
+        },
+        {
+          "color": "#B04BF0",
+          "position": 1
+        }
+      ]
+    }
+  },
+  "duration": {
+    "instant": {
+      "$value": "100ms",
+      "$type": "duration"
+    },
+    "press": {
+      "$value": "150ms",
+      "$type": "duration"
+    },
+    "quick": {
+      "$value": "200ms",
+      "$type": "duration"
+    },
+    "standard": {
+      "$value": "300ms",
+      "$type": "duration"
+    },
+    "emphasized": {
+      "$value": "450ms",
+      "$type": "duration"
+    },
+    "reveal": {
+      "$value": "600ms",
+      "$type": "duration"
+    },
+    "ambient-fast": {
+      "$value": "2400ms",
+      "$type": "duration"
+    },
+    "ambient": {
+      "$value": "4000ms",
+      "$type": "duration"
+    },
+    "ambient-slow": {
+      "$value": "40000ms",
+      "$type": "duration"
+    }
+  },
+  "semantic": {
+    "primary": {
+      "$value": "{color.brand.primary}",
+      "$type": "color"
+    },
+    "on-primary": {
+      "$value": "{color.text.on-primary}",
+      "$type": "color"
+    },
+    "secondary": {
+      "$value": "{color.brand.link}",
+      "$type": "color"
+    },
+    "on-secondary": {
+      "$value": "{color.bg.base}",
+      "$type": "color"
+    },
+    "accent": {
+      "$value": "{color.accent.gold}",
+      "$type": "color"
+    },
+    "on-accent": {
+      "$value": "{color.text.on-accent}",
+      "$type": "color"
+    },
+    "background": {
+      "$value": "{color.bg.base}",
+      "$type": "color"
+    },
+    "foreground": {
+      "$value": "{color.text.primary}",
+      "$type": "color"
+    },
+    "card": {
+      "$value": "{color.surface.card}",
+      "$type": "color"
+    },
+    "card-foreground": {
+      "$value": "{color.text.primary}",
+      "$type": "color"
+    },
+    "muted": {
+      "$value": "{color.surface.card-hi}",
+      "$type": "color"
+    },
+    "muted-foreground": {
+      "$value": "{color.text.muted}",
+      "$type": "color"
+    },
+    "border": {
+      "$value": "{color.border.hairline}",
+      "$type": "color"
+    },
+    "destructive": {
+      "$value": "{color.status.error}",
+      "$type": "color"
+    },
+    "on-destructive": {
+      "$value": "{color.text.on-accent}",
+      "$type": "color"
+    },
+    "ring": {
+      "$value": "{color.focus.ring}",
+      "$type": "color"
+    }
+  },
+  "cubicBezier": {
+    "standard": {
+      "$value": [
+        0.2,
+        0,
+        0,
+        1
+      ],
+      "$type": "cubicBezier"
+    },
+    "emphasized-decelerate": {
+      "$value": [
+        0.05,
+        0.7,
+        0.1,
+        1
+      ],
+      "$type": "cubicBezier"
+    },
+    "emphasized-accelerate": {
+      "$value": [
+        0.3,
+        0,
+        0.8,
+        0.15
+      ],
+      "$type": "cubicBezier"
+    },
+    "gentle-sine": {
+      "$value": [
+        0.37,
+        0,
+        0.63,
+        1
+      ],
+      "$type": "cubicBezier"
+    }
+  }
+}
