@@ -7,10 +7,10 @@
 
 ### Foundation
 
-- [ ] **FND-01**: Developer can build and install the debug app on the test phone from the command line (Kotlin 2.4 / AGP 9.5 / Hilt / KSP / Room 3 / Navigation 3 toolchain builds green; fallbacks documented)
+- [x] **FND-01**: Developer can build and install the debug app on the test phone from the command line (Kotlin 2.4 / AGP 9.5 / Hilt / KSP / Room 3 / Navigation 3 toolchain builds green; fallbacks documented)
 - [ ] **FND-02**: Every screen uses the Nocturne theme generated from `design-system/nocturne.tokens.json` (colours, type scale, shapes, glows) with edge-to-edge layout at targetSdk 36, minSdk 26
 - [ ] **FND-03**: Content screens show the layered animated cosmic background; it is static when system animations are off and absent on camera and generating screens
-- [ ] **FND-04**: The phone can reach the local FastAPI backend's health endpoint over `adb reverse` (debug-only cleartext to 127.0.0.1; Python 3.13 pinned)
+- [x] **FND-04**: The phone can reach the local FastAPI backend's health endpoint over `adb reverse` (debug-only cleartext to 127.0.0.1; Python 3.13 pinned)
 - [x] **FND-05**: Client and server share a versioned palm-reading contract (JSON schema + sample) with normalised 0–1 trace coordinates and a `trace_source` per line
 
 ### Onboarding
@@ -123,10 +123,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FND-01 | Phase 1 | Pending |
+| FND-01 | Phase 1 | Complete |
 | FND-02 | Phase 1 | Pending |
 | FND-03 | Phase 3 | Pending |
-| FND-04 | Phase 1 | Pending |
+| FND-04 | Phase 1 | Complete |
 | FND-05 | Phase 1 | Complete |
 | ONB-01 | Phase 3 | Pending |
 | ONB-02 | Phase 3 | Pending |
