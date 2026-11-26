@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 1
 current_phase_name: Foundations & Contract
 status: executing
-stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-11-26T10:56:44.810Z"
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-11-26T11:13:17.367Z"
 last_activity: 2026-11-26
 last_activity_desc: Phase 1 execution started
-state_head: 9e3feb54563458baedcb9ed0af404fdff5d73983
+state_head: f54957d46f82c7ae8f3b9bfa8c8a2d0f2e42c91f
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-11-26)
 ## Current Position
 
 Phase: 1 (Foundations & Contract) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-11-26 — Phase 1 execution started
 
@@ -59,6 +59,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 1 P01 | 19 min | 2 tasks | 38 files |
 | Phase 01 P02 | 4 min | 2 tasks | 10 files |
 | Phase 01 P03 | 7 min | 2 tasks | 10 files |
+| Phase 01 P04 | 14 min | 2 tasks | 26 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,8 @@ Recent decisions affecting current work:
 - [Phase 01]: PalmReading v1 frozen: Pydantic models author contracts/palm_reading.v1.schema.json (drift-tested); invariants enforced by model_validators; Kotlin DTOs strict-decode the same samples
 - [Phase 01]: Stopped backend behind adb reverse = clean close (OkHttp end-of-stream/EOF), shown on the phone as 'No response: start tools/run-backend.sh'
 - [Phase 01]: /healthz returns exactly {status, anthropic_key: configured|missing}; Settings reads an absolute backend env path; blank key counts as missing
+- [Phase 01]: 01-04: google/fonts pinned at 6ebe737e (FONTS_SHA in tools/fonts.sh); fontTools 4.68.0 run via uv run python -I -m (not uvx) so reads of downloaded fonts are isolated
+- [Phase 01]: 01-04: generator emits NocturneColors.ByPath and NocturneTypeSpecs.ByName so showcase lists never hand-copy token paths or names
 
 ### Pending Todos
 
@@ -100,6 +103,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-26T10:56:44.791Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-11-26T11:13:17.348Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None
