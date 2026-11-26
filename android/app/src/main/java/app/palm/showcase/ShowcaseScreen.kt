@@ -28,6 +28,10 @@ import app.palm.core.designsystem.LocalNocturne
 import app.palm.core.designsystem.NocturneColors
 import app.palm.core.designsystem.NocturneSpace
 import app.palm.core.designsystem.NocturneSize
+import app.palm.core.designsystem.components.FeatureCard
+import app.palm.core.designsystem.components.NocturneButton
+import app.palm.core.designsystem.components.NocturneButtonStyle
+import app.palm.core.designsystem.components.NocturneChip
 import app.palm.core.designsystem.devanagariSafe
 
 private const val PALM = "palm."
@@ -44,6 +48,7 @@ fun ShowcaseScreen(statusViewModel: BackendStatusViewModel) {
         LazyColumn(contentPadding = padding, verticalArrangement = Arrangement.spacedBy(NocturneSpace.S24)) {
             item { Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall) }
             item { BackendStatusRow(statusViewModel) }
+            item { Section("Components") { Components() } }
             item { Section("Colours") { SwatchGrid(roles.map { it.key to it.value }) } }
             item { Section("Palm lines") { SwatchGrid(palm.map { it.key to it.value }) } }
             item { Section("Type") { TypeSamples() } }
@@ -77,6 +82,18 @@ private fun SwatchGrid(swatches: List<Pair<String, Color>>) {
                 Text(path, style = MaterialTheme.typography.bodySmall)
             }
         }
+    }
+}
+
+@Composable
+private fun Components() {
+    Column(verticalArrangement = Arrangement.spacedBy(NocturneSpace.S16)) {
+        NocturneButton("Primary", onClick = {}, Modifier.fillMaxWidth())
+        NocturneButton("Secondary", onClick = {}, Modifier.fillMaxWidth(), style = NocturneButtonStyle.Secondary)
+        NocturneButton("Ghost", onClick = {}, Modifier.fillMaxWidth(), style = NocturneButtonStyle.Ghost)
+        NocturneButton("Scan again", onClick = {}, Modifier.fillMaxWidth(), adChip = true)
+        NocturneChip("Chip")
+        FeatureCard("Feature card", "Gradient fill, foil border and the card glow, all from tokens.", Modifier.fillMaxWidth())
     }
 }
 

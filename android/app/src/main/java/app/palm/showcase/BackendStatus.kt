@@ -1,8 +1,7 @@
 package app.palm.showcase
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -11,6 +10,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import app.palm.BuildConfig
+import app.palm.core.designsystem.LocalNocturne
+import app.palm.core.designsystem.NocturneColors
+import app.palm.core.designsystem.NocturneSemantic
+import app.palm.core.designsystem.NocturneSpace
+import app.palm.core.designsystem.components.NocturneButton
+import app.palm.core.designsystem.components.NocturneButtonStyle
+import app.palm.core.designsystem.components.NocturneChip
 import app.palm.core.network.HealthClient
 import app.palm.core.network.HealthResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -54,16 +60,17 @@ class BackendStatusViewModel @Inject constructor(private val health: HealthClien
 @Composable
 fun BackendStatusRow(viewModel: BackendStatusViewModel, modifier: Modifier = Modifier) {
     val status by viewModel.state.collectAsStateWithLifecycle()
-    Column(modifier) {
+    val caption = LocalNocturne.current.type.caption
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(NocturneSpace.S8)) {
         when (val s = status) {
-            BackendStatus.Checking -> Text("Backend: Checking…")
-            BackendStatus.Connected -> Text("Backend: Connected")
+            BackendStatus.Checking -> NocturneChip("Backend: Checking…", dotColor = NocturneSemantic.MutedForeground)
+            BackendStatus.Connected -> NocturneChip("Backend: Connected", dotColor = NocturneColors.StatusSuccess)
             is BackendStatus.Unreachable -> {
-                Text("Backend: Unreachable")
-                Text(s.cause, style = MaterialTheme.typography.bodySmall)
+                NocturneChip("Backend: Unreachable", dotColor = NocturneColors.StatusError)
+                Text(s.cause, style = caption, color = NocturneSemantic.MutedForeground)
             }
         }
-        Text(BuildConfig.BASE_URL, style = MaterialTheme.typography.bodySmall)
-        OutlinedButton(onClick = viewModel::retry) { Text("Retry") }
+        Text(BuildConfig.BASE_URL, style = caption, color = NocturneSemantic.MutedForeground)
+        NocturneButton("Retry", onClick = viewModel::retry, style = NocturneButtonStyle.Ghost)
     }
 }
