@@ -24,7 +24,6 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### Phase 1: Foundations & Contract
 
 **Goal:** The project builds, installs and runs on the physical phone with the Nocturne theme, the phone can reach the local backend, and client and server share one frozen, versioned palm-reading contract.
-**Mode:** mvp
 **Depends on**: Nothing (first phase)
 **Requirements**: FND-01, FND-02, FND-04, FND-05
 **Success Criteria** (what must be TRUE):
