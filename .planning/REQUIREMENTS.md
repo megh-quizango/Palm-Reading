@@ -123,12 +123,54 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (filled by roadmap) | | |
+| FND-01 | Phase 1 | Pending |
+| FND-02 | Phase 1 | Pending |
+| FND-03 | Phase 3 | Pending |
+| FND-04 | Phase 1 | Pending |
+| FND-05 | Phase 1 | Pending |
+| ONB-01 | Phase 3 | Pending |
+| ONB-02 | Phase 3 | Pending |
+| ONB-03 | Phase 3 | Pending |
+| ONB-04 | Phase 3 | Pending |
+| ONB-05 | Phase 3 | Pending |
+| ONB-06 | Phase 3 | Pending |
+| HOME-01 | Phase 3 | Pending |
+| HOME-02 | Phase 3 | Pending |
+| HOME-03 | Phase 5 | Pending |
+| HOME-04 | Phase 3 | Pending |
+| SCAN-01 | Phase 3 | Pending |
+| SCAN-02 | Phase 4 | Pending |
+| SCAN-03 | Phase 4 | Pending |
+| SCAN-04 | Phase 4 | Pending |
+| SCAN-05 | Phase 4 | Pending |
+| SCAN-06 | Phase 4 | Pending |
+| SCAN-07 | Phase 4 | Pending |
+| READ-01 | Phase 6 | Pending |
+| READ-02 | Phase 2 | Pending |
+| READ-03 | Phase 5 | Pending |
+| READ-04 | Phase 2 | Pending |
+| READ-05 | Phase 2 | Pending |
+| READ-06 | Phase 2 | Pending |
+| READ-07 | Phase 2 | Pending |
+| READ-08 | Phase 6 | Pending |
+| READ-09 | Phase 6 | Pending |
+| READ-10 | Phase 2 | Pending |
+| RES-01 | Phase 5 | Pending |
+| RES-02 | Phase 5 | Pending |
+| RES-03 | Phase 5 | Pending |
+| RES-04 | Phase 5 | Pending |
+| RES-05 | Phase 5 | Pending |
+| RES-06 | Phase 5 | Pending |
+| RES-07 | Phase 5 | Pending |
+| ADS-01 | Phase 6 | Pending |
+| ADS-02 | Phase 6 | Pending |
+| ADS-03 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 42 total
-- Mapped to phases: 0 (pending roadmap)
+- Mapped to phases: 42
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-11-26*
-*Last updated: 2026-11-26 after initial definition*
+*Last updated: 2026-11-26 after roadmap creation (traceability filled)*
