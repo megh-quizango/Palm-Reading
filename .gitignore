@@ -8,3 +8,18 @@ replica/screens/
 tools/adb/shots/
 
 __pycache__/
+
+# Android build output and local config
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.kotlin/
+android/.idea/
+
+# Backend venv and secrets (this repo is public)
+backend/.venv/
+backend/.env
+.env
+*.jks
+*.keystore
