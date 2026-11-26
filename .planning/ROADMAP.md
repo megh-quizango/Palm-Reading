@@ -33,14 +33,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `GET /healthz` on the local FastAPI backend (Python 3.13 pinned) answers from the phone over `adb reverse` at `127.0.0.1`, and the app shows that the backend is reachable; cleartext is allowed in debug only.
   4. `contracts/` holds a versioned palm-reading JSON schema and a sample reading that both the Kotlin and the Pydantic side parse unchanged; trace coordinates are normalised 0-1, each line carries a `trace_source`, and an unusable photo is a successful reading with `verdict.ok=false` and one of 7 reason codes.
 
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans executed
 
 Plans:
 - [x] 01-01-PLAN.md — Walking skeleton: one command installs the target-toolchain app on the phone and it shows the backend Connected; Room 3 on device; toolchain gate recorded (wave 1)
 - [x] 01-02-PLAN.md — Frozen PalmReading v1 contract: Pydantic models, exported schema, samples parsed unchanged by Pydantic and Kotlin DTOs (wave 2)
 - [x] 01-03-PLAN.md — Backend diagnosis on the phone (Unreachable cause, base URL, Retry), /healthz key configured/missing, device-detection tests, README (wave 2)
 - [x] 01-04-PLAN.md — Nocturne theme generated from tokens: colours, shapes, bundled OFL fonts with Devanagari fallback, 11 text styles on the showcase (wave 3)
-- [ ] 01-05-PLAN.md — Showcase components with glows, restyled status chip, animated star background (static under reduce motion), orb launcher icon, phase-end visual check (wave 4)
+- [x] 01-05-PLAN.md — Showcase components with glows, restyled status chip, animated star background (static under reduce motion), orb launcher icon, phase-end visual check (wave 4)
 
 **UI hint**: yes
 
@@ -132,7 +132,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6. After Phase 1,
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundations & Contract | 4/5 | In Progress | - |
+| 1. Foundations & Contract | 5/5 | In Progress | - |
 | 2. Reading Pipeline | 0/TBD | Not started | - |
 | 3. Client Shell | 0/TBD | Not started | - |
 | 4. Scan Loop | 0/TBD | Not started | - |

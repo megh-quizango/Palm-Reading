@@ -2,17 +2,17 @@
 gsd_state_version: "1.0"
 current_phase: 1
 current_phase_name: Foundations & Contract
-status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-11-26T11:13:17.367Z"
+status: verifying
+stopped_at: Completed 01-05-PLAN.md (phase-end visual check pending)
+last_updated: "2026-11-26T11:27:35.990Z"
 last_activity: 2026-11-26
 last_activity_desc: Phase 1 execution started
-state_head: f54957d46f82c7ae8f3b9bfa8c8a2d0f2e42c91f
+state_head: aca129a024d92c926fd81da489d40c9259c806fe
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-11-26)
 
 Phase: 1 (Foundations & Contract) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-11-26 — Phase 1 execution started
 
 Progress: [░░░░░░░░░░] 0%
@@ -60,6 +60,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P02 | 4 min | 2 tasks | 10 files |
 | Phase 01 P03 | 7 min | 2 tasks | 10 files |
 | Phase 01 P04 | 14 min | 2 tasks | 26 files |
+| Phase 01 P05 | 14 min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,8 @@ Recent decisions affecting current work:
 - [Phase 01]: /healthz returns exactly {status, anthropic_key: configured|missing}; Settings reads an absolute backend env path; blank key counts as missing
 - [Phase 01]: 01-04: google/fonts pinned at 6ebe737e (FONTS_SHA in tools/fonts.sh); fontTools 4.68.0 run via uv run python -I -m (not uvx) so reads of downloaded fonts are isolated
 - [Phase 01]: 01-04: generator emits NocturneColors.ByPath and NocturneTypeSpecs.ByName so showcase lists never hand-copy token paths or names
+- [Phase 01]: Effects.kt is the single token-to-Compose conversion point: dropShadow glows and CSS-angle gradient brushes; components pass NocturneGradientAngles constants
+- [Phase 01]: NocturneBackground: seeded 60-star sky, animated values read only in drawBehind, no transition under reduceMotion; content in its own graphicsLayer
 
 ### Pending Todos
 
@@ -103,6 +106,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-26T11:13:17.348Z
-Stopped at: Completed 01-04-PLAN.md
+Last session: 2026-11-26T11:27:35.969Z
+Stopped at: Completed 01-05-PLAN.md (phase-end visual check pending)
 Resume file: None
