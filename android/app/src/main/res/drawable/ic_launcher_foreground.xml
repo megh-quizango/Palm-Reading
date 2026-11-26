@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 108 dp canvas; all artwork inside the central 66 dp safe zone (radius 33 around 54,54) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- orb -->
+    <path
+        android:fillColor="@color/nocturne_accent_gold"
+        android:pathData="M54,34a20,20 0,1 1,0 40a20,20 0,1 1,0 -40z" />
+    <!-- ring -->
+    <path
+        android:pathData="M54,25a29,29 0,1 1,0 58a29,29 0,1 1,0 -58z"
+        android:strokeWidth="2"
+        android:strokeColor="@color/nocturne_brand_link" />
+</vector>
