@@ -16,11 +16,11 @@ Confidence tags: **[O]** observed in the artifact · **[I]** inferred from names
 
 A spiritual and entertainment app built around one hook: **"point your camera at your palm and AI reads your love, career and life lines."** Several cheap-to-serve content modules sit around that hook to drive daily return visits: tarot, horoscopes, a Vedic birth chart, a moon sign, a "soul energy" profile, a love-compatibility test, a daily lucky report, and an LLM chat with a mystic persona.
 
-> **On-device check (§16):** on a fresh install in India, the paywall never appeared. Every gate was a rewarded ad, and interstitials fired on almost every navigation. Treat the paywall below as switched on by remote config, not the default experience.
+> **On-device check (§16):** on a fresh install in India, the paywall never appeared. Every gate was a rewarded ad, and interstitials fired on almost every navigation. **Decision (2026-11-26): the rebuild ships with no paywall and no in-app purchases.** Monetisation is ads only; rewarded ads are the only gate.
 
-The money comes from a **hybrid model**: aggressive ad monetisation (AppLovin MAX mediation, with app-open, interstitial, native, rewarded and lock-screen placements), plus a **subscription/lifetime IAP** that removes ads and lifts free-usage limits. Retention runs on an unusually heavy **notification and lock-screen engine**.
+The original makes money from aggressive ad monetisation (AppLovin MAX mediation, with app-open, interstitial, native, rewarded and lock-screen placements). Its code also contains a subscription paywall, but it never appeared on device and **is out of scope for the rebuild**. Retention runs on an unusually heavy **notification and lock-screen engine**.
 
-**Core loop:** Install → onboarding (language, name, birth data) → **palm scan** → result (Palm / Love / Career tabs) → "Ask AI about this" chat → paywall or ad gates → daily notification brings the user back to the daily report, tarot or horoscope.
+**Core loop:** Install → onboarding (language, name, birth data) → **palm scan** → result (Palm / Love / Career tabs) → "Ask AI about this" chat → rewarded-ad gates → daily notification brings the user back to the daily report, tarot or horoscope.
 
 **Target user [I]:** mass-market users in South Asia, SEA and LatAm who are interested in astrology. Evidence: Vedic and Indian astrology terms (Lagna, Rasi, Dasha, Rahu/Ketu, Sanskrit sign names like Mesha and Kumbha), North and South Indian chart styles, and 49 UI locales including hi, bn, ta, te, mr, gu, kn, ml, or, ur, my, km and in.
 
@@ -32,7 +32,7 @@ The money comes from a **hybrid model**: aggressive ad monetisation (AppLovin MA
 1. A palm reading in under 30 s from app open, with a visual overlay of the detected lines.
 2. At least 8 engagement modules that can be gated for monetisation.
 3. Day-1 retention through the daily report and scheduled notifications.
-4. Revenue from both ads (ARPDAU) and IAP (trial-to-paid conversion).
+4. Revenue from ads (ARPDAU), with rewarded ads gating repeat use.
 5. Localise to the top 10 locales at launch and 40+ later.
 
 **Non-goals (v1)**
@@ -54,11 +54,11 @@ Screen IDs come from the original's navigation destinations (`com.ai.palmai.doma
 | S03 | Onboarding (`ScrOnboard`) | 3 intro pages (`onboard_1..3`) | pager, native ad above Next | per page, ad loaded or not |
 | S04 | Info: Name (`ScrInfoName`) | Collect first name and gender | text field, gender chips (Male/Female/Other) | empty, filled, validation |
 | S05 | Info: Birth (`ScrInfoBirth`) | Collect DOB (and time) | date/time picker | empty, filled |
-| S06 | Home (`ScrHome`) | Hub: time-of-day greeting with name, "What's new" carousel, feature tiles, exit dialog | greeting, feature cards, NEW badge, native ads top and bottom | first visit, returning, premium (no ads), exit confirm |
+| S06 | Home (`ScrHome`) | Hub: time-of-day greeting with name, "What's new" carousel, feature tiles, exit dialog | greeting, feature cards, NEW badge, native ads top and bottom | first visit, returning, exit confirm |
 | S07 | Hand selection (`ScrHandSelect`) | Choose left or right hand, show photo requirements and a standard example | hand toggle, example image, requirement note | — |
 | S08 | Hand scan (`ScrHandScan`) | Live camera with real-time hand guidance, capture or gallery | CameraX preview, frame overlay, live guidance chips, flash, gallery, shutter | permission denied, camera unavailable, palm detected, capture failed |
 | S09 | Generating (`ScrGenerating`) | Waiting screen while the AI analyses (palm or astrology) | animated loader, rotating copy, interstitial/native slot | loading, server busy, invalid photo |
-| S10 | Hand result (`ScrHandResult`) | Palm reading with 3 tabs: **Palm / Love / Career** | photo with line overlay, line cards (Heart, Head, Life, Fate, Sun), insights, traits, share, scan again, Ask AI, report | locked or unlocked, rewarded unlock, invalid photo |
+| S10 | Hand result (`ScrHandResult`) | Palm reading with 3 tabs: **Palm / Love / Career** | photo with line overlay, line cards (Heart, Head, Life, Fate, Sun), insights, traits, share, scan again, Ask AI, report | rewarded unlock, invalid photo |
 | S11 | Chat (`ScrChat`) | AI chat: greeting, suggested questions, "scan my palm" card | message list, streaming bubble, input, suggestion chips, read aloud (TTS), report answer | empty, streaming, quota hit, blocked, busy, unavailable |
 | S12 | Chat conversation (`ScrChatConversation`) | Resume a saved conversation | as S11 | — |
 | S13 | Chat history (`ScrChatHistory`) | List and delete past conversations | list, swipe or delete | empty state with CTA |
@@ -73,13 +73,12 @@ Screen IDs come from the original's navigation destinations (`com.ai.palmai.doma
 | S22 | Astro place (`ScrAstroPlace`) | Search birth place (geocoding) | search field, results | no places found, offline |
 | S23 | Vedic result (`ScrVedicResult`) | Rasi chart, Lagna, Moon sign, planetary details (degree, sign), current Dasha | chart graphic, planet table | — |
 | S24 | Style chart (`ScrStyleChart`) | Switch chart style: North Indian / South Indian / Western | segmented control, chart renderer | — |
-| S25 | Moon sign (`ScrMoonSign`) | Moon-sign profile: nature, needs, reactions, relationships, inner world and self-care | long-form sections | locked (premium benefit "Unlock your Moon Sign") |
-| S26 | Soul energy (`ScrSoulEnergy`) | Vedic sun-sign personality: core, mind and emotions, love, career, strengths, challenges, balance tip | sections, bullet lists | locked (premium "personality & emotions") |
+| S25 | Moon sign (`ScrMoonSign`) | Moon-sign profile: nature, needs, reactions, relationships, inner world and self-care | long-form sections | all free |
+| S26 | Soul energy (`ScrSoulEnergy`) | Vedic sun-sign personality: core, mind and emotions, love, career, strengths, challenges, balance tip | sections, bullet lists | all free |
 | S27 | Love test (`ScrLoveTest`) | Enter your name and your partner's | 2 text fields, CTA | validation "enter both names" |
 | S28 | Love checking (`ScrLoveChecking`) | Fake progress/suspense screen (ad slot) | animation | — |
 | S29 | Love result (`ScrLoveResult`) | Score % with one of 7 bands, entertainment disclaimer | score ring, band title, test again, share | — |
 | S30 | Daily report (`ScrDailyReport`) | Lucky number(s), lucky colour(s), strength, weakness, share | cards, share | — |
-| S31 | Paywall (`ScrPaywall`) | Variants by `PaywallType` (see §7.3) | plans, badges, benefits, restore, legal | loading prices, purchase ok/fail, restore empty/ok |
 | S32 | Settings (`ScrSetting`) | Language, rate, share, privacy, terms, licenses, version | list | — |
 | S33 | Licenses (`ScrLicenses`) | OSS notices (Astronomy Engine and Checker Framework under MIT) | text | — |
 | S34 | Web (`ScrWeb`) | In-app webview for privacy policy and terms | webview | offline |
@@ -103,7 +102,7 @@ F01 First run → first palm reading                         (~9 taps)
     edge: camera denied → gallery fallback; invalid photo → "Photo not accepted" with reason
           (blurry, too far, jewelry, bent, fingers too tight, incomplete, no palm lines); server busy.
     monetisation: native ads on S02/S03; interstitial after onboarding (inter_after_ob);
-          native_scan on S08/S09; free_hand_scan_count gate → paywall or rewarded.
+          native_scan on S08/S09; free_hand_scan_count gate → rewarded ad.
 
 F02 Palm result → AI chat
     S10 "Ask AI" → S11 (palm context injected) → stream answer → follow-ups
@@ -116,7 +115,7 @@ F03 Chat from home
 
 F04 Tarot daily pull                                       (4 taps)
     S06 → S14 topic → S15 pick 1 card → S16 reveal → S17 explanation (do / avoid)
-    edge: free_tarot_draw_count exhausted → rewarded ad or paywall.
+    edge: free_tarot_draw_count exhausted → rewarded ad.
     retention: "One card left to flip" notification if the user leaves before reveal.
 
 F05 Horoscope
@@ -128,17 +127,13 @@ F06 Vedic birth chart
     → S24 switch style. "Other person's astrology" stores a second profile.
 
 F07 Moon sign / soul energy
-    S06 "What's new" → S25 or S26 (derived from birth data) → locked sections → paywall.
+    S06 "What's new" → S25 or S26 (derived from birth data) → all sections free.
 
 F08 Love test                                              (4 taps)
     S06 → S27 two names → S28 checking (ad) → S29 score + band → share / test again.
 
 F09 Daily report
     Notification "Your lucky number today is…" or S06 → S30 → share.
-
-F10 Purchase
-    Any gate → S31 → choose Weekly / Monthly / Lifetime (or special offer) → Play Billing
-    → "Welcome to Premium!" → ads off, limits lifted. Restore purchase from S31.
 
 F11 Rating
     After a positive moment (rate_success_trigger) or on home (rate_home_session):
@@ -206,7 +201,7 @@ Flash toggle, gallery import, left/right hand selection (`HandSide`).
 | R-CHAT-1 | Our own persona (**rename**: the original uses a named sage). The system prompt covers warm, mystical, non-fatalistic tone; **no medical, legal or financial directives**; no death or illness predictions; self-harm escalation to helplines; never claim certainty; and an "entertainment" framing |
 | R-CHAT-2 | Inject the user profile and the latest palm reading as context. Keep the last 20 turns, summarising older ones server-side |
 | R-CHAT-3 | SSE streaming. First token in under 1.5 s at p50 |
-| R-CHAT-4 | Daily quota per install: free N/day, premium high (fair-use cap). A server-side counter keyed by install id plus Play Integrity token |
+| R-CHAT-4 | Daily quota per install: free N/day (fair-use cap). A server-side counter keyed by install id plus Play Integrity token |
 | R-CHAT-5 | Moderation pre- and post-filter. A blocked answer returns `blocked` and the UI shows the rephrase message |
 | R-CHAT-6 | The assistant may emit a structured action `request_palm_scan`, which renders the scan card |
 | R-CHAT-7 | Up to 3 follow-up suggestions returned in `done` |
@@ -230,7 +225,7 @@ Flash toggle, gallery import, left/right hand selection (`HandSide`).
 
 ### 5.6 Moon sign and soul energy (static personality content)
 
-- **[O]** Moon sign has 12 signs × 6 sections (nature, needs, reactions, relationship, inner world, self-care ritual, with the "feels most at home with" compatibility in the relationship section). Soul energy has 12 Vedic sun signs (Sanskrit names) × 7 sections (core, mind and emotions, love, career, strengths, challenges, balance tip) and a "Vedic sun sign · date range" header. Both are premium benefits on the paywall.
+- **[O]** Moon sign has 12 signs × 6 sections (nature, needs, reactions, relationship, inner world, self-care ritual, with the "feels most at home with" compatibility in the relationship section). Soul energy has 12 Vedic sun signs (Sanskrit names) × 7 sections (core, mind and emotions, love, career, strengths, challenges, balance tip) and a "Vedic sun sign · date range" header.
 - **Rebuild:** derive the Moon sign from the Vedic chart engine (needs birth time; fall back to noon with a lower-accuracy note). Write our own content, about 12 × 13 sections at 120–200 words each, bundled and localised.
 
 ### 5.7 Love test (name compatibility)
@@ -283,13 +278,10 @@ Also: `BootReceiver` (reschedules after reboot), `RECEIVE_BOOT_COMPLETED`, FCM p
 | # | Rule | Source |
 |---|---|---|
 | BL-1 | **Free usage counters** per feature: `free_hand_scan_count`, `free_tarot_draw_count`, `free_horoscope_count`, with chat on a server daily quota. Counters are local (DataStore) and mirrored server-side for chat and palm, which cost money | [O] keys |
-| BL-2 | When a counter hits 0: show the paywall (type depends on context). If the paywall is dismissed, offer a **rewarded ad to unlock one use** (`reward_unlock`) | [O] keys, [I] order |
-| BL-3 | **Premium** removes all ads, lifts free limits, unlocks Moon sign, soul energy (personality), zodiac traits, daily insight and "hyper-personalised chat", and enables the "real-time / fast scanner" | [O] paywall benefit strings |
+| BL-2 | When a counter hits 0: offer a **rewarded ad to unlock one use** (`reward_unlock`). No paywall | [O] device |
 | BL-4 | **Interstitial frequency**: after onboarding (`inter_after_ob`), on back navigation (`inter_back`), in-app taps (`inter_inapp_tap`), every N chat messages (`chat_inter_every`), with a global display delay (`inter_display_delay`) and a splash interval (`inter_splash_interval`) | [O] keys |
 | BL-5 | **High/normal floor waterfall**: many placements have a `_high` twin (e.g. `native_scan_high`, `inter_splash_high`). The app tries a high-eCPM ad unit first, then falls back to the normal one | [O] keys, [I] behaviour |
 | BL-6 | **App-open ads** on cold and warm start, with cold/hot load timeouts, a cache and a forced close-button delay (`aoa_*`) | [O] |
-| BL-7 | **Paywall type selection** (`PaywallType`, `paywall_type` remote): intro ("join millions"), VIP ("unlimited access to all"), zodiac-flavoured, and a **special offer** (discounted monthly shown as a "≈ X/week" price, triggered on exit or after a decline) | [O] strings, [I] triggers |
-| BL-8 | **Free trial** (`free_trial_period`, `end_custom_trial`): the trial is configured on the Play product. The app can also run a custom client-side trial window | [O] keys, [I] |
 | BL-9 | **Rating gating**: ask only after a success moment, never twice in a session, stop after "Don't show again" | [O] |
 | BL-10 | **Deterministic outputs**: daily report, tarot of the day and love score must stay stable within the day or name pair (trust) | [A] |
 | BL-11 | **Notification schedule** anchored to the first open, with slotting and the last-type rotation stored so the same type isn't repeated | [O] keys |
@@ -301,8 +293,8 @@ Also: `BootReceiver` (reschedules after reboot), `RECEIVE_BOOT_COMPLETED`, FCM p
 
 ### 7.1 Observed monetisation stack [O]
 - **Ads:** AppLovin MAX mediation, Google AdMob/GAM, Pangle (ByteDance), Mintegral and Vungle/Liftoff SDKs are bundled (others are listed only as adapter names), along with Meta Audience Network classes. UMP consent (GDPR/TCF). The ad config ships encrypted (`assets/ads_config.dat`) and is refreshed remotely. Ad-revenue tracking is on (`ad_revenue_enable`).
-- **IAP:** Google Play Billing with Weekly, Monthly and Lifetime plans, badges "Popular" and "Best Price", a "special offer", restore purchase, and success and failure states. Prices are fetched from Play at runtime, so **actual price points are not in the APK**.
-- **Attribution and analytics:** AppsFlyer (installs, IAP and ad revenue for UA optimisation), Facebook App Events, Firebase Analytics, Remote Config, A/B Testing, Crashlytics and Performance.
+- **IAP:** Play Billing code and paywall strings exist, but no paywall was shown on device. **Not rebuilt.**
+- **Attribution and analytics:** AppsFlyer (installs and ad revenue for UA optimisation), Facebook App Events, Firebase Analytics, Remote Config, A/B Testing, Crashlytics and Performance.
 
 ### 7.2 Ad placements (from config names)
 
@@ -317,30 +309,19 @@ Also: `BootReceiver` (reschedules after reboot), `RECEIVE_BOOT_COMPLETED`, FCM p
 
 ### 7.3 Proposed monetisation for the rebuild [A]
 
-**Plans** (Play Billing v7+). Price benchmarks for the category in tier-1 USD; localise by PPP:
+**Ads only. No paywall, no subscriptions, no in-app purchases** (decided 2026-11-26).
 
-| Plan | Price (US) | Notes |
+| Feature | Free use | Repeat use |
 |---|---|---|
-| Weekly | $4.99 with a 3-day free trial | main conversion plan, tag "Popular" |
-| Monthly | $9.99 | "Best Price"; shown as ≈ $2.49/week |
-| Lifetime | $29.99 one-time | anchor plan |
-| Special offer | Monthly at −50% (first period) | shown once after paywall dismissal or on exit |
-| India, Indonesia, Brazil | ≈ 25–35% of US prices | regional pricing |
+| Palm scan | 1 full reading | 1 rewarded ad per extra scan |
+| AI chat | N messages/day (server quota) | interstitial every 3rd message (as the original); rewarded ad for +N messages |
+| Tarot | 1 draw/day per topic | 1 rewarded ad per extra draw (single ad, not a pod of 3) |
+| Horoscope | own sign daily | 1 rewarded ad per other sign |
+| Vedic chart, moon sign, soul energy, love test, daily report | free | free (banner or native ad on screen) |
 
-**Free vs premium matrix**
+**Ad caps:** at most 1 interstitial per 90 s, none during the first reading of the first session, no interstitial on every Back press, and no auto-redirect ad formats.
 
-| Feature | Free | Premium |
-|---|---|---|
-| Palm scan | 1 full reading, then 1/day via rewarded ad | unlimited + Love and Career tabs fully open |
-| AI chat | 3 messages/day | fair use (e.g. 100/day) |
-| Tarot | 1 draw/day | unlimited + all topics |
-| Horoscope | own sign daily | all signs, weekly and monthly |
-| Vedic chart | basic chart | full planetary table, dasha, other profiles |
-| Moon sign, soul energy | first section | all sections |
-| Love test, daily report | free (ad-supported) | ad-free |
-| Ads | yes | none |
-
-**Revenue drivers and KPIs:** install → paywall view ≥ 70%, paywall → trial ≥ 6%, trial → paid ≥ 35%, D1 retention ≥ 35%, D7 ≥ 12%, ad ARPDAU (free users) $0.03–0.08 in tier-2/3 geos, blended LTV > 1.3× CPI before scaling UA.
+**KPIs:** D1 retention ≥ 35%, D7 ≥ 12%, ad ARPDAU $0.03–0.08 in tier-2/3 geos, rewarded-ad completion ≥ 70%, LTV > 1.3× CPI before scaling UA.
 
 **Unit economics, per palm reading [A]:** segmentation inference about $0.002 on a serverless GPU, LLM text about $0.002–0.01, so under $0.015 per reading. Chat costs about $0.0005–0.003 per message with a small model. Gating with rewarded ads (eCPM $5–20) covers the cost of free users.
 
@@ -352,7 +333,7 @@ Entity names follow the original's domain models **[O]**. Fields are partly **[I
 
 ```
 UserProfile (local)      id, name, gender(male|female|other), dob, birth_time?, birth_place_id?,
-                         zodiac_sign, locale, created_at, premium_state
+                         zodiac_sign, locale, created_at
 BirthProfile             id, owner(self|other), name, dob, time?, location(BirthLocation)
 BirthLocation            name, country, lat, lon, timezone        (from geocoding result)
 SavedPalmReading         id, image_uri, image_hash, hand_side(left|right), created_at,
@@ -364,13 +345,12 @@ TarotDraw                id, topic(love|luck|business|financial|health|protectio
 HoroscopeCache           sign, date, locale, text, source_lang
 VedicChart (derived)     profile_id, lagna, planets[{planet, sign, degree, house, nakshatra}], dasha{maha, antar, until}
 DailyReport (derived)    date, lucky_numbers[], lucky_colors[], strength, weakness
-Entitlement              product_id, purchase_token, type(weekly|monthly|lifetime), state, expires_at, trial(bool)
 UsageCounter             feature, date, used, limit
 Report                   target_type(reading|chat), target_id, reason, note, locale, app_version
 NotificationState        type, last_shown_at, slot, enabled
 ```
 
-**Server tables (Postgres):** `installs` (install_id, integrity_verdict, locale, first_seen), `entitlements` (verified with the Play Developer API and RTDN webhooks), `usage_daily`, `palm_jobs`, `chat_conversations` (optional; privacy allows a "no server history" mode), `reports`, `content_horoscopes`.
+**Server tables (Postgres):** `installs` (install_id, integrity_verdict, locale, first_seen), `usage_daily`, `palm_jobs`, `chat_conversations` (optional; privacy allows a "no server history" mode), `reports`, `content_horoscopes`.
 
 ---
 
@@ -385,7 +365,6 @@ NotificationState        type, last_shown_at, slot, enabled
 | Palm model | own segmentation model served on Modal, Replicate or Hugging Face Inference Endpoints, via an async job API | GPU on demand |
 | LLM | Claude Haiku-class model for chat and reading text, with a larger model for monthly content generation | cost and quality |
 | DB / cache | Postgres (Neon or Supabase) + Redis (quotas) | |
-| Billing | Play Billing + server verification + RTDN (Pub/Sub). RevenueCat is optional to speed up iOS later | |
 | Ads | AppLovin MAX (or AdMob mediation) with UMP consent | |
 | Analytics / attribution | Firebase (Analytics, Remote Config, A/B, Crashlytics), AppsFlyer or Adjust | |
 | Abuse | Play Integrity on quota-bearing endpoints, rate-limited per install | protects LLM and GPU cost |
@@ -398,8 +377,6 @@ GET  /v1/palm/jobs/{id}/events     SSE: progress | result | error(reason)
 POST /v1/chat/stream               {conversation_id, message, locale, context, history} → SSE delta/done/error
 GET  /v1/horoscope/{sign}?date&locale&period
 POST /v1/reports
-POST /v1/billing/verify            {purchase_token, product_id}
-POST /v1/billing/rtdn              Play RTDN webhook
 GET  /v1/config                    feature flags (or Firebase Remote Config)
 ```
 
@@ -426,15 +403,14 @@ The original does several things the rebuild should **not** copy:
 5. **Claims.** Every reading surface shows an "for entertainment purposes" disclaimer. No health, financial or legal predictions. Tarot "Health" and "Financial" topics stay in reflective, non-directive language.
 6. **Clean room.** Don't reuse the original's name, persona, copy, images, ad-unit IDs, API keys or backend endpoints. The original's own backend services and the third-party horoscope API it uses are not ours to call.
 7. **Licences.** Astronomy Engine (MIT: include the notice). Tarot art must be original or public domain. MediaPipe model (Apache-2.0).
-8. **Subscriptions.** Clear trial terms, an auto-renew note on every plan (the original has these), a working restore button, and a cancel link to Play subscriptions.
 
 ---
 
 ## 12. Analytics event plan
 
-`onboard_step{n}`, `onboard_completed`, `palm_scan_start`, `palm_guidance_state{state}`, `palm_upload`, `palm_result{ok|reason}`, `palm_tab{palm|love|career}`, `chat_sent`, `chat_api_failed{code}`, `tarot_draw{topic}`, `horoscope_view{sign}`, `vedic_generate`, `love_test`, `daily_report_view`, `paywall_show{type, source}`, `paywall_purchase{plan}`, `purchase_restore`, `ad_show{format, placement}`, `ad_revenue{value, network}`, `rate_value{n}`, `report_sent{target, reason}`, `noti_shown{type}`, `noti_open{type}`.
+`onboard_step{n}`, `onboard_completed`, `palm_scan_start`, `palm_guidance_state{state}`, `palm_upload`, `palm_result{ok|reason}`, `palm_tab{palm|love|career}`, `chat_sent`, `chat_api_failed{code}`, `tarot_draw{topic}`, `horoscope_view{sign}`, `vedic_generate`, `love_test`, `daily_report_view`, `ad_show{format, placement}`, `ad_revenue{value, network}`, `rate_value{n}`, `report_sent{target, reason}`, `noti_shown{type}`, `noti_open{type}`.
 
-All the names above except the ones marked as ours mirror event keys seen in the original **[O]**: `chat_sent`, `chat_api_failed`, `palm_upload`, `palm_api_failed`, `paywall_show`, `paywall_purchase`, `rate_value`, `love_test`, `daily_report`, `hand_scan`.
+All the names above except the ones marked as ours mirror event keys seen in the original **[O]**: `chat_sent`, `chat_api_failed`, `palm_upload`, `palm_api_failed`, `rate_value`, `love_test`, `daily_report`, `hand_scan`.
 
 ---
 
@@ -463,14 +439,14 @@ All the names above except the ones marked as ours mirror event keys seen in the
 | 2 Engagement | Tarot, daily report, love test, horoscope pipeline, home | 2 |
 | 3 Astrology | Vedic engine, 3 chart styles, moon sign, soul energy, geocoding | 2 |
 | 4 Chat | SSE chat, persona, quotas, history, report | 1.5 |
-| 5 Monetisation | Play Billing + server verify + RTDN, paywall variants, MAX ads with caps, rewarded unlocks, UMP | 2 |
+| 5 Monetisation | MAX ads with caps, rewarded unlocks, UMP | 1 |
 | 6 Retention | Notification engine (5 compliant types), rating flow, remote config, A/B | 1 |
 | 7 Palm model v1 | Labelled dataset (~3–5k palms, own or licensed), segmentation model, line overlay | 4–6 (parallel from week 2) |
 | 8 Hardening | Localisation, accessibility, performance, policy review, store listing | 1.5 |
 
 **The three hardest parts:**
 1. A palm-line detection model that draws believable overlays. It needs a dataset you're allowed to use.
-2. Monetisation tuning (ad caps against IAP conversion) without policy strikes.
+2. Ad tuning (caps against ARPDAU and ratings) without policy strikes.
 3. A correct Vedic chart (sidereal maths, timezone history, dasha periods).
 
 **Fast-start shortcut [A]:** v1 can skip the custom model. Send the photo to a vision-capable LLM that returns approximate line polylines and the reading JSON. Accuracy and overlay quality will be lower. Upgrade to the trained model once the retention numbers hold.
@@ -481,7 +457,7 @@ All the names above except the ones marked as ours mirror event keys seen in the
 
 1. Brand name, persona and visual direction (needed before `/replica-brand`).
 2. Target launch geos, which drive the locale list and price tiers.
-3. Ads plus IAP hybrid, or IAP-only "premium feel"? The hybrid matches the original's revenue mix but hurts ratings.
+3. ~~Ads vs IAP~~ decided: ads only, no paywall (2026-11-26).
 4. Do we store chat history server-side (for cross-device later) or keep it local only?
 5. Palm dataset source: collect with consent, buy, or LLM-only v1?
 
@@ -495,7 +471,7 @@ All the names above except the ones marked as ours mirror event keys seen in the
 
 | Topic | Static assumption | Observed on device |
 |---|---|---|
-| **Paywall** | Paywall is the main gate (§6 BL-2, §7) | **Never shown.** Not after onboarding, not on any gate, and there's no premium or restore entry in home or settings. Every gate is a **rewarded ad**. Billing code exists, but the paywall is remotely switched off for this user or market. The rebuild treats the paywall as a remote-config flag, and the observed default is ads-only |
+| **Paywall** | Paywall is the main gate (§6 BL-2, §7) | **Never shown.** Not after onboarding, not on any gate, and there's no premium or restore entry in home or settings. Every gate is a **rewarded ad**. Billing code exists, but the paywall is remotely switched off for this user or market. The rebuild drops the paywall entirely (ads only) |
 | Free limits | Counters per feature | **Palm scan:** after the first visit to the scanner (even without capturing), the Scan button shows an **"AD"** tag, meaning a rewarded ad per scan. **Horoscope:** 1 free, then "Test again · AD". **Tarot:** the 2nd reading triggered a **rewarded pod of up to 3 video ads** ("Ad 1 of 3 · Reward in 38s"). **Chat:** no quota hit after 6 messages |
 | Chat interstitial | `chat_inter_every` = N | **N = 3.** A full-screen interstitial fires as message 3 and message 6 are sent |
 | Love test | Deterministic, order-independent (our design) | **Confirmed in the original:** Alex+Sam = 80% "A beautiful match" twice, Sam+Alex = 80%, and changing genders didn't change it. The score depends only on the names |
@@ -537,12 +513,11 @@ All the names above except the ones marked as ours mirror event keys seen in the
 2. **Ads auto-opened the Google Play install sheet** with no deliberate click ("You will be taken to the website after the ad"). This is an auto-redirect ad format and a policy risk.
 3. The rating prompt appears after every result, which breaks Google's in-app review guidance (don't prompt repeatedly).
 
-**Implication for the rebuild:** the original is effectively an **ad-monetised app** in this market. Interstitials sit on nearly every navigation, rewarded ads gate every repeat use, and banners and natives fill the screens. The PRD's hybrid model (§7.3) stays the recommendation, but with the paywall **on** by default, ad caps, and none of the three problems above.
+**Implication for the rebuild:** the original is effectively an **ad-monetised app** in this market. Interstitials sit on nearly every navigation, rewarded ads gate every repeat use, and banners and natives fill the screens. The rebuild follows the same ads-only model (§7.3), with ad caps and none of the three problems above.
 
 ### 16.4 Still not verified
 
 - The palm-reading result itself (needs a real palm photo; deliberately not captured).
-- Paywall screens and prices (never surfaced).
 - Chat daily quota (not hit in 6 messages).
 - Tarot free count beyond 1. The order was confirmed, but the reveal ad blocked further testing.
 - Notifications (the permission was never requested during the session, and the 24 h schedules were not observed).
@@ -563,7 +538,7 @@ All the names above except the ones marked as ours mirror event keys seen in the
 | MediaPipe gesture/hand models, CameraX, ML Kit Translate | `assets/gesture_recognizer.task`, Firebase component registrars, native libs | observed |
 | Ad networks and placements | manifest activities, `lib/arm64-v8a/*`, config-key strings | observed (keys); inferred (exact behaviour) |
 | Free counters, chat interstitial cadence, notification toggles | config-key strings (`free_*`, `chat_inter_every`, `enable_noti_*`) | observed names, inferred semantics |
-| Paywall plans and benefits | `paywall_*` strings | observed |
+| Paywall plans and benefits | `paywall_*` strings | observed (out of scope) |
 | Prices, ad frequencies, counter values | not in the APK (remote config and Play) | **unknown** |
 
 **Not verified:** runtime behaviour, actual remote-config values, prices, and server response shapes beyond class names. Running the app on a device (Artemis) or configuring JADX for REA would close these gaps.

@@ -39,11 +39,11 @@ Moon sign profile (12 x 6 sections),content,should,yes,no,"device: 5 sections, a
 Soul energy profile (12 x 7 sections),content,should,yes,no,device: 7 sections all free; Vedic sun sign
 Love test by names (7 bands),love,must,yes,no,"verified deterministic, order- and gender-independent (Alex/Sam=80%)"
 Daily report lucky number/colour/strength/weakness,daily,must,yes,no,deterministic per day
-Paywall weekly/monthly/lifetime,monetisation,must,code only,no,"not shown on device (India, fresh user); remote-gated"
-Special offer paywall,monetisation,should,code only,no,not shown on device
-Paywall type variants via remote config,monetisation,should,code only,no,not shown on device
-Restore purchase,monetisation,must,code only,no,no entry in settings
-Server receipt verification + RTDN,monetisation,must,unknown,no,not visible client-side
+Paywall weekly/monthly/lifetime,monetisation,skip,code only,no,out of scope: no paywall or IAP in rebuild (2026-11-26)
+Special offer paywall,monetisation,skip,code only,no,out of scope: no paywall or IAP in rebuild (2026-11-26)
+Paywall type variants via remote config,monetisation,skip,code only,no,out of scope: no paywall or IAP in rebuild (2026-11-26)
+Restore purchase,monetisation,skip,code only,no,out of scope: no paywall or IAP in rebuild (2026-11-26)
+Server receipt verification + RTDN,monetisation,skip,unknown,no,out of scope: no paywall or IAP in rebuild (2026-11-26)
 Free-usage counters per feature,monetisation,must,yes,no,
 Rewarded ad to unlock one use,monetisation,should,yes,no,"verified: scan, horoscope (1 free), tarot (pod of up to 3)"
 App-open ad,monetisation,should,yes,no,

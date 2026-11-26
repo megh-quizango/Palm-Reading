@@ -10,11 +10,11 @@
 
 ## Next step
 
-Answer the open questions in `PRD.md` §15 (brand, launch markets, ads vs IAP, chat history storage, palm dataset), then run **`/replica-architect`** against `replica/PRD.md` and `replica/features.csv`.
+Answer the open questions in `PRD.md` §15 (brand, launch markets, chat history storage, palm dataset; ads-only with no paywall is decided), then run **`/replica-architect`** against `replica/PRD.md` and `replica/features.csv`.
 
 ## Still unverified (PRD §16.4)
 
-Palm-reading result (needs a real palm photo), paywall screens and prices, chat daily quota, tarot free count beyond 1, notifications.
+Palm-reading result (needs a real palm photo), chat daily quota, tarot free count beyond 1, notifications.
 
 ## Not in this repo (on purpose)
 
