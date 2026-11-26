@@ -12,7 +12,7 @@ Milestone 1 delivers the palm-scan vertical slice of the AI Palm Reading & Astro
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundations & Contract** - Green build on the phone, Nocturne theme, reachable backend, frozen reading contract
+- [x] **Phase 1: Foundations & Contract** - Green build on the phone, Nocturne theme, reachable backend, frozen reading contract (completed 2026-11-26)
 - [ ] **Phase 2: Reading Pipeline** - Backend turns a palm photo + landmarks into a validated, safe, cached reading via an async job API
 - [ ] **Phase 3: Client Shell** - Onboarding, Home hub with cosmic background, and hand selection, persisted across restarts
 - [ ] **Phase 4: Scan Loop** - Live hand guidance, capture and gallery import, processed upload-ready photo, smooth on the low-end phone
@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `GET /healthz` on the local FastAPI backend (Python 3.13 pinned) answers from the phone over `adb reverse` at `127.0.0.1`, and the app shows that the backend is reachable; cleartext is allowed in debug only.
   4. `contracts/` holds a versioned palm-reading JSON schema and a sample reading that both the Kotlin and the Pydantic side parse unchanged; trace coordinates are normalised 0-1, each line carries a `trace_source`, and an unusable photo is a successful reading with `verdict.ok=false` and one of 7 reason codes.
 
-**Plans:** 5/5 plans executed
+**Plans:** 5/5 plans complete
 
 Plans:
 - [x] 01-01-PLAN.md — Walking skeleton: one command installs the target-toolchain app on the phone and it shows the backend Connected; Room 3 on device; toolchain gate recorded (wave 1)
@@ -131,7 +131,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6. After Phase 1,
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundations & Contract | 5/5 | In Progress | - |
+| 1. Foundations & Contract | 5/5 | Complete    | 2026-11-26 |
 | 2. Reading Pipeline | 0/TBD | Not started | - |
 | 3. Client Shell | 0/TBD | Not started | - |
 | 4. Scan Loop | 0/TBD | Not started | - |
