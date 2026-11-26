@@ -1,0 +1,319 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "palm_reading.v1",
+  "$defs": {
+    "Career": {
+      "additionalProperties": false,
+      "properties": {
+        "strengths": {
+          "title": "Strengths",
+          "type": "string"
+        },
+        "challenges": {
+          "title": "Challenges",
+          "type": "string"
+        },
+        "ideal_industries": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Ideal Industries",
+          "type": "array"
+        }
+      },
+      "required": [
+        "strengths",
+        "challenges",
+        "ideal_industries"
+      ],
+      "title": "Career",
+      "type": "object"
+    },
+    "ImageSize": {
+      "additionalProperties": false,
+      "description": "Size of the image sent to the model; trace coordinates are relative to it.",
+      "properties": {
+        "w": {
+          "exclusiveMinimum": 0,
+          "title": "W",
+          "type": "integer"
+        },
+        "h": {
+          "exclusiveMinimum": 0,
+          "title": "H",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "w",
+        "h"
+      ],
+      "title": "ImageSize",
+      "type": "object"
+    },
+    "Love": {
+      "additionalProperties": false,
+      "properties": {
+        "how_you_love": {
+          "title": "How You Love",
+          "type": "string"
+        },
+        "ideal_partner": {
+          "title": "Ideal Partner",
+          "type": "string"
+        },
+        "challenges": {
+          "title": "Challenges",
+          "type": "string"
+        }
+      },
+      "required": [
+        "how_you_love",
+        "ideal_partner",
+        "challenges"
+      ],
+      "title": "Love",
+      "type": "object"
+    },
+    "Meta": {
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "prompt_version": {
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "locale": {
+          "description": "BCP-47 language tag, e.g. en, hi",
+          "title": "Locale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "model",
+        "prompt_version",
+        "generated_at",
+        "locale"
+      ],
+      "title": "Meta",
+      "type": "object"
+    },
+    "PalmLine": {
+      "additionalProperties": false,
+      "description": "trace_source none exactly when trace is empty; present false implies an empty\ntrace; llm and template traces have at least 2 points. Points are [x, y] in 0..1.",
+      "properties": {
+        "type": {
+          "enum": [
+            "heart",
+            "head",
+            "life",
+            "fate",
+            "sun"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "present": {
+          "title": "Present",
+          "type": "boolean"
+        },
+        "trace": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Trace",
+          "type": "array"
+        },
+        "trace_source": {
+          "enum": [
+            "llm",
+            "template",
+            "none"
+          ],
+          "title": "Trace Source",
+          "type": "string"
+        },
+        "interpretation": {
+          "title": "Interpretation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "label",
+        "present",
+        "trace",
+        "trace_source",
+        "interpretation"
+      ],
+      "title": "PalmLine",
+      "type": "object"
+    },
+    "PalmSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "traits": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Traits",
+          "type": "array"
+        }
+      },
+      "required": [
+        "summary",
+        "traits"
+      ],
+      "title": "PalmSummary",
+      "type": "object"
+    },
+    "Verdict": {
+      "additionalProperties": false,
+      "properties": {
+        "ok": {
+          "title": "Ok",
+          "type": "boolean"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "enum": [
+                "blurry_or_dark",
+                "too_far",
+                "jewelry",
+                "bent",
+                "fingers_tight",
+                "incomplete",
+                "no_palm_lines"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        }
+      },
+      "required": [
+        "ok",
+        "reason"
+      ],
+      "title": "Verdict",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Palm reading v1. Invariants: verdict.ok true implies reason null and palm, love,\ncareer present; verdict.ok false implies reason set, lines empty and palm, love,\ncareer null; no line type appears twice. Carries no hand landmarks or image data.",
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "reading_id": {
+      "format": "uuid",
+      "title": "Reading Id",
+      "type": "string"
+    },
+    "hand_side": {
+      "enum": [
+        "left",
+        "right"
+      ],
+      "title": "Hand Side",
+      "type": "string"
+    },
+    "meta": {
+      "$ref": "#/$defs/Meta"
+    },
+    "image_size": {
+      "$ref": "#/$defs/ImageSize"
+    },
+    "verdict": {
+      "$ref": "#/$defs/Verdict"
+    },
+    "lines": {
+      "items": {
+        "$ref": "#/$defs/PalmLine"
+      },
+      "title": "Lines",
+      "type": "array"
+    },
+    "palm": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PalmSummary"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "love": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Love"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "career": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Career"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "reading_id",
+    "hand_side",
+    "meta",
+    "image_size",
+    "verdict",
+    "lines",
+    "palm",
+    "love",
+    "career"
+  ],
+  "title": "PalmReading",
+  "type": "object"
+}

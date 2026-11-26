@@ -35,6 +35,10 @@ android {
         compose = true
         buildConfig = true
     }
+    testOptions {
+        // JVM tests decode the shared contract samples (FND-05)
+        unitTests.all { it.systemProperty("contracts.dir", rootProject.file("../contracts").absolutePath) }
+    }
 }
 
 room3 { schemaDirectory("$projectDir/schemas") }
