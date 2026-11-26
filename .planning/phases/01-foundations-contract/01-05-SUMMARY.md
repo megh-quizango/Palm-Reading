@@ -85,11 +85,11 @@ coverage:
         status: pass
   - deliverable: "Showcase matches the Nocturne tokens on the phone (Hindi shaping, glows, gradient directions, light status icons, orb icon)"
     human_judgment: true
-    rationale: "Phase-end single on-device visual check (backstop truth); screenshots captured, reply pending from the user"
+    rationale: "Phase-end single on-device visual check (backstop truth); screenshots captured, approved by the user, 2026-11-26"
     verification:
       - kind: manual
         ref: "tools/adb/shots/showcase-top.png, showcase-components.png, showcase-type.png, launcher-drawer.png"
-        status: pending
+        status: pass
 ---
 
 # Phase 1 Plan 05: Nocturne Components, Star Background and Orb Icon Summary
@@ -147,6 +147,8 @@ Number Frame deadline missed: 0
 The display runs at 60 Hz and the app rendered about 60.9 fps. All 609 "janky" frames come only from the `High input latency` counter: no frames missed vsync, missed a deadline or had a slow UI thread. That counter is known to flag every animation-driven frame on Android 11 when there is no touch input, so this looks like a counter artefact, not real jank. Before the content layer was added, the same run gave the same numbers (607 frames, 24/25/38 ms). Phase 3 should use `FrameTimeline`-based metrics or Macrobenchmark, not the `Janky frames` line.
 
 ## Screenshots for the phase-end visual check (git-ignored, local)
+
+**Human check: approved by the user, 2026-11-26.**
 
 - `tools/adb/shots/showcase-top.png`: status chip Connected (green dot), Retry, all buttons, the chip, the feature card, stars
 - `tools/adb/shots/showcase-components.png`: buttons, chip, feature card glow and foil border, start of Colours
