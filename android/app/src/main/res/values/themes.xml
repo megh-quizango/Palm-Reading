@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Palm" parent="android:Theme.Material.NoActionBar" />
+    <style name="Theme.Palm" parent="android:Theme.Material.NoActionBar">
+        <!-- Cold start shows the Nocturne background, no white flash -->
+        <item name="android:windowBackground">@color/nocturne_bg_base</item>
+    </style>
 </resources>

@@ -6,8 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
+import app.palm.core.designsystem.NocturneTheme
 import app.palm.core.navigation.AppNavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,7 +20,7 @@ class MainActivity : ComponentActivity() {
         )
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme(colorScheme = darkColorScheme()) { AppNavDisplay() }
+            NocturneTheme { AppNavDisplay() }
         }
     }
 }

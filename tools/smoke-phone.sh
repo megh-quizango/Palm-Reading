@@ -2,7 +2,8 @@
 # Full local stack check: backend up, adb reverse, install + launch, then wait until
 # every regex argument matches the phone's UI dump. Usage: bash tools/smoke-phone.sh "Backend: Connected" ...
 # Env switches: SMOKE_NO_REVERSE=1 (remove the adb reverse rule), SMOKE_NO_BACKEND=1 (keep the backend down),
-# SMOKE_RETRY_EXPECT=<regex> (then start backend + reverse, tap Retry, wait up to 15 s for the regex).
+# SMOKE_RETRY_EXPECT=<regex> (then start backend + reverse, tap Retry, wait up to 15 s for the regex),
+# SMOKE_SCROLLS=<n> (after each dump, swipe up n times by ~2/3 screen and dump again; regexes match the union).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 [ "$#" -ge 1 ] || { echo "usage: $0 <regex>..." >&2; exit 2; }
@@ -55,13 +56,27 @@ else
 fi
 bash "$ROOT/tools/install-debug.sh"
 
+SCROLLS="${SMOKE_SCROLLS:-0}"
+if [ "$SCROLLS" -gt 0 ]; then
+  WH="$(adb -s "$ADB_SERIAL" shell wm size | tr -d '\r' | tail -1 | sed -E 's/.* ([0-9]+)x([0-9]+)$/\1 \2/')"
+  SW="${WH% *}"; SH="${WH#* }"
+fi
+swipe() { adb -s "$ADB_SERIAL" shell input swipe $((SW / 2)) "$1" $((SW / 2)) "$2" "$3"; }
+
 DUMP=""
 for _ in $(seq 15); do
   sleep 2
   DUMP="$(ui_dump)"
+  # uiautomator skips off-screen nodes: scroll through tall screens and keep every dump
+  for _ in $(seq "$SCROLLS"); do
+    swipe $((SH * 5 / 6)) $((SH / 6)) 400
+    sleep 1
+    DUMP="$DUMP"$'\n'"$(ui_dump)"
+  done
   ok=1
   for re in "$@"; do printf '%s\n' "$DUMP" | grep -Eq -- "$re" || { ok=0; break; }; done
   [ "$ok" -eq 1 ] && break
+  for _ in $(seq "$SCROLLS"); do swipe $((SH / 6)) $((SH * 5 / 6)) 100; done # back to the top
 done
 if [ "$ok" -ne 1 ]; then
   printf '%s\n' "$DUMP"

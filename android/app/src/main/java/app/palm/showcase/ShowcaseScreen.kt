@@ -1,9 +1,18 @@
 package app.palm.showcase
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
@@ -11,19 +20,56 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import app.palm.R
+import app.palm.core.designsystem.NocturneColors
+import app.palm.core.designsystem.NocturneSpace
+import app.palm.core.designsystem.NocturneSize
+
+private const val PALM = "palm."
 
 @Composable
 fun ShowcaseScreen(statusViewModel: BackendStatusViewModel) {
-    Surface(Modifier.fillMaxSize()) {
-        LazyColumn(
-            contentPadding = WindowInsets.safeDrawing.asPaddingValues(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
+    val s16 = NocturneSpace.S16
+    val padding = WindowInsets.safeDrawing.add(WindowInsets(s16, s16, s16, s16)).asPaddingValues()
+    val (palm, roles) = NocturneColors.ByPath.entries.partition { it.key.startsWith(PALM) }
+    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        LazyColumn(contentPadding = padding, verticalArrangement = Arrangement.spacedBy(NocturneSpace.S24)) {
             item { Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall) }
             item { BackendStatusRow(statusViewModel) }
+            item { Section("Colours") { SwatchGrid(roles.map { it.key to it.value }, perRow = 3) } }
+            item { Section("Palm lines") { SwatchGrid(palm.map { it.key to it.value }, perRow = palm.size) } }
+        }
+    }
+}
+
+@Composable
+private fun Section(title: String, content: @Composable () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(NocturneSpace.S12)) {
+        Text(title, style = MaterialTheme.typography.titleMedium)
+        content()
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SwatchGrid(swatches: List<Pair<String, Color>>, perRow: Int) {
+    FlowRow(
+        maxItemsInEachRow = perRow,
+        horizontalArrangement = Arrangement.spacedBy(NocturneSpace.S8),
+        verticalArrangement = Arrangement.spacedBy(NocturneSpace.S12),
+    ) {
+        swatches.forEach { (path, color) ->
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(NocturneSpace.S4)) {
+                Box(
+                    Modifier.fillMaxWidth().height(NocturneSize.TouchMin)
+                        .background(color, MaterialTheme.shapes.small)
+                        .border(Dp.Hairline, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small),
+                )
+                Text(path, style = MaterialTheme.typography.labelSmall)
+            }
         }
     }
 }
