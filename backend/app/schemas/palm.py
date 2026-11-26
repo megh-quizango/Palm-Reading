@@ -3,12 +3,16 @@
 These models are the authoring source. `scripts/export_schema.py` writes
 `contracts/palm_reading.v1.schema.json` from them. A field-shape change ships as a
 new schema_version, never as a silent edit of v1.
+
+Validation is strict (no "yes" -> True, no "960" -> 960). Parse wire JSON with
+`PalmReading.model_validate_json(...)`: strict Python-mode validation would reject the
+JSON string forms of UUID and datetime.
 """
 
 from typing import Annotated, Final, Literal, Self
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, field_validator, model_validator
 
 SCHEMA_VERSION: Final = 1
 
@@ -24,12 +28,13 @@ InvalidReason = Literal[
     "incomplete",
     "no_palm_lines",
 ]
+REQUIRED_LINES: Final = frozenset({"heart", "head", "life"})
 Coord = Annotated[float, Field(ge=0, le=1)]
 Point = tuple[Coord, Coord]
 
 
 class ContractModel(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
 
 
 class Meta(ContractModel):
@@ -91,8 +96,8 @@ class Career(ContractModel):
 
 
 class PalmReading(ContractModel):
-    """Palm reading v1. Invariants: verdict.ok true implies reason null and palm, love,
-    career present; verdict.ok false implies reason set, lines empty and palm, love,
+    """Palm reading v1. Invariants: verdict.ok true implies reason null, palm, love,
+    career present and heart, head and life lines listed; verdict.ok false implies reason set, lines empty and palm, love,
     career null; no line type appears twice. Carries no hand landmarks or image data."""
 
     schema_version: Literal[1]
@@ -106,6 +111,14 @@ class PalmReading(ContractModel):
     love: Love | None
     career: Career | None
 
+    @field_validator("schema_version", mode="before")
+    @classmethod
+    def _no_bool_version(cls, v: object) -> object:
+        # Literal[1] would accept true even in strict mode (True == 1)
+        if isinstance(v, bool):
+            raise ValueError("schema_version must be the integer 1")
+        return v
+
     @model_validator(mode="after")
     def _verdict_rules(self) -> Self:
         sections = (self.palm, self.love, self.career)
@@ -114,6 +127,9 @@ class PalmReading(ContractModel):
                 raise ValueError("verdict.ok true requires reason null")
             if any(x is None for x in sections):
                 raise ValueError("verdict.ok true requires palm, love and career")
+            missing = REQUIRED_LINES - {line.type for line in self.lines}
+            if missing:
+                raise ValueError(f"verdict.ok true requires lines {sorted(missing)}")
         else:
             if self.verdict.reason is None:
                 raise ValueError("verdict.ok false requires a reason")

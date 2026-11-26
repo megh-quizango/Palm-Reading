@@ -235,7 +235,7 @@
     }
   },
   "additionalProperties": false,
-  "description": "Palm reading v1. Invariants: verdict.ok true implies reason null and palm, love,\ncareer present; verdict.ok false implies reason set, lines empty and palm, love,\ncareer null; no line type appears twice. Carries no hand landmarks or image data.",
+  "description": "Palm reading v1. Invariants: verdict.ok true implies reason null, palm, love,\ncareer present and heart, head and life lines listed; verdict.ok false implies reason set, lines empty and palm, love,\ncareer null; no line type appears twice. Carries no hand landmarks or image data.",
   "properties": {
     "schema_version": {
       "const": 1,

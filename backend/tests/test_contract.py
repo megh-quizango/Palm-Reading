@@ -21,7 +21,7 @@ def load(name: str) -> dict:
 
 def test_sample_round_trips_unchanged():
     raw = load("palm_reading.sample.json")
-    assert PalmReading.model_validate(raw).model_dump(mode="json") == raw
+    assert PalmReading.model_validate_json(json.dumps(raw)).model_dump(mode="json") == raw
 
 
 def test_committed_schema_matches_models():
@@ -44,14 +44,14 @@ REASONS = ["blurry_or_dark", "too_far", "jewelry", "bent", "fingers_tight", "inc
 
 def test_invalid_photo_sample_round_trips_unchanged():
     raw = load("palm_reading.invalid_photo.sample.json")
-    assert PalmReading.model_validate(raw).model_dump(mode="json") == raw
+    assert PalmReading.model_validate_json(json.dumps(raw)).model_dump(mode="json") == raw
 
 
 @pytest.mark.parametrize("reason", REASONS)
 def test_every_reason_code_is_accepted(reason):
     raw = load("palm_reading.invalid_photo.sample.json")
     raw["verdict"]["reason"] = reason
-    assert PalmReading.model_validate(raw).verdict.reason == reason
+    assert PalmReading.model_validate_json(json.dumps(raw)).verdict.reason == reason
 
 
 def line(raw, kind):
@@ -97,6 +97,12 @@ BROKEN = {
     "unknown_top_level_key": (VALID, lambda r: r.__setitem__("landmarks", [])),
     "schema_version_2": (VALID, lambda r: r.__setitem__("schema_version", 2)),
     "hand_side_both": (VALID, lambda r: r.__setitem__("hand_side", "both")),
+    "ok_true_no_lines": (VALID, lambda r: r.__setitem__("lines", [])),
+    "ok_true_missing_head": (VALID, lambda r: r.__setitem__("lines", [x for x in r["lines"] if x["type"] != "head"])),
+    "coerced_bool": (VALID, lambda r: line(r, "heart").__setitem__("present", "yes")),
+    "coerced_int": (VALID, lambda r: r["image_size"].__setitem__("w", "960")),
+    "coerced_float": (VALID, lambda r: line(r, "heart")["trace"][0].__setitem__(0, "0.5")),
+    "schema_version_true": (VALID, lambda r: r.__setitem__("schema_version", True)),
 }
 
 
@@ -106,7 +112,7 @@ def test_invariant_break_is_rejected(case):
     raw = copy.deepcopy(load(name))
     mutate(raw)
     with pytest.raises(ValidationError):
-        PalmReading.model_validate(raw)
+        PalmReading.model_validate_json(json.dumps(raw))
 
 
 def property_names(node):

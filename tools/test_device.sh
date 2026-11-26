@@ -37,3 +37,7 @@ expect "one device" "$(run_case "SER1" "")" "^rc=0 ADB_SERIAL=SER1 ANDROID_SERIA
 expect "two devices" "$(run_case "SER1 SER2" "")" "^rc=1 " "several devices" "^SER1$" "^SER2$"
 expect "two devices, preset" "$(run_case "SER1 SER2" "SER2")" "^rc=0 ADB_SERIAL=SER2 ANDROID_SERIAL=SER2$"
 expect "unknown preset" "$(run_case "SER1" "NOPE")" "^rc=1 " "NOPE is not listed"
+
+# callers run under set -e: zero devices must still print why (WR-01)
+out="$(STUB_DEVICES="" bash -c 'set -e; source "$1"' _ "$ROOT/tools/_device.sh" 2>&1 || true)"
+expect "zero devices under set -e" "$out" "no device"

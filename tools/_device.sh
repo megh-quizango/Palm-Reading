@@ -7,9 +7,13 @@ if [ -n "${ADB_SERIAL:-}" ]; then
     return 1
   fi
 else
-  _dev_count="$(printf '%s' "$_dev_list" | grep -c .)"
+  _dev_count="$(printf '%s' "$_dev_list" | grep -c . || true)"
   if [ "$_dev_count" -eq 0 ]; then
-    echo "no device: pair wireless debugging, then check adb devices -l" >&2
+    if adb devices | grep -q 'unauthorized'; then
+      echo "device unauthorized: unlock the phone and accept the USB debugging prompt" >&2
+    else
+      echo "no device: pair wireless debugging, then check adb devices -l" >&2
+    fi
     return 1
   elif [ "$_dev_count" -gt 1 ]; then
     printf '%s\n' "$_dev_list" >&2
