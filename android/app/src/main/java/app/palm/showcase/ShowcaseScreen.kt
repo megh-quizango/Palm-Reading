@@ -24,11 +24,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import app.palm.R
+import app.palm.core.designsystem.LocalNocturne
 import app.palm.core.designsystem.NocturneColors
 import app.palm.core.designsystem.NocturneSpace
 import app.palm.core.designsystem.NocturneSize
+import app.palm.core.designsystem.devanagariSafe
 
 private const val PALM = "palm."
+
+// D-06/D-07 proof: conjuncts and matras must shape and stay unclipped in every style
+private const val HINDI_SAMPLE = "हृदय रेखा · ज्ञान · क्षत्रिय"
 
 @Composable
 fun ShowcaseScreen(statusViewModel: BackendStatusViewModel) {
@@ -39,8 +44,9 @@ fun ShowcaseScreen(statusViewModel: BackendStatusViewModel) {
         LazyColumn(contentPadding = padding, verticalArrangement = Arrangement.spacedBy(NocturneSpace.S24)) {
             item { Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall) }
             item { BackendStatusRow(statusViewModel) }
-            item { Section("Colours") { SwatchGrid(roles.map { it.key to it.value }, perRow = 3) } }
-            item { Section("Palm lines") { SwatchGrid(palm.map { it.key to it.value }, perRow = palm.size) } }
+            item { Section("Colours") { SwatchGrid(roles.map { it.key to it.value }) } }
+            item { Section("Palm lines") { SwatchGrid(palm.map { it.key to it.value }) } }
+            item { Section("Type") { TypeSamples() } }
         }
     }
 }
@@ -55,9 +61,9 @@ private fun Section(title: String, content: @Composable () -> Unit) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun SwatchGrid(swatches: List<Pair<String, Color>>, perRow: Int) {
+private fun SwatchGrid(swatches: List<Pair<String, Color>>) {
     FlowRow(
-        maxItemsInEachRow = perRow,
+        maxItemsInEachRow = 3,
         horizontalArrangement = Arrangement.spacedBy(NocturneSpace.S8),
         verticalArrangement = Arrangement.spacedBy(NocturneSpace.S12),
     ) {
@@ -68,7 +74,19 @@ private fun SwatchGrid(swatches: List<Pair<String, Color>>, perRow: Int) {
                         .background(color, MaterialTheme.shapes.small)
                         .border(Dp.Hairline, MaterialTheme.colorScheme.outline, MaterialTheme.shapes.small),
                 )
-                Text(path, style = MaterialTheme.typography.labelSmall)
+                Text(path, style = MaterialTheme.typography.bodySmall)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TypeSamples() {
+    Column(verticalArrangement = Arrangement.spacedBy(NocturneSpace.S16)) {
+        LocalNocturne.current.type.byName.forEach { (name, style) ->
+            Column {
+                Text(name, style = style)
+                Text(HINDI_SAMPLE, style = style.devanagariSafe())
             }
         }
     }

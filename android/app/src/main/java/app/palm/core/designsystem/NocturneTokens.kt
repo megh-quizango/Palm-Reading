@@ -112,6 +112,20 @@ object NocturneTypeSpecs {
     val LabelM = NocturneTypeSpec(NocturneFontRole.Ui, 600, 13f, 18f, 0f)
     val Caption = NocturneTypeSpec(NocturneFontRole.Ui, 400, 12f, 16f, 0f)
     val Overline = NocturneTypeSpec(NocturneFontRole.Ui, 700, 12f, 16f, 0.12f)
+
+    val ByName: Map<String, NocturneTypeSpec> = linkedMapOf(
+        "Display XL" to DisplayXl,
+        "Display L" to DisplayL,
+        "Display M" to DisplayM,
+        "Display S" to DisplayS,
+        "Title M" to TitleM,
+        "Body L" to BodyL,
+        "Body M" to BodyM,
+        "Label L" to LabelL,
+        "Label M" to LabelM,
+        "Caption" to Caption,
+        "Overline" to Overline,
+    )
 }
 
 data class NocturneShadow(val color: Color, val offsetX: Dp, val offsetY: Dp, val blur: Dp, val spread: Dp)

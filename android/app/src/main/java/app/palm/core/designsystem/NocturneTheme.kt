@@ -4,6 +4,7 @@ import android.provider.Settings
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -11,7 +12,65 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontSynthesis
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
+
+/** The 11 token text styles by token name; [byName] keeps token order ("Display XL" .. "Overline"). */
+@Immutable
+data class NocturneTextStyles(
+    val displayXl: TextStyle,
+    val displayL: TextStyle,
+    val displayM: TextStyle,
+    val displayS: TextStyle,
+    val titleM: TextStyle,
+    val bodyL: TextStyle,
+    val bodyM: TextStyle,
+    val labelL: TextStyle,
+    val labelM: TextStyle,
+    val caption: TextStyle,
+    val overline: TextStyle,
+    val byName: Map<String, TextStyle>,
+)
+
+/** D-07: font-metric line height, so Devanagari ascenders and matras are never clipped by token heights. */
+fun TextStyle.devanagariSafe(): TextStyle = copy(lineHeight = TextUnit.Unspecified)
+
+private fun nocturneTextStyles(style: (NocturneTypeSpec) -> TextStyle) = with(NocturneTypeSpecs) {
+    NocturneTextStyles(
+        displayXl = style(DisplayXl),
+        displayL = style(DisplayL),
+        displayM = style(DisplayM),
+        displayS = style(DisplayS),
+        titleM = style(TitleM),
+        bodyL = style(BodyL),
+        bodyM = style(BodyM),
+        labelL = style(LabelL),
+        labelM = style(LabelM),
+        caption = style(Caption),
+        overline = style(Overline),
+        byName = ByName.mapValues { style(it.value) },
+    )
+}
+
+private fun NocturneTextStyles.toTypography() = Typography(
+    displayLarge = displayXl,
+    displayMedium = displayL,
+    displaySmall = displayM,
+    headlineSmall = displayS,
+    titleMedium = titleM,
+    bodyLarge = bodyL,
+    bodyMedium = bodyM,
+    labelLarge = labelL,
+    labelMedium = labelM,
+    bodySmall = caption,
+    labelSmall = overline,
+)
 
 /** Nocturne values that have no Material 3 slot. Every value comes from the generated NocturneTokens.kt. */
 @Immutable
@@ -33,6 +92,7 @@ data class NocturneExtras(
     val durations: NocturneDurations = NocturneDurations,
     val easings: NocturneEasings = NocturneEasings,
     val reduceMotion: Boolean = false,
+    val type: NocturneTextStyles,
 )
 
 val LocalNocturne = staticCompositionLocalOf<NocturneExtras> { error("NocturneTheme is not in the composition") }
@@ -73,8 +133,23 @@ fun NocturneTheme(content: @Composable () -> Unit) {
     val reduceMotion = remember {
         Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
     }
-    val extras = remember(reduceMotion) { NocturneExtras(reduceMotion = reduceMotion) }
-    MaterialTheme(colorScheme = NocturneColorScheme, shapes = NocturneShapes) {
+    // Phase 3 adds the in-app language switch; for now the system locale decides
+    val devanagari = LocalConfiguration.current.locales[0].language == "hi"
+    val type = remember(devanagari) {
+        nocturneTextStyles { spec ->
+            val style = TextStyle(
+                fontFamily = NocturneFonts.family(context, spec.role, spec.weight),
+                fontWeight = FontWeight(spec.weight),
+                fontSize = spec.sizeSp.sp,
+                lineHeight = spec.lineHeightSp.sp,
+                letterSpacing = spec.letterSpacingEm.em,
+                fontSynthesis = FontSynthesis.None,
+            )
+            if (devanagari) style.devanagariSafe() else style
+        }
+    }
+    val extras = remember(reduceMotion, type) { NocturneExtras(reduceMotion = reduceMotion, type = type) }
+    MaterialTheme(colorScheme = NocturneColorScheme, shapes = NocturneShapes, typography = type.toTypography()) {
         CompositionLocalProvider(LocalNocturne provides extras, content = content)
     }
 }

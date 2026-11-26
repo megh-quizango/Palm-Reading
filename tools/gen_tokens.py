@@ -116,8 +116,9 @@ class Gen:
                 raise TokenError(f"identifier collision {key[0]}.{key[1]}: {seen[key]} and {dotted}")
             seen[key] = dotted
             self.place[dotted] = key
-        if ("NocturneColors", "ByPath") in seen:
-            raise TokenError(f"{seen[('NocturneColors', 'ByPath')]}: identifier ByPath is reserved for the generated path map")
+        for key in (("NocturneColors", "ByPath"), ("NocturneTypeSpecs", "ByName")):
+            if key in seen:
+                raise TokenError(f"{seen[key]}: identifier {key[1]} is reserved for a generated map")
 
     def target(self, ref, where, stack=()):
         if ref not in self.by_path:
@@ -240,6 +241,10 @@ class Gen:
                 pairs = [f'        "{".".join(p[1:])}" to {self.place[".".join(p)][1]},'
                          for p, t, _ in self.tokens if t == "color" and p[0] == "color"]
                 out += ["", "    val ByPath: Map<String, Color> = linkedMapOf(", *pairs, "    )"]
+            if obj == "NocturneTypeSpecs":  # token name ("Display XL") -> spec, file order
+                pairs = [f'        "{" ".join(p[1:])}" to {self.place[".".join(p)][1]},'
+                         for p, t, _ in self.tokens if t == "typography"]
+                out += ["", "    val ByName: Map<String, NocturneTypeSpec> = linkedMapOf(", *pairs, "    )"]
             out += ["}", ""]
         return "\n".join(out).rstrip("\n") + "\n"
 

@@ -57,6 +57,8 @@ class RealTokens(unittest.TestCase):
             self.assertIn(f"val {name} = NocturneTypeSpec(", self.kt)
         self.assertIn("val Overline = NocturneTypeSpec(NocturneFontRole.Ui, 700, 12f, 16f, 0.12f)", self.kt)
         self.assertIn("val DisplayXl = NocturneTypeSpec(NocturneFontRole.Display, 600, 40f, 44f, 0f)", self.kt)
+        self.assertIn('"Display XL" to DisplayXl,', self.kt)
+        self.assertIn('"Overline" to Overline,', self.kt)
 
     def test_colors_xml_bg_base(self):
         self.assertIn('<color name="nocturne_bg_base">#FF0B0820</color>', self.xml)
@@ -67,7 +69,7 @@ class RealTokens(unittest.TestCase):
     def test_by_path_map_covers_every_colour(self):
         self.assertIn('"bg.base" to BgBase,', self.kt)
         self.assertIn('"palm.sun" to PalmSun,', self.kt)
-        self.assertEqual(self.kt.count('" to '), 27)
+        self.assertEqual(self.kt.count('" to '), 27 + 11)  # colours + type names
 
     def test_header(self):
         self.assertTrue(self.kt.startswith(g.HEADER + "\n"))
