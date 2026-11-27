@@ -28,7 +28,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -115,18 +117,15 @@ private fun HeroOrb(still: Boolean) {
         spin = loop.animateFloat(0f, 360f, infiniteRepeatable(tween(NocturneDurations.AmbientSlow, easing = LinearEasing)), label = "spin")
     }
     Box(Modifier.size(104.dp), contentAlignment = Alignment.Center) {
-        // Values are read in the graphicsLayer lambdas (draw phase), so the loop never recomposes
+        // Values are read in draw-only transforms: no recomposition, and unlike graphicsLayer no per-frame
+        // onLayoutChange, which flooded accessibility events and kept uiautomator from ever idling on Home
         Image(
             painterResource(R.drawable.hero_orbit), null,
-            Modifier.requiredSize(160.dp, 104.dp).graphicsLayer { rotationZ = spin?.value ?: 0f },
+            Modifier.requiredSize(160.dp, 104.dp).drawWithContent { rotate(spin?.value ?: 0f) { this@drawWithContent.drawContent() } },
         )
         Image(
             painterResource(R.drawable.illus_guide_orb), null,
-            Modifier.size(104.dp).graphicsLayer {
-                val s = breathe?.value ?: 1f
-                scaleX = s
-                scaleY = s
-            },
+            Modifier.size(104.dp).drawWithContent { scale(breathe?.value ?: 1f) { this@drawWithContent.drawContent() } },
         )
     }
 }

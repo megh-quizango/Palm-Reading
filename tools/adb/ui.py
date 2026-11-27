@@ -3,6 +3,7 @@ import os, subprocess, sys, re, xml.etree.ElementTree as ET
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 S = os.environ["ADB_SERIAL"]
 def adb(*a): return subprocess.run(["adb", "-s", S, *a], capture_output=True, text=True, encoding="utf-8", errors="replace").stdout
+adb("shell", "rm", "-f", "/sdcard/ui.xml")  # a failed dump ("could not get idle state") must not reuse the last screen
 adb("shell", "uiautomator", "dump", "/sdcard/ui.xml")
 xml = adb("shell", "cat", "/sdcard/ui.xml")
 xml = xml[xml.find("<?xml"):]

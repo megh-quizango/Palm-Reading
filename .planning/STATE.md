@@ -125,6 +125,10 @@ Recent decisions affecting current work:
 - [Phase 03]: NavBackStack.popFrom(from) guards double Back/OK pops
 - [Phase 03]: Exit-confirm BackHandler stays in HomeScreen (wins over NavDisplay on the phone; A2 fallback not needed)
 - [Phase 03]: Showcase lives in src/debug; src/release ships no-op debugEntries/debugHomeLongPress
+- [Phase 03]: Per-app locale via AppCompat 1.8.0 AppCompatDelegate.setApplicationLocales + autoStoreLocales (LocaleManager on API 33+, AppCompat storage on API 26-32)
+- [Phase 03]: 03-05 cold start (D-16) is gated on the profile-compiled median (cold-start.sh --compile, 5 runs of am start -S -W TotalTime), with the fresh-install median reported beside it. Emulator (API 35, x86_64, not a gate): fresh 565 ms, compiled 565 ms. The Redmi hardware gate is still to be measured
+- [Phase 03]: 03-05 jank metric is the share of "Frame deadline missed" frames in dumpsys gfxinfo (limit 5%); the "Janky frames" line also counts High input latency frames and is unreliable on Android 11. Emulator release (not a gate): Home idle 10 s 29/578 (5.02%), intro swipe x3 9/251 (3.59%)
+- [Phase 03]: 03-05 HeroOrb spin/breathe moved from graphicsLayer to draw-only transforms: per-frame layer updates fired onLayoutChange accessibility events, so uiautomator never went idle on Home
 
 ### Pending Todos
 
@@ -139,6 +143,10 @@ None yet.
 - [Phase 2, 4]: No consented palm photo set exists yet (20-40 labelled photos, kept out of git); needed for the model bake-off and guidance calibration
 - [Phase 2]: Palm model winner (Sonnet 5.5 vs Haiku 5.5) needs user sign-off after the eval
 - [Phase 4]: Handedness and palm-facing thresholds need on-device calibration; verify MediaPipe 16 KB-aligned native libs
+- [Phase 3]: all Hindi strings (values-hi) are Claude-written; native-speaker review needed before release (D-06)
+- [Phase 3]: per-app locale: the API 33+ LocaleManager path is verified (vivo V2225 API 35 reference phone, Redmi Note 10T API 33, emulator API 35); the API 26-32 AppCompat path is unverified on hardware (no API 26-32 device)
+- [Phase 3]: 03-05 performance gates (release cold start < 2 s, <= 5% deadline-missed frames on Home idle and intro swipes) were measured only on the x86 emulator, which is not a gate; the hardware run is deferred to the next phone session (debug intro swipe on the Redmi was 37.5%, so fix the intro pager if release is still over 5%)
+- [Phase 3]: 03-05 Task 3 sign-off pending: the user compares tools/adb/shots/phase3-*.png (43 shots, emulator) with Figma S01-S07 and confirms the A7 cold-start gate and the A10 5% jank threshold
 
 ## Deferred Items
 
