@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="intro_1_title">आपकी हथेली, आपकी कहानी</string>
+    <string name="intro_1_body">कैमरे को अपनी हथेली दिखाइए और पाइए अपनी हृदय रेखा, मस्तिष्क रेखा और जीवन रेखा की रीडिंग।</string>
+    <string name="intro_2_title">आपके सितारे, दिन-ब-दिन</string>
+    <string name="intro_2_body">राशिफल, टैरो और आपकी जन्म कुंडली जल्द आ रहे हैं। इनके लिए बस आपकी जन्म तिथि चाहिए।</string>
+    <string name="intro_3_title">[Guide] से मिलिए</string>
+    <string name="intro_3_body">जल्द ही आप [Guide] से प्यार, काम और आने वाले कल के बारे में पूछ सकेंगे।</string>
+    <string name="intro_get_started">शुरू करें</string>
+    <string name="intro_page_cd">पेज %1$d, कुल %2$d</string>
+
+    <string name="onboarding_step">चरण %1$d / %2$d</string>
+
+    <string name="name_title">हम आपको किस नाम से पुकारें?</string>
+    <string name="name_label">आपका पहला नाम</string>
+    <string name="name_placeholder">जैसे, प्रिया</string>
+    <string name="name_helper">सिर्फ़ आपकी रीडिंग को आपके हिसाब से बनाने के लिए।</string>
+    <string name="name_error_short">कम से कम 2 अक्षर लिखें।</string>
+    <string name="name_error_chars">सिर्फ़ अक्षर लिखें। स्पेस, - और \' चल जाएँगे।</string>
+    <string name="gender_title">लिंग</string>
+    <string name="gender_hint">वैकल्पिक। सिर्फ़ रीडिंग की भाषा चुनने के लिए।</string>
+    <string name="gender_male">पुरुष</string>
+    <string name="gender_female">महिला</string>
+    <string name="gender_other">अन्य</string>
+
+    <string name="birth_title">आपका जन्म कब हुआ था?</string>
+    <string name="birth_body">आपकी जन्म तिथि से आपका राशिफल और जन्म कुंडली बनती है।</string>
+    <string name="birth_date_label">जन्म तिथि</string>
+    <string name="birth_date_placeholder">तारीख़ चुनें</string>
+    <string name="birth_time_label">जन्म का समय (वैकल्पिक)</string>
+    <string name="birth_time_placeholder">समय चुनें</string>
+    <string name="birth_date_confirm">तारीख़ सेट करें</string>
+    <string name="birth_date_dismiss">कैलेंडर बंद करें</string>
+    <string name="birth_time_dialog_title">जन्म का समय</string>
+    <string name="birth_time_confirm">समय सेट करें</string>
+    <string name="birth_time_dismiss">घड़ी बंद करें</string>
+    <string name="birth_time_unknown">मुझे अपने जन्म का समय नहीं पता</string>
+    <string name="birth_time_unknown_note">कोई बात नहीं। जिन रीडिंग में जन्म का समय लगता है, वे थोड़ी कम सटीक होंगी।</string>
+</resources>

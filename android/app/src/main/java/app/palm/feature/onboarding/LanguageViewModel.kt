@@ -51,11 +51,10 @@ class LanguageViewModel @Inject constructor(
         }
     }
 
-    fun continueTo(completeOnboarding: Boolean = false, next: () -> Unit) {
+    fun continueTo(next: () -> Unit) {
         viewModelScope.launch {
             try {
                 repo.setLanguage(_selected.value)
-                if (completeOnboarding) repo.completeOnboarding()
                 _saveFailed.value = false
                 next()
             } catch (_: IOException) {

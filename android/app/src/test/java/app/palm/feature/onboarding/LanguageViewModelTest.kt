@@ -41,12 +41,13 @@ class LanguageViewModelTest {
         assertEquals(0, calls)
     }
 
-    @Test fun continueCompletesOnboardingOnce() {
+    @Test fun continueStoresLanguageWithoutCompletingOnboarding() {
         val repo = FakeProfileRepository()
-        val vm = LanguageViewModel(repo, FakeAppLocale())
+        val vm = LanguageViewModel(repo, FakeAppLocale(currentValue = AppLanguage.HI))
         var calls = 0
-        vm.continueTo(completeOnboarding = true) { calls++ }
-        assertTrue(repo.state.value.onboardingComplete)
+        vm.continueTo { calls++ }
+        assertEquals(AppLanguage.HI, repo.state.value.language)
+        assertFalse(repo.state.value.onboardingComplete)
         assertFalse(vm.saveFailed.value)
         assertEquals(1, calls)
     }

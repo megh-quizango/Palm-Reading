@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="intro_1_title">Your palm, your story</string>
+    <string name="intro_1_body">Show your palm to the camera and get a reading of your heart, head and life lines.</string>
+    <string name="intro_2_title">Your stars, day by day</string>
+    <string name="intro_2_body">Horoscope, tarot and your birth chart are on the way. Your birth date is all they need.</string>
+    <string name="intro_3_title">Meet [Guide]</string>
+    <string name="intro_3_body">Soon you can ask [Guide] about love, work and what lies ahead.</string>
+    <string name="intro_get_started">Get started</string>
+    <string name="intro_page_cd">Page %1$d of %2$d</string>
+
+    <string name="onboarding_step">Step %1$d of %2$d</string>
+
+    <string name="name_title">What should we call you?</string>
+    <string name="name_label">Your first name</string>
+    <string name="name_placeholder">e.g. Priya</string>
+    <string name="name_helper">Used only to personalise your readings.</string>
+    <string name="name_error_short">Enter at least 2 letters.</string>
+    <string name="name_error_chars">Use letters only. Spaces, - and \' are fine.</string>
+    <string name="gender_title">Gender</string>
+    <string name="gender_hint">Optional. Only used to word your readings.</string>
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <string name="gender_other">Other</string>
+
+    <string name="birth_title">When were you born?</string>
+    <string name="birth_body">Your birth date shapes your horoscope and birth chart.</string>
+    <string name="birth_date_label">Birth date</string>
+    <string name="birth_date_placeholder">Choose a date</string>
+    <string name="birth_time_label">Birth time (optional)</string>
+    <string name="birth_time_placeholder">Choose a time</string>
+    <string name="birth_date_confirm">Set date</string>
+    <string name="birth_date_dismiss">Close calendar</string>
+    <string name="birth_time_dialog_title">Birth time</string>
+    <string name="birth_time_confirm">Set time</string>
+    <string name="birth_time_dismiss">Close clock</string>
+    <string name="birth_time_unknown">I don\'t know my birth time</string>
+    <string name="birth_time_unknown_note">No problem. Readings that use your birth time will be a little less exact.</string>
+</resources>
