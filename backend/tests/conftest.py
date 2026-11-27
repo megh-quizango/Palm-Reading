@@ -173,7 +173,8 @@ class FakeSdk:
 
 
 def settings(**kw) -> Settings:
-    return Settings(**{"_env_file": None, "anthropic_api_key": None, **kw})
+    # Existing tests exercise the Claude path with a fake SDK; template mode is opted into
+    return Settings(**{"_env_file": None, "anthropic_api_key": None, "palm_mode": "claude", **kw})
 
 
 def client_factory(fake=None, **settings_kw) -> TestClient:

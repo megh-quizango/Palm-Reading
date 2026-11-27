@@ -3,7 +3,7 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 02-07-PLAN.md
+stopped_at: 02-07 complete; 02-08/02-09 deferred, backend runs in template mode
 last_updated: "2026-11-27T05:42:46.297Z"
 last_activity: 2026-11-27
 last_activity_desc: Phase 2 execution started
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-11-26)
 
 Phase: 2 (Reading Pipeline) — EXECUTING
 Plan: 8 of 9
-Status: Ready to execute
+Status: 02-08/02-09 deferred (template mode); Phase 2 not verified
 Last activity: 2026-11-27 — Phase 2 execution started
 
 Progress: [██░░░░░░░░] 17%
@@ -75,6 +75,7 @@ Progress: [██░░░░░░░░] 17%
 
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
+- [Phase 2, 2026-11-27]: User chose to leave the Anthropic backend for now. PALM_MODE=template (default) serves canned en/hi readings (backend/app/services/template_model.py, 3 en + 2 hi variants picked by photo SHA-256) with landmark-anchored template lines and no API call; PALM_MODE=claude restores the real path. Plans 02-08 (real eval) and 02-09 (model sign-off) deferred until the user supplies the key, photos and budget. Dev testing uses synthetic template photos.
 
 - [Roadmap]: Navigation 3 + Room 3, minSdk 26 / targetSdk 36 / compileSdk 37; fallback is Kotlin 2.3.21 / Room 2.8.5 / Navigation-Compose if the Phase 1 scaffold fails
 - [Roadmap]: Contract uses normalised 0-1 traces with `trace_source` (llm|template|none); invalid photo is a successful job with `verdict.ok=false`; poll is the job contract (no SSE in M1)
@@ -113,6 +114,7 @@ Recent decisions affecting current work:
 None yet.
 
 ### Blockers/Concerns
+- [Phase 2]: 02-08/02-09 deferred: real-Claude eval needs ANTHROPIC_API_KEY, 20+ consented photos + labels.csv, MediaPipe/model approval and a ~$10-15 budget. Until then readings are canned (template mode).
 
 - ~~[Phase 1]: Kotlin 2.4.21 + Hilt 2.60.1 + KSP 2.3.14 + Room 3 + AGP 9.5.3 may not build together; scaffold build is the first gate~~ RESOLVED by plan 01-01 (target set green on device; Compose BOM held at 2026.09.00 until platforms;android-37.2 is installed)
 - ~~[Phase 1]: MIUI on the Redmi asks "Install via USB?" for every adb install and auto-denies after about 10 s (INSTALL_FAILED_USER_RESTRICTED). Unattended installs need the user to tick "Remember my choice" once on that prompt~~ RESOLVED (user ticked "Remember my choice"; plan 01-03 ran 4 installs unattended)

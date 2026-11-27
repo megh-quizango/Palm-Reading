@@ -15,6 +15,7 @@ from app.jobs import Busy, JobService
 from app.services.claude_client import PalmModel
 from app.services.image_prep import MAX_BYTES, BadImage, prepare
 from app.services.palm_reader import PalmReader
+from app.services.template_model import TemplateModel
 
 MAX_BODY = MAX_BYTES + 64 * 1024  # image cap plus room for the text fields and boundaries
 HANDS = frozenset({"left", "right"})
@@ -68,6 +69,10 @@ def create_app(settings: Settings | None = None, anthropic_client: object | None
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         client, owned = anthropic_client, None
+        if s.palm_mode == "template":
+            app.state.jobs = JobService(s, PalmReader(TemplateModel()))
+            yield
+            return
         if client is None and key():
             # Looked up on the module at call time so the test guard can intercept it.
             # Per-attempt timeout = job deadline, so the SDK never cuts and re-sends a live attempt.

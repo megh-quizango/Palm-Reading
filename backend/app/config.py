@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -10,6 +11,9 @@ class Settings(BaseSettings):
     # Absolute path: the server finds backend/.env whichever directory it starts from (Pitfall 9)
     model_config = SettingsConfigDict(env_file=BACKEND_DIR / ".env", extra="ignore")
     anthropic_api_key: SecretStr | None = None
+    # env PALM_MODE: "template" serves canned readings with no Anthropic call (user choice
+    # 2026-11-27, real eval deferred); "claude" needs ANTHROPIC_API_KEY
+    palm_mode: Literal["template", "claude"] = "template"
     palm_model: str = "claude-sonnet-5-5"  # env PALM_MODEL (D-06)
     job_deadline_s: float = 45.0  # whole-job deadline (D-03, R-PALM-5)
     claude_concurrency: int = 4  # concurrent model calls (D-03)

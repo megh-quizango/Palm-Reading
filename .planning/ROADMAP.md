@@ -67,8 +67,8 @@ Plans:
 - [x] 02-05-PLAN.md — Install-scoped dHash result cache, blur/dark pre-gate, rate limit and daily spend cap (wave 3)
 - [x] 02-06-PLAN.md — Privacy proof: no image on disk or in logs, no landmarks stored, after success, failure and timeout (wave 4)
 - [x] 02-07-PLAN.md — Eval harness green in fake mode: bake-off metrics, MediaPipe landmarks tool, image red-team (wave 4)
-- [ ] 02-08-PLAN.md — User prerequisites, then the real-Claude bake-off and red-team; 02-EVAL.md (wave 5)
-- [ ] 02-09-PLAN.md — Model, template-first and threshold sign-off applied and recorded in STATE.md (wave 6)
+- [ ] 02-08-PLAN.md — User prerequisites, then the real-Claude bake-off and red-team; 02-EVAL.md (wave 5) — DEFERRED (user 2026-11-27: template mode for now)
+- [ ] 02-09-PLAN.md — Model, template-first and threshold sign-off applied and recorded in STATE.md (wave 6) — DEFERRED (follows 02-08)
 
 ### Phase 3: Client Shell
 
