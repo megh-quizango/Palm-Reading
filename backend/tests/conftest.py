@@ -52,6 +52,15 @@ def make_jpeg(size=(960, 1280), exif=False) -> bytes:
     return out.getvalue()
 
 
+def jpeg_variant(i: int) -> bytes:
+    """make_jpeg() with one mid-cell pixel turned white: new sha256, same dHash."""
+    img = Image.open(io.BytesIO(make_jpeg()))
+    img.putpixel((8 + 16 * i, 8), (255, 255, 255))
+    out = io.BytesIO()
+    img.save(out, "JPEG", quality=90)
+    return out.getvalue()
+
+
 # 21 normalised right-palm points [x, y, z] (wrist low, fingers up). Landmark 1's z is the
 # privacy marker 0.123457 that plan 02-06 searches logs for.
 LANDMARKS = [
