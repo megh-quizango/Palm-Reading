@@ -83,11 +83,11 @@ Plans:
   4. Onboarding and Home show the layered animated cosmic background without visible jank on the reference phone; it is static when system animations are off, and the scan and generating screens opt out of it.
   5. From the hero card the user chooses left or right hand and sees photo tips (one good example and four bad examples) before continuing to the scanner; the chosen hand is carried forward.
 
-**Plans:** 1/5 plans executed
+**Plans:** 2/5 plans executed
 
 Plans:
 - [x] 03-01-PLAN.md — Tracer: consent for all new artifacts, then splash -> Language (en/hi switch in place) -> Home, persisted across a relaunch on the Redmi; profile repository, routes, AppCompat locale, test fixtures, tools/ui.sh + tools/device-lock.sh (wave 1)
-- [ ] 03-02-PLAN.md — Nocturne visual layer: six-layer draw-phase sky (static under reduce motion / battery saver), Phase 3 type scale on every M3 slot, the 20 drawables (wave 1, no phone)
+- [x] 03-02-PLAN.md — Nocturne visual layer: six-layer draw-phase sky (static under reduce motion / battery saver), Phase 3 type scale on every M3 slot, the 20 drawables (wave 1, no phone)
 - [ ] 03-03-PLAN.md — Onboarding steps: 3 intro pages, first name + gender with validation, birth date / optional time / "I don't know", saves, prefill and the Back chain (wave 2)
 - [ ] 03-04-PLAN.md — Home hub and hand choice: greeting, hero, 7-tile grid, coming-soon sheet route, exit confirm, hand selection with photo tips, Scan(hand) placeholder without sky, first on-device sky motion check, debug-only showcase (wave 2)
 - [ ] 03-05-PLAN.md — Phase gate on the Redmi: release-type cold start < 2 s, motion (animations off/on, battery saver) and frame pacing, full instrumented suite, clean release APK, en/hi screenshot walk, user visual sign-off (wave 3)
@@ -152,7 +152,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6. After Phase 1,
 |-------|----------------|--------|-----------|
 | 1. Foundations & Contract | 5/5 | Complete    | 2026-11-26 |
 | 2. Reading Pipeline | 7/9 | In Progress | - |
-| 3. Client Shell | 1/5 | In Progress | - |
+| 3. Client Shell | 2/5 | In Progress | - |
 | 4. Scan Loop | 0/TBD | Not started | - |
 | 5. Result Against the Fixture | 0/TBD | Not started | - |
 | 6. Wire-Up & Ad Gates | 0/TBD | Not started | - |

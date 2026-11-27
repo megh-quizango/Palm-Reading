@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-11-27T08:24:38.860Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-11-27T08:39:03.127Z"
 last_activity: 2026-11-27
 last_activity_desc: Phase 2 execution started
-state_head: 8457834f4f0f6b254228b7925eaa1fa78572542a
+state_head: bee3d6f1493f7d0ca369a56a8fd25f22c7ba2ba4
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 19
-  completed_plans: 13
+  completed_plans: 14
   percent: 17
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-11-26)
 ## Current Position
 
 Phase: 3 (Client Shell) — PLANNED, ready to execute (Phase 2: 02-08/02-09 deferred, not verified)
-Plan: 1 of 5 (waves: 03-01+03-02, 03-03+03-04, 03-05)
+Plan: 2 of 5 (waves: 03-01+03-02, 03-03+03-04, 03-05)
 Status: Phase 3 plans checked (2 rounds, passed). UI-SPEC checker still flags typography/spacing counts against the Phase 1 token scale and generic OK/Cancel on pickers; accepted, revisit in UI review
 Last activity: 2026-11-27 — Phase 3 planned
 
@@ -69,6 +69,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 02 P06 | 2min | 2 tasks | 4 files |
 | Phase 02 P07 | 15min | 3 tasks | 6 files |
 | Phase 03 P01 | 16min | 3 tasks | 33 files |
+| Phase 03 P02 | 10min | 3 tasks | 26 files |
 
 ## Accumulated Context
 
@@ -112,6 +113,8 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-01: Profile DataStore uses OkioStorage (same format) because FileStorage rename fails on Windows JVM test hosts
 - [Phase 03]: 03-01: vivo V2225 (API 35) is the reference phone; API 33+ LocaleManager path verified, API 26-32 AppCompat path not verified on hardware
 - [Phase 03]: 03-01: LanguageScreen takes onContinue; entries decide the next step so 03-03 only edits OnboardingEntries
+- [Phase 03]: 03-02: the sky clock is a MutableLongState read as a primitive in onDrawBehind (-1 = rest); no clock when animate=false, animator scale 0 or battery saver
+- [Phase 03]: 03-02: Phase 3 illustrations are ported from our own 2026-11-26 design-session SVG (Figma MCP unavailable); tips and hero_orbit are hand-authored stand-ins under final names
 
 ### Pending Todos
 
@@ -137,6 +140,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-27T08:24:38.734Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-11-27T08:39:02.998Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
