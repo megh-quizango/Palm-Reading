@@ -11,7 +11,7 @@ from starlette.exceptions import HTTPException
 from starlette.formparsers import MultiPartParser
 
 from app.config import Settings
-from app.jobs import JobService
+from app.jobs import Busy, JobService
 from app.services.claude_client import PalmModel
 from app.services.image_prep import MAX_BYTES, BadImage, prepare
 from app.services.palm_reader import PalmReader
@@ -127,7 +127,10 @@ def create_app(settings: Settings | None = None, anthropic_client: object | None
         except BadImage:
             return error(422, "bad_request")
         del raw
-        job = jobs.submit(prepared, hand, locale, landmarks, install_id=install_id, idem_key=idem_key)
+        try:
+            job = jobs.submit(prepared, hand, locale, landmarks, install_id=install_id, idem_key=idem_key)
+        except Busy as e:
+            return error(429, "busy", {"Retry-After": str(e.retry_after)})
         return JSONResponse({"job_id": job.id}, status_code=202)
 
     @app.get("/v1/palm/jobs/{job_id}")

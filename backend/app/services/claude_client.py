@@ -18,6 +18,31 @@ SYSTEM_PROMPT: Final[str] = (
     .replace("\r\n", "\n")
 )
 LANGUAGES: Final = {"en": "English", "hi": "Hindi"}
+MAX_TOKENS: Final = 8000
+WORST_CASE_INPUT_TOKENS: Final = 6000  # an eval call sends about 4,000 input tokens
+# USD per 1M tokens: (input, output, cache read); cache write = 1.25 x input. Haiku's cache
+# read is assumed at 0.1 x input (A5)
+PRICES: Final = {
+    "claude-sonnet-5-5": (2.00, 10.00, 0.10),
+    "claude-haiku-5-5": (0.10, 0.50, 0.01),
+    "claude-opus-5-5": (4.00, 20.00, 0.20),
+}
+
+
+def cost(model: str, usage: Any) -> float:
+    pin, pout, pread = PRICES.get(model, PRICES["claude-opus-5-5"])  # unknown: highest price
+    return (
+        (usage.input_tokens or 0) * pin
+        + (usage.output_tokens or 0) * pout
+        + (usage.cache_creation_input_tokens or 0) * pin * 1.25
+        + (usage.cache_read_input_tokens or 0) * pread
+    ) / 1e6
+
+
+def worst_case_cost(model: str) -> float:
+    """Charge for an attempt that may have been billed but returned no usage."""
+    pin, pout, _ = PRICES.get(model, PRICES["claude-opus-5-5"])
+    return (WORST_CASE_INPUT_TOKENS * pin + MAX_TOKENS * pout) / 1e6
 
 
 class Malformed(Exception):
@@ -85,7 +110,7 @@ class PalmModel:
         # No sampling, thinking, tool_choice or prefill parameters: they 400 on 5.x models (D-04)
         return await self.client.messages.parse(
             model=self.model,
-            max_tokens=8000,
+            max_tokens=MAX_TOKENS,
             system=[{"type": "text", "text": SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
             messages=[
                 {

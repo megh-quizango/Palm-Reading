@@ -2,9 +2,12 @@
 
 import asyncio
 import logging
+import math
 import time
 import uuid
+from collections import defaultdict, deque
 from dataclasses import dataclass
+from datetime import UTC, date, datetime
 from typing import Any
 
 from pydantic import ValidationError
@@ -12,7 +15,7 @@ from pydantic import ValidationError
 from app.config import Settings
 from app.schemas.palm import PalmReading
 from app.services import claude_client
-from app.services.claude_client import Malformed, ModelFailure
+from app.services.claude_client import Malformed, ModelFailure, Refused, cost, worst_case_cost
 from app.services import image_prep as ip
 from app.services.image_prep import Prepared, hamming
 from app.services.palm_reader import PalmReader, invalid_reading
@@ -22,11 +25,21 @@ log = logging.getLogger("palm.jobs")
 # Strong references so running tasks are not garbage-collected (D-03)
 TASKS: set[asyncio.Task] = set()
 now = time.monotonic  # tests patch jobs.now
+today = lambda: datetime.now(UTC).date()  # noqa: E731  tests patch jobs.today
 JOB_TTL_S = 600  # jobs are swept lazily this long after creation (D-03)
 RETRY_MIN_LEFT_S = 15.0  # a malformed reply is retried only with this much deadline left (D-05)
 DHASH_MAX_DISTANCE = 6  # of 64 bits; a re-capture within this distance is a cache hit (D-12, eval-tuned)
 CACHE_TTL_S = 86_400
 CACHE_MAX = 2000
+WINDOWS = ((600, "rate_limit_10min"), (86_400, "rate_limit_day"))  # (seconds, Settings field)
+
+
+class Busy(Exception):
+    """Over a rate window or the daily spend cap: 429 with Retry-After, no model call (D-14)."""
+
+    def __init__(self, retry_after: int):
+        super().__init__(retry_after)
+        self.retry_after = retry_after
 
 
 @dataclass
@@ -59,6 +72,8 @@ class JobService:
         self.sem = asyncio.Semaphore(settings.claude_concurrency)
         # (install, hand, locale, prompt version, sha256) -> (created, dhash, reading JSON) only (D-12)
         self.cache: dict[tuple[str, str, str, str, str], tuple[float, int, str]] = {}
+        self.admitted: dict[str, deque[float]] = defaultdict(deque)  # install -> model-bound job times
+        self.ledger: dict[date, float] = {}  # UTC day -> USD charged
 
     def _sweep(self) -> None:
         # Lazy, on every request; no background sweeper task (D-03)
@@ -103,6 +118,7 @@ class JobService:
             self._store(ckey, prepared.dhash, reading)
             job = self._done(hand, locale, reading)
         if job is None:
+            self._admit(install_id)  # last: free paths above never count
             job = Job(str(uuid.uuid4()), "queued", hand, locale, now())
             self.jobs[job.id] = job
             self.inflight[flight] = job.id
@@ -114,6 +130,43 @@ class JobService:
         if idem:
             self.by_idem[idem] = job.id
         return job
+
+    def _admit(self, install_id: str) -> None:
+        if self.ledger.get(today(), 0.0) >= self.settings.daily_spend_cap_usd:
+            n = datetime.now(UTC)
+            raise Busy(86_400 - (n.hour * 3600 + n.minute * 60 + n.second))  # to UTC midnight
+        t = now()
+        q = self.admitted[install_id]
+        while q and q[0] <= t - 86_400:
+            q.popleft()
+        for span, limit in WINDOWS:
+            inside = [x for x in q if x > t - span]
+            if len(inside) >= getattr(self.settings, limit):
+                raise Busy(max(1, math.ceil(inside[0] + span - t)))
+        q.append(t)
+
+    def _charge(self, usd: float) -> None:
+        self.ledger[today()] = self.ledger.get(today(), 0.0) + usd
+
+    async def _read(self, job: Job, jpeg: bytes, w: int, h: int, landmarks: Any):
+        """One model attempt, charged to the ledger however it ends (cancellation included)."""
+        # shortcut: concurrent jobs can overshoot the cap by up to claude_concurrency calls; add a reservation before the call if the cap is ever tight.
+        model = self.settings.palm_model
+        usd = worst_case_cost(model)  # no usage came back: assume the attempt was billed
+        try:
+            result = await self.reader.read(jpeg, w, h, job.hand, job.locale, landmarks)
+            usd = cost(result.model, result.usage)
+            return result
+        except (Malformed, Refused) as e:
+            if e.usage is not None:
+                usd = cost(e.model or model, e.usage)
+            raise
+        except ModelFailure as e:
+            if not e.billable:  # API status errors are not billed
+                usd = 0.0
+            raise
+        finally:
+            self._charge(usd)
 
     def _cached(self, ckey: tuple, dh: int) -> str | None:
         """Exact sha256 first, else the nearest same-prefix dHash within DHASH_MAX_DISTANCE."""
@@ -152,7 +205,7 @@ class JobService:
                     job.status = "running"
                     for attempt in range(2):
                         try:
-                            result = await self.reader.read(jpeg, w, h, job.hand, job.locale, landmarks)
+                            result = await self._read(job, jpeg, w, h, landmarks)
                             break
                         # Malformed reply, or a reading the strict contract rejects: one identical retry
                         except (Malformed, ValidationError) as e:
