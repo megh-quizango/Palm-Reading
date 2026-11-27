@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-11-27T05:09:07.687Z"
+stopped_at: Completed 02-04-PLAN.md
+last_updated: "2026-11-27T05:14:41.796Z"
 last_activity: 2026-11-27
 last_activity_desc: Phase 2 execution started
-state_head: ebb480be028581c155899c18c919b583067bbfc4
+state_head: 0f2ab6e6e894631184a43d203a493480cdbac0e2
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 14
-  completed_plans: 8
+  completed_plans: 9
   percent: 17
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-11-26)
 ## Current Position
 
 Phase: 2 (Reading Pipeline) — EXECUTING
-Plan: 4 of 9
+Plan: 5 of 9
 Status: Ready to execute
 Last activity: 2026-11-27 — Phase 2 execution started
 
@@ -64,6 +64,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 02 P01 | 5min | 3 tasks | 16 files |
 | Phase 02 P02 | 4min | 2 tasks | 4 files |
 | Phase 02 P03 | 3min | 3 tasks | 7 files |
+| Phase 02 P04 | 4min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,9 @@ Recent decisions affecting current work:
 - [Phase 02]: 02-03: a POST that single-flights onto a running job also maps its own Idempotency-Key to that job
 - [Phase 02]: 02-03: failure logs are job_failed job_id/code/error=<class of __cause__ or exception>, never the message
 - [Phase 02]: 02-03: OverloadedError (529) maps to busy through the InternalServerError branch
+- [Phase 02]: ReadResult.llm stays unfiltered model output; only the filtered reading reaches jobs and cache
+- [Phase 02]: Safety list field with flagged items counts as one rewrite: dropped and refilled to 3 from NEUTRAL defaults
+- [Phase 02]: Bare शेयर is not a Hindi directive trigger; only शेयरों / शेयर में / शेयर बाज़ार count
 
 ### Pending Todos
 
@@ -117,6 +121,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-27T05:09:07.565Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-11-27T05:14:41.678Z
+Stopped at: Completed 02-04-PLAN.md
 Resume file: None
