@@ -13,12 +13,18 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -41,6 +47,13 @@ import app.palm.core.designsystem.devanagariSafe
 fun NameScreen(viewModel: NameViewModel, onContinue: () -> Unit, modifier: Modifier = Modifier) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val type = LocalNocturne.current.type
+    val focusManager = LocalFocusManager.current
+    var hadFocus by remember { mutableStateOf(false) }
+    val error = when {
+        !state.showError -> null
+        state.check == NameCheck.TOO_SHORT -> stringResource(R.string.name_error_short)
+        else -> stringResource(R.string.name_error_chars)
+    }
     // safeDrawing includes the IME inset, so the CTA rides above the keyboard (adjustResize)
     OnboardingStep(
         step = 1,
@@ -57,6 +70,15 @@ fun NameScreen(viewModel: NameViewModel, onContinue: () -> Unit, modifier: Modif
             label = stringResource(R.string.name_label),
             placeholder = stringResource(R.string.name_placeholder),
             helper = stringResource(R.string.name_helper),
+            error = error,
+            modifier = Modifier.onFocusChanged {
+                if (hadFocus && !it.hasFocus) viewModel.revealError()
+                hadFocus = it.hasFocus
+            },
+            keyboardActions = KeyboardActions(onDone = {
+                viewModel.revealError()
+                focusManager.clearFocus() // also hides the keyboard
+            }),
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
                 autoCorrectEnabled = false,
