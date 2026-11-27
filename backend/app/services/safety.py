@@ -23,6 +23,40 @@ RULES: Final = [
         ("en.lifespan", r"\blife\s*span\b|\blifespans?\b|\blife expectancy\b|\blongevity\b"),
         # The p1 prompt asks for each line's length, so "a long life line" is fine
         ("en.life_length", r"\b(long|short) life\b(?![\s-]*lines?\b)"),
+        (
+            "en.illness",
+            r"\billness\w*|\bdiseases?\b|\bcancers?\b|\bdiabet\w*|\bheart attacks?\b"
+            r"|\bsurger(y|ies)\b|\bdiagnos(is|ed)\b|\bmedicat\w*|\bdoctors?\b|\bhospitals?\b",
+        ),
+        (
+            "en.pregnancy",
+            r"\bpregnan\w*|\bfertility\b|\binfertil\w*|\bmiscarr\w*|\bconceiv\w*\s+(a\s+)?(child|baby)",
+        ),
+        ("en.gambling", r"\blotter(y|ies)\b|\bgambl\w*"),
+        ("en.legal", r"\blawsuits?\b|\bcourts?\b|\blegal action\b"),
+        # Advice, not bare career words: "Medicine" or "Finance" as an industry is fine
+        (
+            "en.directive",
+            r"\b(should|must|need to|have to|avoid|stop|start)\b.{0,40}?"
+            r"\b(invest\w*|stocks?\b|shares\b|crypto\w*|loans?\b|borrow\w*|sue\b|divorce\w*"
+            r"|medicine\w*|medicat\w*|treatment\w*|diet\w*)",
+        ),
+        (
+            "hinglish",
+            r"\b(maut|mrityu|bimari\w*|rog|garbh\w*|dawai\w*|ilaaj|satta|jua|mukadm\w*)\b",
+        ),
+        # Devanagari: no \b (matras are not \w, A10), so plain stems and lookarounds
+        ("hi.death", r"मृत्यु|मौत|(?<![ऀ-ॿ])मर(न|े| जा| सक)|निधन|देहांत"),
+        (
+            "hi.lifespan",
+            r"(लंबी|लम्बी|कम|छोटी)\s*उम्र|उम्र\s*(लंबी|लम्बी|कम|छोटी)|आयु|दीर्घायु|अल्पायु",
+        ),
+        ("hi.illness", r"बीमार|रोग|कैंसर|दवा|इलाज|डॉक्टर|अस्पताल"),
+        ("hi.pregnancy", r"गर्भ|प्रेग्नें|बांझ"),
+        ("hi.gambling", r"लॉटरी|सट्टा|जुआ"),
+        ("hi.legal", r"मुकदमा|अदालत|कोर्ट"),
+        # bare शेयर also means "share (feelings)", so only the market senses count
+        ("hi.directive", r"(निवेश|शेयर(ों| में| बाज़ार)|कर्ज|लोन|तलाक).{0,30}(करें|चाहिए|कीजिए|मत)"),
     ]
 ]
 
