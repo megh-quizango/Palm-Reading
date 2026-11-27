@@ -34,6 +34,9 @@ object NocturneGradientAngles {
 /** Outline width for ghost buttons, chips and the foil border; the tokens define no border width. */
 val NocturneBorderWidth = 1.dp
 
+/** Selected, focused and error borders (rows, fields, tiles); the tokens define no border widths. */
+val NocturneSelectedBorderWidth = 2.dp
+
 /** The one conversion from a token glow to a Compose drop shadow (Figma blur = Compose radius, A10). */
 fun Modifier.nocturneGlow(shadow: NocturneShadow, shape: Shape): Modifier = dropShadow(
     shape,

@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">[AppName]</string>
+    <string name="app_name" translatable="false">[AppName]</string>
+
+    <string name="common_continue">Continue</string>
+    <string name="common_next">Next</string>
+    <string name="common_ok">OK</string>
+    <string name="common_back">Back</string>
+    <string name="common_save_failed">Couldn\'t save. Please try again.</string>
+    <string name="common_selected">Selected</string>
+    <string name="common_not_selected">Not selected</string>
+
+    <string name="language_title">Choose your language</string>
+    <string name="language_subtitle">Read [AppName] in English or Hindi.</string>
+    <string name="language_cta">Continue in English</string>
+    <string name="language_name_en" translatable="false">English</string>
+    <string name="language_name_hi" translatable="false">हिन्दी</string>
+
+    <string name="home_greeting_morning">Good morning, %1$s</string>
+    <string name="home_greeting_afternoon">Good afternoon, %1$s</string>
+    <string name="home_greeting_evening">Good evening, %1$s</string>
+    <string name="home_greeting_night">The stars are out, %1$s</string>
 </resources>

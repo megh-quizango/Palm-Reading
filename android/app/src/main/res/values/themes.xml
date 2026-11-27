@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Palm" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.Palm" parent="Theme.AppCompat.NoActionBar">
         <!-- Cold start shows the Nocturne background, no white flash -->
         <item name="android:windowBackground">@color/nocturne_bg_base</item>
+    </style>
+
+    <!-- S01: system splash held until the first profile read (D-02) -->
+    <style name="Theme.Palm.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/nocturne_bg_base</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.Palm</item>
     </style>
 </resources>

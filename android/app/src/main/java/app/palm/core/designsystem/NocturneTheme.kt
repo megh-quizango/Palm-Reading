@@ -133,7 +133,7 @@ fun NocturneTheme(content: @Composable () -> Unit) {
     val reduceMotion = remember {
         Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
     }
-    // Phase 3 adds the in-app language switch; for now the system locale decides
+    // The AppCompat per-app locale (D-06) recreates the activity, so this follows the chosen language
     val devanagari = LocalConfiguration.current.locales[0].language == "hi"
     val type = remember(devanagari) {
         nocturneTextStyles { spec ->

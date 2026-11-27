@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Claude-written Hindi; flagged for native-speaker review in STATE.md -->
+<resources>
+    <string name="common_continue">आगे बढ़ें</string>
+    <string name="common_next">आगे</string>
+    <string name="common_ok">ठीक है</string>
+    <string name="common_back">वापस</string>
+    <string name="common_save_failed">सेव नहीं हो सका। कृपया फिर से कोशिश करें।</string>
+    <string name="common_selected">चुना गया</string>
+    <string name="common_not_selected">नहीं चुना गया</string>
+
+    <string name="language_title">अपनी भाषा चुनें</string>
+    <string name="language_subtitle">[AppName] को अंग्रेज़ी या हिंदी में इस्तेमाल करें।</string>
+    <string name="language_cta">हिंदी में आगे बढ़ें</string>
+
+    <string name="home_greeting_morning">सुप्रभात, %1$s</string>
+    <string name="home_greeting_afternoon">नमस्ते, %1$s</string>
+    <string name="home_greeting_evening">शुभ संध्या, %1$s</string>
+    <string name="home_greeting_night">तारे निकल आए हैं, %1$s</string>
+</resources>
