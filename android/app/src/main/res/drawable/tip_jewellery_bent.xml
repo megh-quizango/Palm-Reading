@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Photo tip, new art in the Constellation hand style (hand-authored); decorative -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="56dp"
+    android:height="56dp"
+    android:viewportWidth="56"
+    android:viewportHeight="56">
+    <group android:rotation="24" android:pivotX="30" android:pivotY="27">
+        <group android:pivotX="0" android:pivotY="0" android:scaleX="0.19" android:scaleY="0.19" android:translateX="13.47" android:translateY="1.92">
+            <path
+                android:pathData="M60 250C40 210 30 180 28 150L22 100C20 88 36 84 40 96L50 130L48 50C48 36 66 36 66 50L70 120L74 28C74 14 94 14 94 28L94 118L102 36C102 22 122 22 122 36L118 124L132 66C134 52 152 56 150 70L138 150C134 190 124 222 116 250Z"
+                android:strokeColor="@color/nocturne_accent_gold"
+                android:strokeWidth="7.37"
+                android:strokeLineJoin="round">
+                <aapt:attr name="android:fillColor">
+                    <gradient android:type="linear" android:startX="22" android:startY="14" android:endX="22" android:endY="250">
+                        <item android:offset="0" android:color="#FFEEE8FF" />
+                        <item android:offset="0.55" android:color="#FFA48CFF" />
+                        <item android:offset="1" android:color="#FF4B33C9" />
+                    </gradient>
+                </aapt:attr>
+            </path>
+            <path
+                android:pathData="M48 140C70 128 100 126 136 136M40 160C66 160 92 166 120 180M52 146C34 172 40 214 62 248M92 248C90 220 90 196 92 168"
+                android:strokeColor="@color/nocturne_accent_gold"
+                android:strokeWidth="5.79"
+                android:strokeAlpha="0.8"
+                android:strokeLineCap="round" />
+            <path
+                android:pathData="M98,100a14,6 0 1,0 28,0a14,6 0 1,0 -28,0Z"
+                android:strokeColor="@color/nocturne_accent_gold"
+                android:strokeWidth="15.79" />
+            <path
+                android:pathData="M100,88a12,12 0 1,0 24,0a12,12 0 1,0 -24,0Z"
+                android:fillColor="#FFF4F1FF"
+                android:strokeColor="@color/nocturne_accent_gold"
+                android:strokeWidth="8.42" />
+        </group>
+    </group>
+</vector>
