@@ -24,6 +24,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"http://127.0.0.1:8000\"")
         }
         release {
+            signingConfig = signingConfigs.getByName("debug") // shortcut: debug-signed only for on-device timing (D-16), replace with the upload key at REL-03
             buildConfigField("String", "BASE_URL", "\"https://api.invalid\"")
         }
     }
