@@ -25,13 +25,13 @@
 ### Home
 
 - [x] **HOME-01**: User sees a time-of-day greeting with their name on Home
-- [ ] **HOME-02**: User sees the hero card and feature grid; tiles outside milestone 1 open a "coming soon" state
+- [x] **HOME-02**: User sees the hero card and feature grid; tiles outside milestone 1 open a "coming soon" state
 - [ ] **HOME-03**: User can reopen their last palm reading from Home
-- [ ] **HOME-04**: Pressing Back on Home asks to confirm leaving the app
+- [x] **HOME-04**: Pressing Back on Home asks to confirm leaving the app
 
 ### Scan
 
-- [ ] **SCAN-01**: User can choose left or right hand and see photo tips (good example + 4 bad examples) before scanning
+- [x] **SCAN-01**: User can choose left or right hand and see photo tips (good example + 4 bad examples) before scanning
 - [ ] **SCAN-02**: User is asked for camera permission; if denied they see an explanation with "Open settings" and "Choose from gallery"; if the camera is unavailable they see a gallery fallback
 - [ ] **SCAN-03**: While scanning, user sees live guidance that reacts to back of hand, closed hand, too far, moving, and "palm detected" (stable, no flicker)
 - [ ] **SCAN-04**: User can capture only when a palm is detected; user can toggle the flash
@@ -135,10 +135,10 @@
 | ONB-05 | Phase 3 | Complete |
 | ONB-06 | Phase 3 | Complete |
 | HOME-01 | Phase 3 | Complete |
-| HOME-02 | Phase 3 | Pending |
+| HOME-02 | Phase 3 | Complete |
 | HOME-03 | Phase 5 | Pending |
-| HOME-04 | Phase 3 | Pending |
-| SCAN-01 | Phase 3 | Pending |
+| HOME-04 | Phase 3 | Complete |
+| SCAN-01 | Phase 3 | Complete |
 | SCAN-02 | Phase 4 | Pending |
 | SCAN-03 | Phase 4 | Pending |
 | SCAN-04 | Phase 4 | Pending |
