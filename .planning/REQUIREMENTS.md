@@ -42,12 +42,12 @@
 ### Reading pipeline
 
 - [ ] **READ-01**: User's photo, hand side and the 21 hand landmarks are sent to the backend as a job; the app polls for the result with a 45-second overall deadline
-- [ ] **READ-02**: The backend returns a validated reading (palm summary, traits, Heart/Head/Life/Fate/Sun lines with traces, love, career, verdict) produced by Claude vision; malformed output is retried once, then fails cleanly
+- [x] **READ-02**: The backend returns a validated reading (palm summary, traits, Heart/Head/Life/Fate/Sun lines with traces, love, career, verdict) produced by Claude vision; malformed output is retried once, then fails cleanly
 - [ ] **READ-03**: When the photo is unusable, the user sees one of 7 reasons (blurry/dark, too far, jewellery, bent, fingers too tight, incomplete, no palm lines) with a retake tip, and the attempt does not use up their free scan
 - [ ] **READ-04**: The same palm photo within 24 hours returns the same reading (server cache by visual fingerprint + hand + language + prompt version)
-- [ ] **READ-05**: The backend never writes the palm image to disk or logs; landmarks are used only for line validation and never stored
+- [x] **READ-05**: The backend never writes the palm image to disk or logs; landmarks are used only for line validation and never stored
 - [ ] **READ-06**: AI lines that fail validation against the hand landmarks are replaced by landmark-anchored template lines, and the overlay is labelled approximate
-- [ ] **READ-07**: Readings never contain death, illness, pregnancy, medical, legal or financial directives (prompt rules + server output filter)
+- [x] **READ-07**: Readings never contain death, illness, pregnancy, medical, legal or financial directives (prompt rules + server output filter)
 - [ ] **READ-08**: The generating screen shows progress and handles busy, offline and timeout with retry
 - [ ] **READ-09**: On the real phone a reading arrives in under 12 s typically (p50) and under 30 s at worst (p95)
 - [ ] **READ-10**: The backend rate-limits each install and enforces a daily spend cap
@@ -146,12 +146,12 @@
 | SCAN-06 | Phase 4 | Pending |
 | SCAN-07 | Phase 4 | Pending |
 | READ-01 | Phase 6 | Pending |
-| READ-02 | Phase 2 | Pending |
+| READ-02 | Phase 2 | Complete |
 | READ-03 | Phase 5 | Pending |
 | READ-04 | Phase 2 | Pending |
-| READ-05 | Phase 2 | Pending |
+| READ-05 | Phase 2 | Complete |
 | READ-06 | Phase 2 | Pending |
-| READ-07 | Phase 2 | Pending |
+| READ-07 | Phase 2 | Complete |
 | READ-08 | Phase 6 | Pending |
 | READ-09 | Phase 6 | Pending |
 | READ-10 | Phase 2 | Pending |
