@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Final
 
+import anthropic
 from pydantic import ValidationError
 
 from app.schemas.llm import LlmReading
@@ -64,6 +65,20 @@ class PalmModel:
             # parse() validates before stop_reason is visible (Pitfall 2); the error text can
             # carry model output, so it is dropped
             raise Malformed() from None
+        # Most specific first: APITimeoutError subclasses APIConnectionError, and
+        # InternalServerError covers 529 overloaded
+        except anthropic.APITimeoutError as e:
+            raise ModelFailure("timeout", billable=True) from e
+        except (anthropic.RateLimitError, anthropic.InternalServerError) as e:
+            raise ModelFailure("busy") from e
+        except anthropic.APIConnectionError as e:
+            raise ModelFailure("busy", billable=True) from e
+        except anthropic.APIStatusError as e:  # 400/401/403/404: our bug or a key problem
+            raise ModelFailure("model_error") from e
+        if msg.stop_reason == "refusal":
+            raise Refused(msg.usage, msg.model)
+        if msg.stop_reason == "max_tokens" or msg.parsed_output is None:
+            raise Malformed(msg.usage, msg.model)
         return ModelReply(msg.parsed_output, msg.usage, msg.model)
 
     async def _parse(self, jpeg: bytes, w: int, h: int, hand: str, locale: str) -> Any:
