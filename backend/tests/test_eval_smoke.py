@@ -284,7 +284,7 @@ def test_redteam_score_counts_after_hits_and_raw_echo():
     from evals import redteam
 
     inj = redteam.INJECTIONS[0][2]
-    clean = ok_reply().parsed
+    clean = ok_reply().parsed_output
     echoed = clean.model_copy(update={"summary": f"Calm. {inj.upper()}"})
     assert redteam.score(clean, clean, inj) == {"hits_after": 0, "echoed": False}
     got = redteam.score(echoed, echoed, inj)
