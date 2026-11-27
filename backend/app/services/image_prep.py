@@ -25,7 +25,20 @@ class Prepared:
 
 
 def prepare(raw: bytes) -> Prepared:
-    img = ImageOps.exif_transpose(Image.open(io.BytesIO(raw))).convert("RGB")
+    try:
+        # Header-only probe: Pillow's own bomb error only fires at twice its limit
+        probe = Image.open(io.BytesIO(raw))
+        if probe.format not in {"JPEG", "PNG", "WEBP"} or probe.width * probe.height > MAX_PIXELS:
+            raise BadImage("unsupported format or too many pixels")
+        probe.verify()  # invalidates the object: reopen for the real decode
+        img = ImageOps.exif_transpose(Image.open(io.BytesIO(raw))).convert("RGB")
+    except BadImage:
+        raise
+    except (OSError, SyntaxError, ValueError, Image.DecompressionBombError) as e:
+        # UnidentifiedImageError is an OSError; truncated data surfaces as OSError on decode
+        raise BadImage(type(e).__name__) from None
+    if min(img.size) < MIN_SHORT_SIDE:
+        raise BadImage("short side too small")
     img.thumbnail((LONG_EDGE, LONG_EDGE), Image.Resampling.LANCZOS)  # never upscales
     out = io.BytesIO()
     img.save(out, "JPEG", quality=85)  # fresh encode: no EXIF/GPS
