@@ -4,9 +4,12 @@ version = "0.1.0"
 description = "Palm reading API (local dev skeleton)"
 requires-python = ">=3.13,<3.14"
 dependencies = [
+    "anthropic==2.14.0",
     "fastapi==0.165.0",
+    "pillow==13.0.0",
     "pydantic==2.14.4",
     "pydantic-settings==2.16.3",
+    "python-multipart==0.0.34",
     "uvicorn[standard]==0.54.0",
 ]
 

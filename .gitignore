@@ -23,3 +23,8 @@ backend/.env
 .env
 *.jks
 *.keystore
+
+# Eval photos, outputs and model downloads: never commit (public repo, D-15)
+backend/evals/photos/
+backend/evals/results/
+backend/evals/models/
