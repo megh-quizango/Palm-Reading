@@ -3,8 +3,10 @@ package app.palm.core.data
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.core.okio.OkioStorage
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.PreferencesSerializer
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
@@ -28,6 +30,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import okio.FileSystem
+import okio.Path.Companion.toOkioPath
 
 enum class AppLanguage(val tag: String) { EN("en"), HI("hi") }
 
@@ -113,12 +117,16 @@ class DataStoreProfileRepository @Inject constructor(private val store: DataStor
     }
 }
 
-/** The one construction path for the profile store (Hilt module and JVM tests). */
+/**
+ * The one construction path for the profile store (Hilt module and JVM tests).
+ * Okio storage: same file format as the default FileStorage, and its atomic move also replaces the file on a
+ * Windows test host, where FileStorage's File.renameTo fails on every write after the first.
+ */
 fun createProfileStore(scope: CoroutineScope, produceFile: () -> File): DataStore<Preferences> =
     PreferenceDataStoreFactory.create(
+        storage = OkioStorage(FileSystem.SYSTEM, PreferencesSerializer) { produceFile().absoluteFile.toOkioPath() },
         corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
         scope = scope,
-        produceFile = produceFile,
     )
 
 @Module
