@@ -3,10 +3,10 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: planning
-stopped_at: Phase 1 complete, ready to plan Phase 2
+stopped_at: Phase 2 planned (9 plans, 6 waves), ready to execute
 last_updated: "2026-11-26T12:00:31.131Z"
 last_activity: 2026-11-26
-last_activity_desc: Phase 1 complete, transitioned to Phase 2
+last_activity_desc: Phase 2 planned; plan check passed after 2 rounds (29 issues fixed)
 state_head: 373b54ca578fd112de6a7283d7f4ffcd843691bc
 progress:
   total_phases: 6
@@ -23,14 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-26)
 
 **Core value:** The palm scan moment: live on-device hand guidance, then a believable Palm / Love / Career reading with the detected lines drawn over the user's own photo, in under 30 seconds.
-**Current focus:** Phase 1 — Foundations & Contract
+**Current focus:** Phase 2 — Reading Pipeline
 
 ## Current Position
 
 Phase: 2 — Reading Pipeline
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-11-26 — Phase 1 complete, transitioned to Phase 2
+Plan: 0 of 9 (planned, not started)
+Status: Ready to execute
+Last activity: 2026-11-27 — Phase 2 planned (9 plans, 6 waves), plan check passed
 
 Progress: [██░░░░░░░░] 17%
 
@@ -83,6 +83,7 @@ Recent decisions affecting current work:
 - [Phase 01]: 01-04: generator emits NocturneColors.ByPath and NocturneTypeSpecs.ByName so showcase lists never hand-copy token paths or names
 - [Phase 01]: Effects.kt is the single token-to-Compose conversion point: dropShadow glows and CSS-angle gradient brushes; components pass NocturneGradientAngles constants
 - [Phase 01]: NocturneBackground: seeded 60-star sky, animated values read only in drawBehind, no transition under reduceMotion; content in its own graphicsLayer
+- [Phase 2 planning]: Plan check: 2 rounds (multi-lens review + adversarial verify), 27 + 2 confirmed issues fixed; real-API eval budget estimate is ~$10-15 (Hindi pass, 6-topic red-team), approved by the user at 02-08 Task 1
 
 ### Pending Todos
 
