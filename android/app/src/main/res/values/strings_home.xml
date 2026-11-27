@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_hero_overline">Palm reading</string>
+    <string name="home_hero_title">Read your palm</string>
+    <string name="home_hero_body">Point your camera at your palm and see your heart, head and life lines.</string>
+    <string name="home_hero_cta">Scan my palm</string>
+    <string name="home_explore">Explore your destiny</string>
+    <string name="home_soon_badge">Soon</string>
+    <string name="home_tile_soon_cd">%1$s, coming soon</string>
+
+    <string name="feature_palm">Palm reading</string>
+    <string name="feature_tarot">Tarot</string>
+    <string name="feature_horoscope">Horoscope</string>
+    <string name="feature_birth_chart">Birth chart</string>
+    <string name="feature_love_test">Love test</string>
+    <string name="feature_daily_report">Daily report</string>
+    <string name="feature_ask_guide">Ask [Guide]</string>
+
+    <string name="coming_soon_overline">Coming soon</string>
+    <string name="coming_soon_body">We\'re still working on this one. Your palm reading is ready today.</string>
+
+    <string name="exit_title">Leave [AppName]?</string>
+    <string name="exit_body">Your profile stays saved on this phone. Come back any time.</string>
+    <string name="exit_stay">Stay</string>
+    <string name="exit_leave">Leave</string>
+
+    <string name="hand_title">Hand reading</string>
+    <string name="hand_question">Which hand should we read?</string>
+    <string name="hand_left">Left hand</string>
+    <string name="hand_right">Right hand</string>
+    <string name="hand_hint">Many palm readers use your dominant hand for the present and future.</string>
+    <string name="tips_good_title">Good photo</string>
+    <string name="tips_good_body">Whole palm in the frame, fingers open, good light.</string>
+    <string name="tips_bad_title">Avoid these</string>
+    <string name="tips_bad_far">Too far</string>
+    <string name="tips_bad_blurry">Blurry or dark</string>
+    <string name="tips_bad_fingers">Fingers closed</string>
+    <string name="tips_bad_jewellery">Jewellery or bent</string>
+    <string name="tips_bad_cd">Avoid: %1$s</string>
+    <string name="hand_requirement">Use the back camera in good light, and take off rings if you can.</string>
+    <string name="hand_privacy">Your photo is only used to make your reading and is deleted right after.</string>
+
+    <string name="scan_placeholder_title">Scanner arrives in the next update</string>
+    <string name="scan_placeholder_hand">Hand: %1$s</string>
+</resources>

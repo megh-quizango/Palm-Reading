@@ -27,7 +27,7 @@ import app.palm.core.designsystem.NocturneSpace
 import app.palm.core.designsystem.nocturneBrush
 import app.palm.core.designsystem.nocturneGlow
 
-enum class NocturneButtonStyle { Primary, Secondary, Ghost }
+enum class NocturneButtonStyle { Primary, Secondary, Ghost, OnHero }
 
 private const val DISABLED_ALPHA = 0.38f // lower emphasis with the same colours
 
@@ -46,11 +46,13 @@ fun NocturneButton(
             Modifier.nocturneGlow(NocturneShadows.GlowPrimary, PillShape).background(primaryBrush, PillShape)
         NocturneButtonStyle.Secondary -> Modifier.background(NocturneSemantic.Muted, PillShape)
         NocturneButtonStyle.Ghost -> Modifier.border(NocturneBorderWidth, NocturneSemantic.Border, PillShape)
+        NocturneButtonStyle.OnHero -> Modifier.background(NocturneColors.TextOnPrimary, PillShape)
     }
     val textColor = when (style) {
         NocturneButtonStyle.Primary -> NocturneSemantic.OnPrimary
         NocturneButtonStyle.Secondary -> NocturneSemantic.Foreground
         NocturneButtonStyle.Ghost -> NocturneColors.BrandLink
+        NocturneButtonStyle.OnHero -> NocturneColors.BrandPrimaryDeep
     }
     Row(
         modifier

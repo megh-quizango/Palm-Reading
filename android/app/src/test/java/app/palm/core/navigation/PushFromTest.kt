@@ -20,4 +20,11 @@ class PushFromTest {
         stack.pushFrom(Language, Intro) // second in-flight continueTo finishing after the first
         assertEquals(listOf(Language, Intro, Name), stack.toList())
     }
+
+    @Test fun doubleBackPopsOnce() {
+        val stack = NavBackStack<NavKey>(Home, HandSelect)
+        stack.popFrom(HandSelect)
+        stack.popFrom(HandSelect)
+        assertEquals(listOf(Home), stack.toList())
+    }
 }

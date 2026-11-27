@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -25,11 +27,18 @@ import app.palm.core.designsystem.LocalNocturne
 import app.palm.core.designsystem.NocturneSemantic
 import app.palm.core.designsystem.NocturneSpace
 import app.palm.core.designsystem.devanagariSafe
+import app.palm.core.navigation.Feature
 import java.time.LocalTime
 
-/** S06 Home: header only for now; 03-04 adds the hero, grid, sheet and exit dialog. */
+/** S06 Home: header, hero, feature grid; Back asks before leaving (D-11..D-13). */
 @Composable
-fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier = Modifier) {
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    onScan: () -> Unit,
+    onFeature: (Feature) -> Unit,
+    onGreetingLongPress: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
     val profile by viewModel.profile.collectAsStateWithLifecycle()
     val p = profile ?: return
     val type = LocalNocturne.current.type
@@ -53,5 +62,7 @@ fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier = Modifier) {
                 modifier = Modifier.semantics { heading() },
             )
         }
+        Spacer(Modifier.height(NocturneSpace.S16))
+        HeroCard(onScan)
     }
 }

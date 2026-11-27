@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_hero_overline">हस्तरेखा</string>
+    <string name="home_hero_title">अपनी हथेली पढ़वाएँ</string>
+    <string name="home_hero_body">कैमरा अपनी हथेली पर रखें और देखें अपनी हृदय, मस्तिष्क और जीवन रेखा।</string>
+    <string name="home_hero_cta">हथेली स्कैन करें</string>
+    <string name="home_explore">अपनी किस्मत जानिए</string>
+    <string name="home_soon_badge">जल्द</string>
+    <string name="home_tile_soon_cd">%1$s, जल्द आ रहा है</string>
+
+    <string name="feature_palm">हस्तरेखा</string>
+    <string name="feature_tarot">टैरो</string>
+    <string name="feature_horoscope">राशिफल</string>
+    <string name="feature_birth_chart">जन्म कुंडली</string>
+    <string name="feature_love_test">लव टेस्ट</string>
+    <string name="feature_daily_report">दैनिक रिपोर्ट</string>
+    <string name="feature_ask_guide">[Guide] से पूछें</string>
+
+    <string name="coming_soon_overline">जल्द ही</string>
+    <string name="coming_soon_body">इस पर अभी काम चल रहा है। आपकी हस्तरेखा रीडिंग आज ही तैयार है।</string>
+
+    <string name="exit_title">[AppName] से बाहर जाएँ?</string>
+    <string name="exit_body">आपकी प्रोफ़ाइल इसी फ़ोन पर सेव रहेगी। जब चाहें लौट आइए।</string>
+    <string name="exit_stay">रुकें</string>
+    <string name="exit_leave">बाहर जाएँ</string>
+
+    <string name="hand_title">हस्तरेखा रीडिंग</string>
+    <string name="hand_question">कौन-सा हाथ पढ़ें?</string>
+    <string name="hand_left">बायाँ हाथ</string>
+    <string name="hand_right">दायाँ हाथ</string>
+    <string name="hand_hint">कई हस्तरेखा विशेषज्ञ वर्तमान और भविष्य के लिए आपका मुख्य हाथ देखते हैं।</string>
+    <string name="tips_good_title">अच्छी फ़ोटो</string>
+    <string name="tips_good_body">पूरी हथेली फ़्रेम में, उंगलियाँ खुली, अच्छी रोशनी।</string>
+    <string name="tips_bad_title">इनसे बचें</string>
+    <string name="tips_bad_far">बहुत दूर</string>
+    <string name="tips_bad_blurry">धुंधली या अंधेरी</string>
+    <string name="tips_bad_fingers">उंगलियाँ बंद</string>
+    <string name="tips_bad_jewellery">गहने या मुड़ा हाथ</string>
+    <string name="tips_bad_cd">इससे बचें: %1$s</string>
+    <string name="hand_requirement">अच्छी रोशनी में पीछे वाला कैमरा इस्तेमाल करें, और हो सके तो अंगूठी उतार दें।</string>
+    <string name="hand_privacy">आपकी फ़ोटो सिर्फ़ रीडिंग बनाने में इस्तेमाल होती है और उसके तुरंत बाद मिटा दी जाती है।</string>
+
+    <string name="scan_placeholder_title">स्कैनर अगले अपडेट में आएगा</string>
+    <string name="scan_placeholder_hand">हाथ: %1$s</string>
+</resources>

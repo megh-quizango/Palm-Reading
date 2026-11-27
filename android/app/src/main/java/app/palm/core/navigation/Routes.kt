@@ -42,4 +42,9 @@ fun NavBackStack<NavKey>.pushFrom(from: NavKey, to: NavKey) {
     if (lastOrNull() == from) add(to)
 }
 
+/** Pop only while [from] is on top, so a double tap on Back or OK cannot pop two screens. */
+fun NavBackStack<NavKey>.popFrom(from: NavKey) {
+    if (lastOrNull() == from) removeAt(size - 1)
+}
+
 fun startRoute(profile: Profile): Route = if (profile.onboardingComplete) Home else Language

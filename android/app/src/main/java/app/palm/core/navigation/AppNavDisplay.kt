@@ -23,6 +23,7 @@ import app.palm.core.designsystem.LocalNocturne
 import app.palm.core.designsystem.NocturneBackground
 import app.palm.core.designsystem.NocturneDurations
 import app.palm.core.designsystem.NocturneEasings
+import app.palm.feature.handselect.handSelectEntries
 import app.palm.feature.home.homeEntries
 import app.palm.feature.onboarding.onboardingEntries
 
@@ -44,8 +45,9 @@ fun AppNavDisplay(start: Route?) {
     val endPx = if (LocalLayoutDirection.current == LayoutDirection.Ltr) px else -px
     val still = LocalNocturne.current.reduceMotion
     fun spec(slidePx: Int) = if (still) EnterTransition.None togetherWith ExitTransition.None else transition(slidePx)
-    // One sky for every screen, so the stars never restart on a transition; entries stay transparent
-    NocturneBackground {
+    // One sky for every screen, so the stars never restart on a transition; entries stay transparent.
+    // An opt-out route on top (Scan) pauses it; the call site never changes, so the nav subtree is kept (D-14)
+    NocturneBackground(animate = (backStack.lastOrNull() as? Route)?.showsBackground ?: true) {
         NavDisplay(
             backStack = backStack,
             // Back on a one-entry stack (Language, the first onboarding step) leaves the app (D-01)
@@ -61,6 +63,7 @@ fun AppNavDisplay(start: Route?) {
                 entry<Splash> { } // the kept system splash covers it; the sky shows through
                 onboardingEntries(backStack)
                 homeEntries(backStack)
+                handSelectEntries(backStack)
             },
         )
     }
