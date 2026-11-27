@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 02-04-PLAN.md
-last_updated: "2026-11-27T05:14:41.796Z"
+stopped_at: Completed 02-05-PLAN.md
+last_updated: "2026-11-27T05:21:59.370Z"
 last_activity: 2026-11-27
 last_activity_desc: Phase 2 execution started
-state_head: 0f2ab6e6e894631184a43d203a493480cdbac0e2
+state_head: 20ad385d418fe850b77aca7996172dd6cc5aa6bb
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 14
-  completed_plans: 9
+  completed_plans: 10
   percent: 17
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-11-26)
 ## Current Position
 
 Phase: 2 (Reading Pipeline) — EXECUTING
-Plan: 5 of 9
+Plan: 6 of 9
 Status: Ready to execute
 Last activity: 2026-11-27 — Phase 2 execution started
 
@@ -65,6 +65,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 02 P02 | 4min | 2 tasks | 4 files |
 | Phase 02 P03 | 3min | 3 tasks | 7 files |
 | Phase 02 P04 | 4min | 2 tasks | 4 files |
+| Phase 02 P05 | 20min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,8 @@ Recent decisions affecting current work:
 - [Phase 02]: ReadResult.llm stays unfiltered model output; only the filtered reading reaches jobs and cache
 - [Phase 02]: Safety list field with flagged items counts as one rewrite: dropped and refilled to 3 from NEUTRAL defaults
 - [Phase 02]: Bare शेयर is not a Hindi directive trigger; only शेयरों / शेयर में / शेयर बाज़ार count
+- [Phase 02]: 02-05: laplacian_var crops the 1 px border Pillow leaves unfiltered (a smooth blurred gradient scored ~92 otherwise)
+- [Phase 02]: 02-05: attempts ending without usage (incl. contract ValidationError and deadline cancel) are charged worst_case_cost; API status errors charge nothing
 
 ### Pending Todos
 
@@ -121,6 +124,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-27T05:14:41.678Z
-Stopped at: Completed 02-04-PLAN.md
+Last session: 2026-11-27T05:21:59.249Z
+Stopped at: Completed 02-05-PLAN.md
 Resume file: None
