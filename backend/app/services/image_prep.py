@@ -2,9 +2,13 @@
 
 import hashlib
 import io
+import logging
 from dataclasses import dataclass
 
 from PIL import Image, ImageFilter, ImageOps, ImageStat
+
+# Pillow plugins log EXIF tag values (GPS) at DEBUG; never let them reach DEBUG (D-08)
+logging.getLogger("PIL").setLevel(logging.WARNING)
 
 MAX_BYTES = 8 * 1024 * 1024
 MAX_PIXELS = 40_000_000

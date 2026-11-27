@@ -32,6 +32,8 @@ cp backend/.env.example backend/.env   # then put your key after ANTHROPIC_API_K
 
 `backend/.env` is git-ignored; never commit it. The key stays on the server and never goes into the app. `GET /healthz` reports `"anthropic_key": "configured"` or `"missing"`, never the key itself.
 
+Never enable DEBUG on the `anthropic` or `PIL` loggers, whether through `ANTHROPIC_LOG=debug` or a root DEBUG config (`logging.basicConfig(level=logging.DEBUG)` or a debug dictConfig): the SDK then logs request bodies including the base64 palm photo, and Pillow logs EXIF values such as GPS. The backend pins both loggers to WARNING; do not lower them.
+
 ## When the app shows `Backend: Unreachable`
 
 The status row shows the cause, the base URL and a Retry button. Fix the cause, then tap Retry.

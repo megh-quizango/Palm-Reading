@@ -1,6 +1,7 @@
 """The only module that knows the Anthropic SDK call shape (D-04)."""
 
 import base64
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Final
@@ -9,6 +10,9 @@ import anthropic
 from pydantic import ValidationError
 
 from app.schemas.llm import LlmReading
+
+# The SDK logs full request bodies (the base64 palm photo) at DEBUG; never let it reach DEBUG (D-08)
+logging.getLogger("anthropic").setLevel(logging.WARNING)
 
 PROMPT_VERSION: Final = "p1"
 # CRLF normalised so the cached prefix is byte-stable across checkouts (Pitfall 8)
