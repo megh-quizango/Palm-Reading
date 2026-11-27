@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundations & Contract** - Green build on the phone, Nocturne theme, reachable backend, frozen reading contract (completed 2026-11-26)
 - [ ] **Phase 2: Reading Pipeline** - Backend turns a palm photo + landmarks into a validated, safe, cached reading via an async job API
-- [ ] **Phase 3: Client Shell** - Onboarding, Home hub with cosmic background, and hand selection, persisted across restarts
+- [x] **Phase 3: Client Shell** - Onboarding, Home hub with cosmic background, and hand selection, persisted across restarts
 - [ ] **Phase 4: Scan Loop** - Live hand guidance, capture and gallery import, processed upload-ready photo, smooth on the low-end phone
 - [ ] **Phase 5: Result Against the Fixture** - Palm / Love / Career result with line overlay, saved and shareable, built on fixture data
 - [ ] **Phase 6: Wire-Up & Ad Gates** - Real palm to real reading in under 30 s, generating/error states, stubbed rewarded gate for repeat scans
@@ -90,7 +90,7 @@ Plans:
 - [x] 03-02-PLAN.md — Nocturne visual layer: six-layer draw-phase sky (static under reduce motion / battery saver), Phase 3 type scale on every M3 slot, the 20 drawables (wave 1, no phone)
 - [x] 03-03-PLAN.md — Onboarding steps: 3 intro pages, first name + gender with validation, birth date / optional time / "I don't know", saves, prefill and the Back chain (wave 2)
 - [x] 03-04-PLAN.md — Home hub and hand choice: greeting, hero, 7-tile grid, coming-soon sheet route, exit confirm, hand selection with photo tips, Scan(hand) placeholder without sky, first on-device sky motion check, debug-only showcase (wave 2)
-- [ ] 03-05-PLAN.md — Phase gate on the Redmi: release-type cold start < 2 s, motion (animations off/on, battery saver) and frame pacing, full instrumented suite, clean release APK, en/hi screenshot walk, user visual sign-off (wave 3)
+- [x] 03-05-PLAN.md — Phase gate on the Redmi: release-type cold start < 2 s, motion (animations off/on, battery saver) and frame pacing, full instrumented suite, clean release APK, en/hi screenshot walk, user visual sign-off (wave 3)
 
 **UI hint**: yes
 
@@ -152,7 +152,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6. After Phase 1,
 |-------|----------------|--------|-----------|
 | 1. Foundations & Contract | 5/5 | Complete    | 2026-11-26 |
 | 2. Reading Pipeline | 7/9 | In Progress | - |
-| 3. Client Shell | 4/5 | In Progress | - |
+| 3. Client Shell | 5/5 | Complete (hardware perf gate deferred) | 2026-11-27 |
 | 4. Scan Loop | 0/TBD | Not started | - |
 | 5. Result Against the Fixture | 0/TBD | Not started | - |
 | 6. Wire-Up & Ad Gates | 0/TBD | Not started | - |

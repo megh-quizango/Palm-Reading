@@ -23,14 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-26)
 
 **Core value:** The palm scan moment: live on-device hand guidance, then a believable Palm / Love / Career reading with the detected lines drawn over the user's own photo, in under 30 seconds.
-**Current focus:** Phase 3 — Client Shell (planned)
+**Current focus:** Phase 4 — next (Phase 3 complete, hardware perf gate deferred)
 
 ## Current Position
 
-Phase: 3 (Client Shell) — PLANNED, ready to execute (Phase 2: 02-08/02-09 deferred, not verified)
-Plan: 4 of 5 (waves: 03-01+03-02, 03-03+03-04, 03-05)
-Status: Phase 3 plans checked (2 rounds, passed). UI-SPEC checker still flags typography/spacing counts against the Phase 1 token scale and generic OK/Cancel on pickers; accepted, revisit in UI review
-Last activity: 2026-11-27 — Phase 3 planned
+Phase: 3 (Client Shell) — COMPLETE (user approved 2026-11-27; Phase 2: 02-08/02-09 deferred, not verified)
+Plan: 5 of 5
+Status: Phase 3 complete. Verification human_needed 10/12: cold start < 2 s and <= 5% jank measured only on the emulator, hardware run deferred to the next phone session. User approved the screens vs Figma and the A7/A10 gate choices
+Last activity: 2026-11-27 — Phase 3 executed and approved
 
 Progress: [██░░░░░░░░] 17%
 
@@ -146,7 +146,7 @@ None yet.
 - [Phase 3]: all Hindi strings (values-hi) are Claude-written; native-speaker review needed before release (D-06)
 - [Phase 3]: per-app locale: the API 33+ LocaleManager path is verified (vivo V2225 API 35 reference phone, Redmi Note 10T API 33, emulator API 35); the API 26-32 AppCompat path is unverified on hardware (no API 26-32 device)
 - [Phase 3]: 03-05 performance gates (release cold start < 2 s, <= 5% deadline-missed frames on Home idle and intro swipes) were measured only on the x86 emulator, which is not a gate; the hardware run is deferred to the next phone session (debug intro swipe on the Redmi was 37.5%, so fix the intro pager if release is still over 5%)
-- [Phase 3]: 03-05 Task 3 sign-off pending: the user compares tools/adb/shots/phase3-*.png (43 shots, emulator) with Figma S01-S07 and confirms the A7 cold-start gate and the A10 5% jank threshold
+- [Phase 3]: the Redmi Note 10T may have a test setting left changed (animations / font scale / battery saver) from an interrupted 03-05 run; check it next time it is connected
 
 ## Deferred Items
 

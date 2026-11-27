@@ -3,7 +3,7 @@ phase: 03-client-shell
 plan: 05
 subsystem: android-client
 tags: [release-build, cold-start, jank, motion, screenshots, phase-gate]
-status: partial
+status: complete
 requires: [03-01, 03-02, 03-03, 03-04]
 provides:
   - debug-signed release variant app.palm.dev for on-device timing (REL-03 swaps the key)
@@ -28,8 +28,8 @@ key-files:
     - android/app/src/main/java/app/palm/core/designsystem/components/FeatureCard.kt
     - .planning/STATE.md
 decisions:
-  - "Cold start gated on the profile-compiled median (A7), fresh-install median reported beside it; user confirmation pending (Task 3)"
-  - "Jank gated on the gfxinfo 'Frame deadline missed' share <= 5% (A10); user confirmation pending (Task 3)"
+  - "Cold start gated on the profile-compiled median (A7), fresh-install median reported beside it; confirmed by the user 2026-11-27 (Task 3)"
+  - "Jank gated on the gfxinfo 'Frame deadline missed' share <= 5% (A10); confirmed by the user 2026-11-27 (Task 3)"
   - "HeroOrb animation uses draw-only transforms so uiautomator (and accessibility services) see an idle Home"
 metrics:
   duration: "about 45 min (review-fix session)"
@@ -44,7 +44,7 @@ plan_head_after: "the fix(03-05) review-fix commit that adds this file (previous
 
 # Phase 3 Plan 05: Phase gate on a release build Summary
 
-The debug-signed release build onboards and runs the full functional gate on the emulator: motion off/on/saver, the Scan opt-out, the 9 instrumented tests, a clean release APK and 43 en/hi screenshots. The release cold-start and jank numbers are recorded as emulator-only. The hardware performance gate and the user's Task 3 sign-off are still open.
+The debug-signed release build onboards and runs the full functional gate on the emulator: motion off/on/saver, the Scan opt-out, the 9 instrumented tests, a clean release APK and 43 en/hi screenshots. The release cold-start and jank numbers are recorded as emulator-only. The user approved Task 3; the hardware performance gate is still deferred to the next phone session.
 
 ## Device
 
@@ -95,9 +95,9 @@ Spot-checked: the Hindi Home at 2.0, the Hindi tips at 2.0 and the Hindi birth s
 
 Added the native-speaker flag for the Hindi strings (D-06). Added the locale-path note: API 33+ verified, API 26-32 AppCompat unverified. This corrects the plan's "API 33+ unverified, Redmi API 30" wording, since the reference phones are API 33/35. Also added: the AppCompat 1.8.0 + autoStoreLocales decision, the cold-start gate variant with the emulator medians, the jank metric with the emulator numbers, the hardware-gate deferral and the pending Task 3 sign-off.
 
-## Task 3: user sign-off (PENDING)
+## Task 3: user sign-off (APPROVED 2026-11-27)
 
-This is a blocking-human checkpoint and has not been done. The user still has to compare the 43 screenshots with Figma S01-S07 and confirm the A7 cold-start gate (profile-compiled median) and the A10 jank threshold (at most 5% deadline-missed). The answers go into this file and STATE.md.
+The user reviewed the emulator screenshots (S02-S07 en, Hindi Home and intro, Hindi Home at font scale 2.0) against Figma S01-S07 and replied "Approved, push". That reply also accepts the proposed gates: A7 cold start is gated on the profile-compiled median, with the fresh-install median reported beside it; A10 jank is gated at <= 5% deadline-missed frames. Both hardware gate runs are still deferred to the next phone session (see STATE.md Blockers).
 
 ## Deviations from Plan
 
@@ -111,7 +111,7 @@ Finding (major, .planning/STATE.md:116): Tasks 2 and 3 were not done. STATE.md h
 
 - Task 2 finished on the release build on emulator-5554: motion off/on/saver OK, Scan opt-out OK, 9/9 instrumented, release APK clean, 43 screenshots, settings restored. Cold start and jank are recorded as "emulator, not a gate", with the hardware gate deferred.
 - STATE.md now has the `native-speaker` flag and the `API 33` / API 26-32 line, plus the decision lines.
-- This SUMMARY was written. Task 3 sign-off is still pending with the user.
+- This SUMMARY was written. Task 3 was later approved by the user (2026-11-27).
 - Fix exposed by the run: `HeroCard.kt` HeroOrb used `graphicsLayer { rotationZ / scaleX / scaleY }`. Each per-frame layer update calls `owner.onLayoutChange`, which floods accessibility content-changed events. As a result `uiautomator dump` failed with "could not get idle state" on Home, and the same flood hits any running accessibility service. The orb now uses `drawWithContent { rotate/scale { drawContent() } }`, which is draw-only and does not recompose. The motion check still animates. HomeTest passes 4/4.
 - Fix exposed by the run: `tools/adb/ui.py` re-read the previous `/sdcard/ui.xml` when a dump failed, so `expect` reported a stale screen. It now deletes the file before each dump.
 - Not changed: the intro pager. The release swipe measured 3.59% on the emulator, and there is no hardware evidence that a fix is needed yet.
