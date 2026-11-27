@@ -46,7 +46,7 @@
 - [ ] **READ-03**: When the photo is unusable, the user sees one of 7 reasons (blurry/dark, too far, jewellery, bent, fingers too tight, incomplete, no palm lines) with a retake tip, and the attempt does not use up their free scan
 - [ ] **READ-04**: The same palm photo within 24 hours returns the same reading (server cache by visual fingerprint + hand + language + prompt version)
 - [x] **READ-05**: The backend never writes the palm image to disk or logs; landmarks are used only for line validation and never stored
-- [ ] **READ-06**: AI lines that fail validation against the hand landmarks are replaced by landmark-anchored template lines, and the overlay is labelled approximate
+- [x] **READ-06**: AI lines that fail validation against the hand landmarks are replaced by landmark-anchored template lines, and the overlay is labelled approximate
 - [x] **READ-07**: Readings never contain death, illness, pregnancy, medical, legal or financial directives (prompt rules + server output filter)
 - [ ] **READ-08**: The generating screen shows progress and handles busy, offline and timeout with retry
 - [ ] **READ-09**: On the real phone a reading arrives in under 12 s typically (p50) and under 30 s at worst (p95)
@@ -150,7 +150,7 @@
 | READ-03 | Phase 5 | Pending |
 | READ-04 | Phase 2 | Pending |
 | READ-05 | Phase 2 | Complete |
-| READ-06 | Phase 2 | Pending |
+| READ-06 | Phase 2 | Complete |
 | READ-07 | Phase 2 | Complete |
 | READ-08 | Phase 6 | Pending |
 | READ-09 | Phase 6 | Pending |

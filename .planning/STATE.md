@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-11-27T04:56:52.589Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-11-27T05:02:54.695Z"
 last_activity: 2026-11-27
 last_activity_desc: Phase 2 execution started
-state_head: b68e84319fa6e81e76b3ec207521a0a9ff3bc95f
+state_head: cada838daffb18907f8fb58e02f5208fe691f1f4
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 14
-  completed_plans: 6
+  completed_plans: 7
   percent: 17
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-11-26)
 ## Current Position
 
 Phase: 2 (Reading Pipeline) — EXECUTING
-Plan: 2 of 9
+Plan: 3 of 9
 Status: Ready to execute
 Last activity: 2026-11-27 — Phase 2 execution started
 
@@ -62,6 +62,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 01 P04 | 14 min | 2 tasks | 26 files |
 | Phase 01 P05 | 14 min | 2 tasks | 13 files |
 | Phase 02 P01 | 5min | 3 tasks | 16 files |
+| Phase 02 P02 | 4min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,8 @@ Recent decisions affecting current work:
 - [Phase 2 planning]: Plan check: 2 rounds (multi-lens review + adversarial verify), 27 + 2 confirmed issues fixed; real-API eval budget estimate is ~$10-15 (Hindi pass, 6-topic red-team), approved by the user at 02-08 Task 1
 - [Phase 02]: 02-01: LLM verdict ok=false with reason none maps to no_palm_lines
 - [Phase 02]: 02-01: POST gate order is Content-Length (411/413), X-Install-Id, busy (503), then form parsing
+- [Phase 02]: 02-02: assemble returns (PalmReading, line_checks); PalmReader.read is its only caller
+- [Phase 02]: 02-02: TEMPLATES retuned inside the landmark hull (A3); thresholds are named constants for 02-09
 
 ### Pending Todos
 
@@ -110,6 +113,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-27T04:56:52.473Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-11-27T05:02:54.578Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
