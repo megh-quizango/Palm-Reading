@@ -1,5 +1,6 @@
 package app.palm.core.designsystem
 
+import android.os.PowerManager
 import android.provider.Settings
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -129,9 +130,10 @@ private val NocturneShapes = Shapes(
 @Composable
 fun NocturneTheme(content: @Composable () -> Unit) {
     val context = LocalContext.current
-    // Unset on some phones, so the default must be 1f (animations on)
+    // Unset on some phones, so the default must be 1f (animations on). Loops also rest under battery saver (UI-SPEC)
     val reduceMotion = remember {
-        Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
+        Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f ||
+            context.getSystemService(PowerManager::class.java)?.isPowerSaveMode == true
     }
     // The AppCompat per-app locale (D-06) recreates the activity, so this follows the chosen language
     val devanagari = LocalConfiguration.current.locales[0].language == "hi"
