@@ -13,8 +13,9 @@ from app.config import Settings
 from app.schemas.palm import PalmReading
 from app.services import claude_client
 from app.services.claude_client import Malformed, ModelFailure
+from app.services import image_prep as ip
 from app.services.image_prep import Prepared, hamming
-from app.services.palm_reader import PalmReader
+from app.services.palm_reader import PalmReader, invalid_reading
 
 log = logging.getLogger("palm.jobs")
 
@@ -91,6 +92,16 @@ class JobService:
             job = self._done(hand, locale, PalmReading.model_validate_json(cached))
         if job is None:
             job = self.jobs.get(self.inflight.get(flight))
+        if job is None and (
+            prepared.brightness < ip.PREGATE_MIN_MEAN
+            or prepared.laplacian_var < ip.PREGATE_MIN_LAPLACIAN_VAR
+        ):
+            # Obviously dark or blurry: answered without a model call (D-09)
+            reading = invalid_reading(
+                "blurry_or_dark", w=prepared.w, h=prepared.h, hand=hand, locale=locale, model="pregate"
+            )
+            self._store(ckey, prepared.dhash, reading)
+            job = self._done(hand, locale, reading)
         if job is None:
             job = Job(str(uuid.uuid4()), "queued", hand, locale, now())
             self.jobs[job.id] = job

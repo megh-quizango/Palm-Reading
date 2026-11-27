@@ -4,12 +4,15 @@ import hashlib
 import io
 from dataclasses import dataclass
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageFilter, ImageOps, ImageStat
 
 MAX_BYTES = 8 * 1024 * 1024
 MAX_PIXELS = 40_000_000
 LONG_EDGE = 1568
 MIN_SHORT_SIDE = 256
+# D-09 pre-gate: deliberately lax start values (A2); the eval calibrates them
+PREGATE_MIN_MEAN = 35
+PREGATE_MIN_LAPLACIAN_VAR = 15
 
 
 class BadImage(ValueError):
@@ -23,6 +26,8 @@ class Prepared:
     h: int
     sha256: str
     dhash: int
+    laplacian_var: float
+    brightness: float
 
 
 def dhash(gray: Image.Image, n: int = 8) -> int:
@@ -38,6 +43,15 @@ def dhash(gray: Image.Image, n: int = 8) -> int:
 
 def hamming(a: int, b: int) -> int:
     return (a ^ b).bit_count()
+
+
+def laplacian_var(gray: Image.Image) -> float:
+    small = gray.copy()
+    small.thumbnail((512, 512))  # size-independent threshold
+    kernel = ImageFilter.Kernel((3, 3), [0, 1, 0, 1, -4, 1, 0, 1, 0], scale=1, offset=128)
+    lap = small.filter(kernel)
+    # Pillow copies the 1 px border unfiltered; raw grey values there would inflate the variance
+    return ImageStat.Stat(lap.crop((1, 1, lap.width - 1, lap.height - 1))).var[0]
 
 
 def prepare(raw: bytes) -> Prepared:
@@ -60,4 +74,7 @@ def prepare(raw: bytes) -> Prepared:
     img.save(out, "JPEG", quality=85)  # fresh encode: no EXIF/GPS
     jpeg = out.getvalue()
     gray = img.convert("L")
-    return Prepared(jpeg, img.width, img.height, hashlib.sha256(jpeg).hexdigest(), dhash(gray))
+    return Prepared(
+        jpeg, img.width, img.height, hashlib.sha256(jpeg).hexdigest(),
+        dhash(gray), laplacian_var(gray), ImageStat.Stat(gray).mean[0],
+    )
