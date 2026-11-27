@@ -20,6 +20,7 @@ log = logging.getLogger("palm.jobs")
 # Strong references so running tasks are not garbage-collected (D-03)
 TASKS: set[asyncio.Task] = set()
 now = time.monotonic  # tests patch jobs.now
+JOB_TTL_S = 600  # jobs are swept lazily this long after creation (D-03)
 RETRY_MIN_LEFT_S = 15.0  # a malformed reply is retried only with this much deadline left (D-05)
 
 
@@ -47,20 +48,56 @@ class JobService:
         self.settings = settings
         self.reader = reader
         self.jobs: dict[str, Job] = {}
+        # Both keys carry the install id: one install never receives another's job (D-02, T-02-13)
+        self.by_idem: dict[tuple[str, str], str] = {}
+        self.inflight: dict[tuple[str, str, str, str], str] = {}  # (install, sha256, hand, locale)
         self.sem = asyncio.Semaphore(settings.claude_concurrency)
 
-    def submit(self, prepared: Prepared, hand: str, locale: str, landmarks: Any) -> Job:
-        job = Job(str(uuid.uuid4()), "queued", hand, locale, now())
-        self.jobs[job.id] = job
-        task = asyncio.create_task(self._run(job, prepared.jpeg, prepared.w, prepared.h, landmarks))
-        TASKS.add(task)
-        task.add_done_callback(TASKS.discard)
+    def _sweep(self) -> None:
+        # Lazy, on every request; no background sweeper task (D-03)
+        cutoff = now() - JOB_TTL_S
+        dead = {jid for jid, j in self.jobs.items() if j.created < cutoff}
+        if not dead:
+            return
+        for jid in dead:
+            del self.jobs[jid]
+        self.by_idem = {k: v for k, v in self.by_idem.items() if v not in dead}
+        self.inflight = {k: v for k, v in self.inflight.items() if v not in dead}
+
+    def submit(
+        self,
+        prepared: Prepared,
+        hand: str,
+        locale: str,
+        landmarks: Any,
+        *,
+        install_id: str,
+        idem_key: str | None = None,
+    ) -> Job:
+        self._sweep()
+        idem = (install_id, idem_key) if idem_key else None
+        flight = (install_id, prepared.sha256, hand, locale)
+        job = self.jobs.get(self.by_idem.get(idem)) or self.jobs.get(self.inflight.get(flight))
+        if job is None:
+            job = Job(str(uuid.uuid4()), "queued", hand, locale, now())
+            self.jobs[job.id] = job
+            self.inflight[flight] = job.id
+            task = asyncio.create_task(
+                self._run(job, prepared.jpeg, prepared.w, prepared.h, landmarks, flight)
+            )
+            TASKS.add(task)
+            task.add_done_callback(TASKS.discard)
+        if idem:
+            self.by_idem[idem] = job.id
         return job
 
     def get(self, job_id: str) -> Job | None:
+        self._sweep()
         return self.jobs.get(job_id)
 
-    async def _run(self, job: Job, jpeg: bytes, w: int, h: int, landmarks: Any) -> None:
+    async def _run(
+        self, job: Job, jpeg: bytes, w: int, h: int, landmarks: Any, flight: tuple
+    ) -> None:
         loop = asyncio.get_running_loop()
         try:
             async with asyncio.timeout(self.settings.job_deadline_s) as deadline:
@@ -87,4 +124,5 @@ class JobService:
             log.error("job_failed job_id=%s code=%s error=%s", job.id, code, type(e.__cause__ or e).__name__)
             job.status, job.error = "failed", code
         finally:
+            self.inflight.pop(flight, None)  # single-flight covers queued and running jobs only
             del jpeg, landmarks  # drop the image reference as soon as the call returns (D-08)

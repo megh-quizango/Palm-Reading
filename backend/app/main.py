@@ -97,7 +97,9 @@ def create_app(settings: Settings | None = None, anthropic_client: object | None
             return error(411, "bad_request")
         if not length.isdigit() or int(length) > MAX_BODY:
             return error(413, "bad_request")
-        if not _is_uuid(request.headers.get("X-Install-Id")):
+        install_id = request.headers.get("X-Install-Id")
+        idem_key = request.headers.get("Idempotency-Key")  # optional; a UUID when sent (D-02)
+        if not _is_uuid(install_id) or (idem_key is not None and not _is_uuid(idem_key)):
             return error(422, "bad_request")
         jobs: JobService = request.app.state.jobs
         if jobs.reader is None:
@@ -125,7 +127,7 @@ def create_app(settings: Settings | None = None, anthropic_client: object | None
         except BadImage:
             return error(422, "bad_request")
         del raw
-        job = jobs.submit(prepared, hand, locale, landmarks)
+        job = jobs.submit(prepared, hand, locale, landmarks, install_id=install_id, idem_key=idem_key)
         return JSONResponse({"job_id": job.id}, status_code=202)
 
     @app.get("/v1/palm/jobs/{job_id}")
