@@ -15,16 +15,16 @@
 
 ### Onboarding
 
-- [ ] **ONB-01**: User sees a branded splash on launch that hands off to onboarding (first run) or Home (returning)
-- [ ] **ONB-02**: User can pick the app language (English, Hindi) on first run
+- [x] **ONB-01**: User sees a branded splash on launch that hands off to onboarding (first run) or Home (returning)
+- [x] **ONB-02**: User can pick the app language (English, Hindi) on first run
 - [ ] **ONB-03**: User can page through 3 intro screens with Next / Get started
 - [ ] **ONB-04**: User can enter a first name (validated: at least 2 letters) and optionally choose a gender
 - [ ] **ONB-05**: User can enter a birth date and optionally a birth time, with an "I don't know my birth time" option
-- [ ] **ONB-06**: Onboarding is shown only once; the profile survives app restarts (DataStore, excluded from backup)
+- [x] **ONB-06**: Onboarding is shown only once; the profile survives app restarts (DataStore, excluded from backup)
 
 ### Home
 
-- [ ] **HOME-01**: User sees a time-of-day greeting with their name on Home
+- [x] **HOME-01**: User sees a time-of-day greeting with their name on Home
 - [ ] **HOME-02**: User sees the hero card and feature grid; tiles outside milestone 1 open a "coming soon" state
 - [ ] **HOME-03**: User can reopen their last palm reading from Home
 - [ ] **HOME-04**: Pressing Back on Home asks to confirm leaving the app
@@ -128,13 +128,13 @@
 | FND-03 | Phase 3 | Pending |
 | FND-04 | Phase 1 | Complete |
 | FND-05 | Phase 1 | Complete |
-| ONB-01 | Phase 3 | Pending |
-| ONB-02 | Phase 3 | Pending |
+| ONB-01 | Phase 3 | Complete |
+| ONB-02 | Phase 3 | Complete |
 | ONB-03 | Phase 3 | Pending |
 | ONB-04 | Phase 3 | Pending |
 | ONB-05 | Phase 3 | Pending |
-| ONB-06 | Phase 3 | Pending |
-| HOME-01 | Phase 3 | Pending |
+| ONB-06 | Phase 3 | Complete |
+| HOME-01 | Phase 3 | Complete |
 | HOME-02 | Phase 3 | Pending |
 | HOME-03 | Phase 5 | Pending |
 | HOME-04 | Phase 3 | Pending |

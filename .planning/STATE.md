@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: 02-07 complete; 02-08/02-09 deferred, backend runs in template mode
-last_updated: "2026-11-27T05:42:46.297Z"
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-11-27T08:24:38.860Z"
 last_activity: 2026-11-27
 last_activity_desc: Phase 2 execution started
-state_head: 89e35a86aba838edfeae77b348b54119d3957ae8
+state_head: 8457834f4f0f6b254228b7925eaa1fa78572542a
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 14
-  completed_plans: 12
+  total_plans: 19
+  completed_plans: 13
   percent: 17
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-11-26)
 ## Current Position
 
 Phase: 3 (Client Shell) — PLANNED, ready to execute (Phase 2: 02-08/02-09 deferred, not verified)
-Plan: 0 of 5 (waves: 03-01+03-02, 03-03+03-04, 03-05)
+Plan: 1 of 5 (waves: 03-01+03-02, 03-03+03-04, 03-05)
 Status: Phase 3 plans checked (2 rounds, passed). UI-SPEC checker still flags typography/spacing counts against the Phase 1 token scale and generic OK/Cancel on pickers; accepted, revisit in UI review
 Last activity: 2026-11-27 — Phase 3 planned
 
@@ -68,6 +68,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 02 P05 | 20min | 3 tasks | 9 files |
 | Phase 02 P06 | 2min | 2 tasks | 4 files |
 | Phase 02 P07 | 15min | 3 tasks | 6 files |
+| Phase 03 P01 | 16min | 3 tasks | 33 files |
 
 ## Accumulated Context
 
@@ -108,12 +109,16 @@ Recent decisions affecting current work:
 - [Phase 02]: 02-07: eval red-team cell fails only on no reading (refusal/malformed/model failure after retry); a budget stop leaving red-team cells unrun also exits 1
 - [Phase 02]: 02-07: photos labelled notes=redteam-hi are red-team inputs only, excluded from bake-off, dHash and pre-gate tables
 - [Phase 02]: 02-07: make_landmarks also applies the git check-ignore gate to the photos dir it writes into
+- [Phase 03]: 03-01: Profile DataStore uses OkioStorage (same format) because FileStorage rename fails on Windows JVM test hosts
+- [Phase 03]: 03-01: vivo V2225 (API 35) is the reference phone; API 33+ LocaleManager path verified, API 26-32 AppCompat path not verified on hardware
+- [Phase 03]: 03-01: LanguageScreen takes onContinue; entries decide the next step so 03-03 only edits OnboardingEntries
 
 ### Pending Todos
 
 None yet.
 
 ### Blockers/Concerns
+
 - [Phase 2]: 02-08/02-09 deferred: real-Claude eval needs ANTHROPIC_API_KEY, 20+ consented photos + labels.csv, MediaPipe/model approval and a ~$10-15 budget. Until then readings are canned (template mode).
 
 - ~~[Phase 1]: Kotlin 2.4.21 + Hilt 2.60.1 + KSP 2.3.14 + Room 3 + AGP 9.5.3 may not build together; scaffold build is the first gate~~ RESOLVED by plan 01-01 (target set green on device; Compose BOM held at 2026.09.00 until platforms;android-37.2 is installed)
@@ -132,6 +137,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-27T05:42:46.144Z
-Stopped at: Completed 02-07-PLAN.md
+Last session: 2026-11-27T08:24:38.734Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
