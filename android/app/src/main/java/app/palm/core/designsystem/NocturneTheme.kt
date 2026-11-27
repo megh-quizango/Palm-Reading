@@ -39,8 +39,11 @@ data class NocturneTextStyles(
     val byName: Map<String, TextStyle>,
 )
 
-/** D-07: font-metric line height, so Devanagari ascenders and matras are never clipped by token heights. */
-fun TextStyle.devanagariSafe(): TextStyle = copy(lineHeight = TextUnit.Unspecified)
+/**
+ * D-07: font-metric line height, so Devanagari ascenders and matras are never clipped by token heights,
+ * and zero letter spacing, so a tracked style (Overline) never splits conjuncts.
+ */
+fun TextStyle.devanagariSafe(): TextStyle = copy(lineHeight = TextUnit.Unspecified, letterSpacing = 0.em)
 
 private fun nocturneTextStyles(style: (NocturneTypeSpec) -> TextStyle) = with(NocturneTypeSpecs) {
     NocturneTextStyles(
@@ -59,18 +62,23 @@ private fun nocturneTextStyles(style: (NocturneTypeSpec) -> TextStyle) = with(No
     )
 }
 
+/** Every M3 slot maps to a Phase 3 style (UI-SPEC), so pickers, fields and sheets never bring default sizes back. */
 private fun NocturneTextStyles.toTypography() = Typography(
-    displayLarge = displayXl,
+    displayLarge = displayL,
     displayMedium = displayL,
     displaySmall = displayM,
-    headlineSmall = displayS,
+    headlineLarge = displayM,
+    headlineMedium = displayM,
+    headlineSmall = displayM,
+    titleLarge = titleM,
     titleMedium = titleM,
-    bodyLarge = bodyL,
-    bodyMedium = bodyM,
+    titleSmall = titleM,
     labelLarge = labelL,
+    bodyLarge = bodyL,
+    bodyMedium = bodyL,
     labelMedium = labelM,
+    labelSmall = labelM,
     bodySmall = caption,
-    labelSmall = overline,
 )
 
 /** Nocturne values that have no Material 3 slot. Every value comes from the generated NocturneTokens.kt. */
@@ -135,7 +143,7 @@ fun NocturneTheme(content: @Composable () -> Unit) {
         Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f ||
             context.getSystemService(PowerManager::class.java)?.isPowerSaveMode == true
     }
-    // The AppCompat per-app locale (D-06) recreates the activity, so this follows the chosen language
+    // The per-app locale comes from AppCompat (03-01); LocalConfiguration already reflects it after the recreate
     val devanagari = LocalConfiguration.current.locales[0].language == "hi"
     val type = remember(devanagari) {
         nocturneTextStyles { spec ->

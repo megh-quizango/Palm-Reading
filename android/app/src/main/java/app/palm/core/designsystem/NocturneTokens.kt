@@ -105,13 +105,13 @@ object NocturneTypeSpecs {
     val DisplayL = NocturneTypeSpec(NocturneFontRole.Display, 600, 32f, 38f, 0f)
     val DisplayM = NocturneTypeSpec(NocturneFontRole.Display, 600, 26f, 32f, 0f)
     val DisplayS = NocturneTypeSpec(NocturneFontRole.Display, 600, 22f, 28f, 0f)
-    val TitleM = NocturneTypeSpec(NocturneFontRole.Ui, 700, 17f, 24f, 0f)
+    val TitleM = NocturneTypeSpec(NocturneFontRole.Ui, 600, 15f, 22f, 0f)
     val BodyL = NocturneTypeSpec(NocturneFontRole.Ui, 500, 15f, 22f, 0f)
     val BodyM = NocturneTypeSpec(NocturneFontRole.Ui, 400, 14f, 20f, 0f)
-    val LabelL = NocturneTypeSpec(NocturneFontRole.Ui, 700, 16f, 20f, 0f)
+    val LabelL = NocturneTypeSpec(NocturneFontRole.Ui, 600, 15f, 20f, 0f)
     val LabelM = NocturneTypeSpec(NocturneFontRole.Ui, 600, 13f, 18f, 0f)
-    val Caption = NocturneTypeSpec(NocturneFontRole.Ui, 400, 12f, 16f, 0f)
-    val Overline = NocturneTypeSpec(NocturneFontRole.Ui, 700, 12f, 16f, 0.12f)
+    val Caption = NocturneTypeSpec(NocturneFontRole.Ui, 500, 13f, 18f, 0f)
+    val Overline = NocturneTypeSpec(NocturneFontRole.Ui, 600, 13f, 18f, 0.12f)
 
     val ByName: Map<String, NocturneTypeSpec> = linkedMapOf(
         "Display XL" to DisplayXl,

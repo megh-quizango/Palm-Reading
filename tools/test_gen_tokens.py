@@ -55,7 +55,8 @@ class RealTokens(unittest.TestCase):
         for name in ("DisplayXl", "DisplayL", "DisplayM", "DisplayS", "TitleM", "BodyL", "BodyM",
                      "LabelL", "LabelM", "Caption", "Overline"):
             self.assertIn(f"val {name} = NocturneTypeSpec(", self.kt)
-        self.assertIn("val Overline = NocturneTypeSpec(NocturneFontRole.Ui, 700, 12f, 16f, 0.12f)", self.kt)
+        self.assertIn("val Overline = NocturneTypeSpec(NocturneFontRole.Ui, 600, 13f, 18f, 0.12f)", self.kt)
+        self.assertIn("val TitleM = NocturneTypeSpec(NocturneFontRole.Ui, 600, 15f, 22f, 0f)", self.kt)
         self.assertIn("val DisplayXl = NocturneTypeSpec(NocturneFontRole.Display, 600, 40f, 44f, 0f)", self.kt)
         self.assertIn('"Display XL" to DisplayXl,', self.kt)
         self.assertIn('"Overline" to Overline,', self.kt)
