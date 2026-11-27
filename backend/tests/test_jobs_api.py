@@ -258,4 +258,5 @@ def test_expired_job_is_404_and_key_is_released(monkeypatch):
         new = post_job(c, headers=hdrs).json()["job_id"]
         poll(c, new)
     assert gone.status_code == 404 and gone.json() == {"error": {"code": "not_found"}}
-    assert new != old and len(fake.calls) == 2
+    # the key is released (a new job); the 24 h result cache serves the repeat photo (D-12)
+    assert new != old and len(fake.calls) == 1

@@ -22,6 +22,22 @@ class Prepared:
     w: int
     h: int
     sha256: str
+    dhash: int
+
+
+def dhash(gray: Image.Image, n: int = 8) -> int:
+    """64-bit horizontal-gradient hash of the downscaled grey image (D-12)."""
+    px = gray.resize((n + 1, n), Image.Resampling.LANCZOS).tobytes()
+    bits = 0
+    for r in range(n):
+        row = px[r * (n + 1) : (r + 1) * (n + 1)]
+        for c in range(n):
+            bits = (bits << 1) | (row[c] > row[c + 1])
+    return bits
+
+
+def hamming(a: int, b: int) -> int:
+    return (a ^ b).bit_count()
 
 
 def prepare(raw: bytes) -> Prepared:
@@ -43,4 +59,5 @@ def prepare(raw: bytes) -> Prepared:
     out = io.BytesIO()
     img.save(out, "JPEG", quality=85)  # fresh encode: no EXIF/GPS
     jpeg = out.getvalue()
-    return Prepared(jpeg, img.width, img.height, hashlib.sha256(jpeg).hexdigest())
+    gray = img.convert("L")
+    return Prepared(jpeg, img.width, img.height, hashlib.sha256(jpeg).hexdigest(), dhash(gray))
