@@ -1,15 +1,20 @@
 """READ-05 / D-08: a palm photo never reaches disk or logs, and landmarks are never stored."""
 
+import base64
 import io
+import logging
 import random
 import tempfile
+import time
+from collections import deque
 
 from PIL import Image
 from pydantic import ValidationError
 
+from app import jobs
 from app.schemas.llm import LlmReading
 from app.services import image_prep
-from conftest import FakeSdk, client_factory, ok_reply, poll, post_job
+from conftest import LANDMARKS, FakeSdk, client_factory, make_jpeg, ok_reply, poll, post_job
 
 
 def _validation_error() -> ValidationError:
@@ -50,6 +55,89 @@ def run_outcomes(after=None) -> None:
             assert (body["error"] or {}).get("code") == code
             if after:
                 after(c)
+
+
+def _all_outcomes(after=None) -> None:
+    """The three outcomes, plus a 422 rejection and a done job for an EXIF/GPS photo."""
+    run_outcomes(after)
+    with client_factory(FakeSdk([ok_reply()])) as c:
+        bad = [list(p) for p in LANDMARKS]
+        bad[2][0] = 2.0
+        assert post_job(c, landmarks=bad).status_code == 422
+        r = post_job(c, make_jpeg(exif=True))
+        assert r.status_code == 202, r.text
+        assert poll(c, r.json()["job_id"])["status"] == "done"
+        if after:
+            after(c)
+
+
+def test_sdk_and_pil_loggers_never_debug(caplog):
+    caplog.set_level(logging.DEBUG)
+    assert not logging.getLogger("anthropic._base_client").isEnabledFor(logging.DEBUG)
+    assert not logging.getLogger("PIL.TiffImagePlugin").isEnabledFor(logging.DEBUG)
+
+
+def test_no_image_or_landmarks_in_logs(caplog):
+    caplog.set_level(logging.DEBUG)
+    _all_outcomes()
+    assert not [r.name for r in caplog.records if r.name.startswith(("anthropic", "PIL"))]
+    text = caplog.text
+    prefixes = [
+        base64.b64encode(image_prep.prepare(j).jpeg).decode()[:40]
+        for j in (BIG_JPEG, make_jpeg(exif=True))
+    ]
+    for needle in ["/9j/", "0.123457", "\\xff\\xd8", "\xff\xd8", "JFIF", *prefixes]:
+        assert needle not in text, needle
+
+
+def _is_landmarks(x) -> bool:
+    return len(x) == 21 and all(
+        isinstance(p, (list, tuple)) and len(p) == 3 and all(isinstance(v, (int, float)) for v in p)
+        for p in x
+    )
+
+
+def _leaks(root) -> list[str]:
+    """Walk app-held state; only objects whose type lives in the `app` package are descended into,
+    so the injected FakeSdk (which keeps request kwargs on purpose) and asyncio primitives are leaves."""
+    seen, found, stack = set(), [], [root]
+    while stack:
+        x = stack.pop()
+        if id(x) in seen:
+            continue
+        seen.add(id(x))
+        if isinstance(x, (bytes, bytearray, memoryview)):
+            found.append(f"bytes len={len(x)}")
+        elif isinstance(x, str):
+            if "/9j/" in x or "0.123457" in x:
+                found.append(f"str {x[:60]!r}")
+        elif isinstance(x, float):
+            if x == 0.123457:
+                found.append("landmark float")
+        elif isinstance(x, dict):
+            stack += [*x.keys(), *x.values()]
+        elif isinstance(x, (list, tuple, set, frozenset, deque)):
+            if isinstance(x, (list, tuple)) and _is_landmarks(x):
+                found.append("landmarks list")
+            stack += list(x)
+        elif type(x).__module__.split(".")[0] == "app" and hasattr(x, "__dict__"):
+            stack += list(vars(x).values())
+    return found
+
+
+def test_no_image_or_landmarks_in_stores(caplog):
+    caplog.set_level(logging.DEBUG)
+    before = set(jobs.TASKS)
+
+    def check(c):
+        svc = c.app.state.jobs
+        assert svc.jobs and _leaks(svc) == []
+        end = time.monotonic() + 1.0
+        while jobs.TASKS - before and time.monotonic() < end:
+            time.sleep(0.01)
+        assert not jobs.TASKS - before  # every job task finished and was discarded
+
+    _all_outcomes(check)
 
 
 def test_no_disk_after_success_failure_timeout(monkeypatch, tmp_path):
