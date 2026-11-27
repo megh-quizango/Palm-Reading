@@ -8,6 +8,7 @@ import uuid
 from types import SimpleNamespace
 
 import anthropic
+import httpx2
 import pytest
 from fastapi.testclient import TestClient
 from PIL import Image, ImageDraw
@@ -124,6 +125,22 @@ def ok_reply(w=960, h=1280):
     return SimpleNamespace(
         parsed_output=parsed, stop_reason="end_turn", usage=usage, model="claude-sonnet-5-5"
     )
+
+
+def sdk_error(cls, status: int | None = None) -> Exception:
+    """An SDK exception built with the installed 2.14.0 constructors (httpx2 is the SDK's transport)."""
+    req = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
+    if status is None:  # APIConnectionError / APITimeoutError take only the request
+        return cls(request=req)
+    return cls("sdk error", response=httpx2.Response(status, request=req), body=None)
+
+
+def reply_with(**kw):
+    """ok_reply() with fields replaced, e.g. stop_reason="refusal" or parsed_output=None."""
+    r = ok_reply()
+    for k, v in kw.items():
+        setattr(r, k, v)
+    return r
 
 
 class FakeSdk:
