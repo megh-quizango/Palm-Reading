@@ -2,36 +2,59 @@
 set and writes per-call rows plus an aggregates-only markdown summary.
 
 Run from backend/: `python -m evals.run_eval --fake --synthetic` (no key, no photos).
+Photo set (git-ignored): <photos>/*.jpg|jpeg|png|webp, <photos>/labels.csv with columns
+file,hand_side,expected_ok,expected_reason,group,notes, optional <stem>.landmarks.json.
 """
 
 import argparse
 import asyncio
 import base64
+import csv
 import hashlib
 import io
 import json
 import math
 import random
+import statistics
+import subprocess
 import sys
 import time
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from datetime import datetime
+from itertools import combinations
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
-from PIL import Image, ImageDraw, ImageOps
+import anthropic  # module import: the client class is looked up at call time (D-16 guard)
+from PIL import Image, ImageDraw
 
 from app.config import Settings
+from app.jobs import DHASH_MAX_DISTANCE
 from app.schemas.llm import LlmReading
 from app.services import image_prep as ip
 from app.services import line_geometry as geo
-from app.services.claude_client import Malformed, ModelFailure, PalmModel, Refused, cost
+from app.services.claude_client import (
+    PROMPT_VERSION,
+    Malformed,
+    ModelFailure,
+    PalmModel,
+    Refused,
+    cost,
+    worst_case_cost,
+)
 from app.services.palm_reader import LINE_ORDER, PalmReader
 
 # Anchored on the package, never on the cwd (Pitfall 9)
 EVALS = Path(__file__).resolve().parent
 REPO = EVALS.parents[1]
+
+ENUM_FIELDS = ("length", "curvature", "depth", "continuity")
+FAILURE_KINDS = ("timeout", "busy", "model_error")
+RULES = ("pass", "count", "hull", "length", "folds", "pair", "omitted")
+TOKENS_PER_POINT = 10  # about 10 output tokens per {"x":..,"y":..} point (RESEARCH Pattern 2)
+TEMPLATE_FIRST_AT = 70.0  # D-11: LLM lines valid below this share -> template-first
 
 # 21 normalised right-palm landmarks [x, y, z], wrist low and fingers up (synthetic photos)
 SYN_LANDMARKS = [
@@ -57,6 +80,17 @@ class Photo:
     landmarks: list | None
 
 
+@dataclass
+class Call:
+    kind: str  # "bake" | "redteam"
+    photo: Photo
+    model: str
+    locale: str
+    repeat: int
+    prep: ip.Prepared  # the image sent: the photo's own, or a red-team rendering
+    injection: tuple | None = None  # (topic, script, text) for red-team cells
+
+
 def parse_args(argv: list[str] | None) -> argparse.Namespace:
     p = argparse.ArgumentParser(prog="python -m evals.run_eval")
     p.add_argument("--fake", action="store_true", help="fake model client, no key, no spend")
@@ -66,9 +100,21 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     p.add_argument("--repeats", type=int, default=1)
     p.add_argument("--limit", type=int, default=None)
     p.add_argument("--concurrency", type=int, default=4)
+    p.add_argument("--max-usd", type=float, default=8.0, help="stop scheduling past this charge")
     p.add_argument("--photos", type=Path, default=EVALS / "photos")
     p.add_argument("--out", type=Path, default=EVALS / "results")
     return p.parse_args(argv)
+
+
+def ignored(path: Path) -> bool:
+    """True when git ignores `path` (probed through a child, so a missing dir still matches a
+    directory rule); paths outside the repo are not ours to guard."""
+    try:
+        rel = Path(path).resolve().relative_to(REPO)
+    except ValueError:
+        return True
+    probe = f"{rel.as_posix()}/.probe"
+    return subprocess.run(["git", "check-ignore", "-q", probe], cwd=REPO).returncode == 0
 
 
 def synthetic_jpeg(landmarks: list, size=(960, 1280), shade: int = 0) -> bytes:
@@ -99,6 +145,28 @@ def synthetic_set() -> list[tuple[str, str, str, bytes, list]]:
         ("syn2", "right", "a", synthetic_jpeg(SYN_LANDMARKS, shade=6), SYN_LANDMARKS),
         ("syn3", "left", "b", synthetic_jpeg(left), left),
     ]
+
+
+def load_photos(d: Path) -> list[Photo]:
+    photos = []
+    with open(d / "labels.csv", newline="", encoding="utf-8-sig") as f:
+        for row in csv.DictReader(f):
+            p = d / row["file"].strip()
+            lm_file = p.with_name(f"{p.stem}.landmarks.json")
+            lm = json.loads(lm_file.read_text(encoding="utf-8")) if lm_file.exists() else None
+            photos.append(
+                Photo(
+                    p.stem,
+                    row["hand_side"].strip() or "right",
+                    {"true": True, "false": False}.get(row["expected_ok"].strip().lower()),
+                    row["expected_reason"].strip(),
+                    row["group"].strip(),
+                    row["notes"],
+                    ip.prepare(p.read_bytes()),
+                    lm,
+                )
+            )
+    return photos
 
 
 class FakeClient:
@@ -164,108 +232,358 @@ class FakeClient:
         )
 
 
+# ---------- running ----------
+
+
 def pct(xs: list[float], q: float) -> float:
     """Nearest-rank percentile."""
     s = sorted(xs)
     return s[max(1, math.ceil(q / 100 * len(s))) - 1]
 
 
-def usage_of(e: Any) -> Any:
-    return getattr(e, "usage", None)
-
-
-async def attempt(reader: PalmReader, photo: Photo, locale: str) -> tuple[Any, str, float, Any]:
-    """One PalmReader.read attempt: (ReadResult or None, outcome, wall seconds, usage)."""
+async def attempt(reader: PalmReader, call: Call) -> tuple[Any, str, float, Any, float]:
+    """One PalmReader.read attempt: (ReadResult or None, outcome, wall s, usage, charge).
+    charge is what the attempt may have cost: actual when usage came back, else worst case
+    unless the failure never reached the model."""
+    worst = worst_case_cost(call.model)
+    p = call.prep
     t0 = time.perf_counter()
     try:
-        r = await reader.read(
-            photo.prep.jpeg, photo.prep.w, photo.prep.h, photo.hand, locale, photo.landmarks
-        )
-    except Malformed as e:
-        return None, "malformed", time.perf_counter() - t0, usage_of(e)
-    except Refused as e:
-        return None, "refusal", time.perf_counter() - t0, usage_of(e)
+        r = await reader.read(p.jpeg, p.w, p.h, call.photo.hand, call.locale, call.photo.landmarks)
+    except (Malformed, Refused) as e:
+        kind = "malformed" if isinstance(e, Malformed) else "refusal"
+        u = e.usage
+        return None, kind, time.perf_counter() - t0, u, cost(call.model, u) if u else worst
     except ModelFailure as e:
-        return None, e.code, time.perf_counter() - t0, None
+        return None, e.code, time.perf_counter() - t0, None, worst if e.billable else 0.0
     dt = time.perf_counter() - t0
     v = r.reading.verdict
-    return r, "ok" if v.ok else f"invalid:{v.reason}", dt, r.usage
+    return r, "ok" if v.ok else f"invalid:{v.reason}", dt, r.usage, cost(call.model, r.usage)
 
 
-async def run(a: argparse.Namespace, client: Any, models: list[str], photos: list[Photo]) -> list[dict]:
+def make_row(seq: int, call: Call, r: Any, outcome: str, dt: float, usage: Any, charge: float) -> dict:
+    ph, p = call.photo, call.prep
+    enums, points = {}, 0
+    if r is not None:
+        enums = {"verdict_ok": r.llm.verdict.ok, "verdict_reason": r.llm.verdict.reason}
+        for k in LINE_ORDER:
+            line = getattr(r.llm.lines, k)
+            enums |= {f"{k}.{f}": getattr(line, f) for f in ENUM_FIELDS}
+            points += len(line.points)
+    no_lm = ph.landmarks is None or geo.palm_from_landmarks(ph.landmarks, p.w, p.h) is None
+    return {
+        "seq": seq,
+        "kind": call.kind,
+        "photo": ph.id,
+        "group": ph.group,
+        "hand": ph.hand,
+        "model": call.model,
+        "locale": call.locale,
+        "repeat": call.repeat,
+        "latency_s": round(dt, 4),
+        "input_tokens": getattr(usage, "input_tokens", None),
+        "output_tokens": getattr(usage, "output_tokens", None),
+        "cache_read": getattr(usage, "cache_read_input_tokens", None),
+        "cache_write": getattr(usage, "cache_creation_input_tokens", None),
+        "cost": cost(call.model, usage) if usage is not None else 0.0,  # actual, for reporting
+        "charge": charge,  # budget accounting
+        "outcome": outcome,
+        "expected_ok": ph.expected_ok,
+        "expected_reason": ph.expected_reason,
+        "no_landmarks": no_lm,
+        "line_checks": r.line_checks if r is not None else {},
+        "enums": enums,
+        "points": points,
+        "safety_hits": r.safety_hits if r is not None else 0,
+    }
+
+
+async def run(a: argparse.Namespace, client: Any, calls: list[Call], owned: bool) -> dict:
+    """Runs calls in order through one semaphore; stops scheduling once the charge passes
+    --max-usd. Returns rows, the first reading per (photo, model) and the budget state."""
     sem = asyncio.Semaphore(a.concurrency)
-    readers = {m: PalmReader(PalmModel(client, m)) for m in models}
-    rows: list[dict] = []
+    readers = {m: PalmReader(PalmModel(client, m)) for m in {c.model for c in calls}}
+    st: dict = {"rows": [], "first": {}, "spent": 0.0, "seq": 0, "skipped": 0}
 
-    async def one(photo: Photo, model: str, locale: str, rep: int) -> None:
-        async with sem:
-            r, outcome, dt, usage = await attempt(readers[model], photo, locale)
-        rows.append(
-            {
-                "photo": photo.id,
-                "model": model,
-                "locale": locale,
-                "repeat": rep,
-                "latency_s": round(dt, 4),
-                "input_tokens": getattr(usage, "input_tokens", None),
-                "output_tokens": getattr(usage, "output_tokens", None),
-                "cost": cost(model, usage) if usage is not None else 0.0,
-                "outcome": outcome,
-                "line_checks": r.line_checks if r else {},
-                "safety_hits": r.safety_hits if r else 0,
-            }
-        )
+    async def one(call: Call) -> None:
+        try:
+            seq = st["seq"]
+            st["seq"] += 1
+            # latency covers only the read await, inside the semaphore (no queue wait)
+            r, outcome, dt, usage, charge = await attempt(readers[call.model], call)
+            st["spent"] += charge
+            st["rows"].append(make_row(seq, call, r, outcome, dt, usage, charge))
+            if r is not None and call.kind == "bake":
+                st["first"].setdefault((call.photo.id, call.model), (call, r.llm))
+        finally:
+            sem.release()
 
-    locales = a.locales.split(",")
-    await asyncio.gather(
-        *(
-            one(p, m, loc, rep)
-            for rep in range(a.repeats)
-            for p in photos
-            for loc in locales
-            for m in models
-        )
+    tasks = []
+    try:
+        for i, call in enumerate(calls):
+            await sem.acquire()
+            if st["spent"] > a.max_usd:
+                sem.release()
+                st["skipped"] = len(calls) - i
+                break
+            tasks.append(asyncio.create_task(one(call)))
+        await asyncio.gather(*tasks)
+    finally:
+        if owned:
+            await client.close()
+    st["rows"].sort(key=lambda r: r["seq"])
+    return st
+
+
+# ---------- metrics ----------
+
+
+def mean(xs) -> float | None:
+    xs = list(xs)
+    return sum(xs) / len(xs) if xs else None
+
+
+def lines_valid(per_photo: list[tuple[int, int]], n: int = 1000, seed: int = 0):
+    """(pass %, 95% low, 95% high, template-first verdict) from (passed, total) per photo.
+    Resamples photos, not calls: repeats and lines of one photo share an image."""
+    if not per_photo:
+        return None
+
+    def share(s):
+        return 100 * sum(p for p, _ in s) / sum(t for _, t in s)
+
+    rng = random.Random(seed)
+    boots = [share(rng.choices(per_photo, k=len(per_photo))) for _ in range(n)]
+    lo, hi = pct(boots, 2.5), pct(boots, 97.5)
+    verdict = "yes" if hi < TEMPLATE_FIRST_AT else "no" if lo > TEMPLATE_FIRST_AT else "inconclusive"
+    return round(share(per_photo), 1), round(lo, 1), round(hi, 1), verdict
+
+
+def agreement(rows: list[dict]) -> float | None:
+    """Per enum field, the modal value's share across repeats of one photo, averaged."""
+    by = defaultdict(list)
+    for r in rows:
+        if r["enums"]:
+            by[r["photo"]].append(r["enums"])
+    shares = [
+        Counter(e[f] for e in runs).most_common(1)[0][1] / len(runs)
+        for runs in by.values()
+        if len(runs) >= 2
+        for f in runs[0]
+    ]
+    return mean(shares)
+
+
+def verdict_match(r: dict) -> bool:
+    e = r["enums"]
+    if e["verdict_ok"] != r["expected_ok"]:
+        return False
+    return r["expected_ok"] or not r["expected_reason"] or e["verdict_reason"] == r["expected_reason"]
+
+
+def aggregate(rows: list[dict]) -> dict[tuple[str, str], dict]:
+    """Bake-off metrics per (model, locale), in schedule order."""
+    bake = [r for r in rows if r["kind"] == "bake"]
+    out = {}
+    for key in dict.fromkeys((r["model"], r["locale"]) for r in bake):
+        g = [r for r in bake if (r["model"], r["locale"]) == key]
+        read = [r for r in g if r["enums"]]
+        lm = [r for r in read if not r["no_landmarks"]]
+        per_photo: dict[str, list[int]] = defaultdict(lambda: [0, 0])
+        types = {k: Counter() for k in LINE_ORDER}
+        for r in lm:
+            for k, v in r["line_checks"].items():
+                per_photo[r["photo"]][0] += v == "pass"
+                per_photo[r["photo"]][1] += 1
+                types[k][v] += 1
+        outs = [r["output_tokens"] for r in g if r["output_tokens"] is not None]
+        mal = Counter(r["photo"] for r in g if r["outcome"] == "malformed")
+        labelled = [r for r in read if r["expected_ok"] is not None]
+        repeats = [r for r in g if r["repeat"] > 0 and r["cache_read"] is not None]
+        mean_out, mean_pts = mean(outs), mean(r["points"] for r in read)
+        lat = [r["latency_s"] for r in g]
+        out[key] = {
+            "calls": len(g),
+            "failures": {k: sum(r["outcome"] == k for r in g) for k in FAILURE_KINDS},
+            "p50": pct(lat, 50),
+            "p95": pct(lat, 95),
+            "mean_out": mean_out,
+            "mean_points": mean_pts,
+            "points_share": mean_pts * TOKENS_PER_POINT / mean_out if mean_out and mean_pts else None,
+            "mean_cost": mean(r["cost"] for r in g),
+            "max_cost": max(r["cost"] for r in g),
+            "lines": lines_valid([tuple(v) for v in per_photo.values() if v[1]]),
+            "line_types": types,
+            "no_landmarks": len(read) - len(lm),
+            "enum_agreement": agreement(read),
+            "refusals": sum(r["outcome"] == "refusal" for r in g),
+            "suspected_refusals": sum(n >= 2 for n in mal.values()),
+            "malformed": sum(mal.values()),
+            "verdict_agreement": mean(verdict_match(r) for r in labelled),
+            "cache_share": mean(r["cache_read"] > 0 for r in repeats),
+        }
+    return out
+
+
+def fmt(v, spec: str = ".2f") -> str:
+    return "n/a" if v is None else format(v, spec)
+
+
+def photo_tables(photos: list[Photo]) -> list[str]:
+    out = ["", "## dHash (re-capture distance)", "",
+           "| pairs | n | min | median | current DHASH_MAX_DISTANCE |", "|---|---|---|---|---|"]
+    pairs = {"intra": [], "inter": []}
+    for p, q in combinations(photos, 2):
+        same = bool(p.group) and p.group == q.group
+        pairs["intra" if same else "inter"].append(ip.hamming(p.prep.dhash, q.prep.dhash))
+    for k, d in pairs.items():
+        mn, md = (min(d), statistics.median(d)) if d else (None, None)
+        out.append(f"| {k} | {len(d)} | {fmt(mn, 'd')} | {fmt(md, '.1f')} | {DHASH_MAX_DISTANCE} |")
+    out += ["", "## Pre-gate", "",
+            f"Current thresholds: brightness >= {ip.PREGATE_MIN_MEAN}, "
+            f"laplacian_var >= {ip.PREGATE_MIN_LAPLACIAN_VAR}.", "",
+            "| expected_ok | n | laplacian_var min / median / max | brightness min / median / max |",
+            "|---|---|---|---|"]
+    for flag in (True, False):
+        ps = [p for p in photos if p.expected_ok is flag]
+        cells = []
+        for attr in ("laplacian_var", "brightness"):
+            v = [getattr(p.prep, attr) for p in ps]
+            cells.append(" / ".join(f"{x:.1f}" for x in (min(v), statistics.median(v), max(v))) if v else "n/a")
+        out.append(f"| {str(flag).lower()} | {len(ps)} | {cells[0]} | {cells[1]} |")
+    rejected = sum(
+        p.prep.brightness < ip.PREGATE_MIN_MEAN or p.prep.laplacian_var < ip.PREGATE_MIN_LAPLACIAN_VAR
+        for p in photos
+        if p.expected_ok
     )
-    return rows
+    out.append(f"\nexpected_ok=true photos the current thresholds would reject: {rejected}")
+    return out
 
 
-def summary(rows: list[dict], models: list[str]) -> str:
-    out = ["# Eval summary", "", "| model | locale | calls | p50 s | p95 s | mean $ | max $ |",
-           "|---|---|---|---|---|---|---|"]
-    for m in models:
-        for loc in sorted({r["locale"] for r in rows}):
-            g = [r for r in rows if r["model"] == m and r["locale"] == loc]
-            if not g:
-                continue
-            lat = [r["latency_s"] for r in g]
-            c = [r["cost"] for r in g]
+def summary(a: argparse.Namespace, rows: list[dict], photos: list[Photo], st: dict) -> str:
+    """Aggregates only: no photo ids, file names, per-photo rows or reading text (D-15)."""
+    mode = "fake" if a.fake else "real"
+    out = ["# Eval summary", "",
+           f"Mode {mode}, prompt {PROMPT_VERSION}, {len(photos)} photos, repeats {a.repeats}, "
+           f"concurrency {a.concurrency}, charged ${st['spent']:.4f} of --max-usd {a.max_usd}."]
+    if st["skipped"]:
+        out.append(f"\nBudget stop: {st['skipped']} scheduled calls not run.")
+    agg = aggregate(rows)
+    if agg:
+        out += ["", "## Bake-off", "",
+                "| model | locale | calls | timeout | busy | model_error | p50 s | p95 s "
+                "| mean out tok | mean pts/call | pts share | mean $ | max $ | lines valid % (95% CI) "
+                "| template-first | enum agree | refusals | suspected refusals | malformed "
+                "| verdict agree | cache-read share |",
+                "|" + "---|" * 21]
+        for (m, loc), g in agg.items():
+            f = g["failures"]
+            lv = g["lines"]
+            lines = f"{lv[0]:.1f} ({lv[1]:.1f}..{lv[2]:.1f}) | {lv[3]}" if lv else "n/a | n/a"
             out.append(
-                f"| {m} | {loc} | {len(g)} | {pct(lat, 50):.2f} | {pct(lat, 95):.2f} "
-                f"| {sum(c) / len(c):.4f} | {max(c):.4f} |"
+                f"| {m} | {loc} | {g['calls']} | {f['timeout']} | {f['busy']} | {f['model_error']} "
+                f"| {g['p50']:.2f} | {g['p95']:.2f} | {fmt(g['mean_out'], '.0f')} "
+                f"| {fmt(g['mean_points'], '.1f')} | {fmt(g['points_share'], '.0%')} "
+                f"| {g['mean_cost']:.4f} | {g['max_cost']:.4f} | {lines} "
+                f"| {fmt(g['enum_agreement'], '.0%')} | {g['refusals']} | {g['suspected_refusals']} "
+                f"| {g['malformed']} | {fmt(g['verdict_agreement'], '.0%')} "
+                f"| {fmt(g['cache_share'], '.0%')} |"
             )
+        out += ["", "## Lines valid per line type (count per rule)", "",
+                "| model | locale | line | " + " | ".join(RULES) + " | no landmarks | valid % |",
+                "|" + "---|" * (len(RULES) + 5)]
+        for (m, loc), g in agg.items():
+            for k, c in g["line_types"].items():
+                total = sum(c.values())
+                cells = " | ".join(str(c[x]) for x in RULES)
+                valid = fmt(100 * c["pass"] / total if total else None, ".1f")
+                out.append(f"| {m} | {loc} | {k} | {cells} | {g['no_landmarks']} | {valid} |")
+    out += photo_tables(photos)
     return "\n".join(out) + "\n"
+
+
+def overlay(call: Call, llm: LlmReading, path: Path) -> None:
+    """LLM trace (red) and landmark template (blue) per line on the prepared image."""
+    p = call.prep
+    img = Image.open(io.BytesIO(p.jpeg)).convert("RGB")
+    d = ImageDraw.Draw(img)
+    lm = call.photo.landmarks
+    palm = geo.palm_from_landmarks(lm, p.w, p.h) if lm else None
+    for k in LINE_ORDER:
+        pts = [(q.x, q.y) for q in getattr(llm.lines, k).points]
+        if len(pts) >= 2:
+            d.line(pts, fill=(235, 60, 60), width=4)
+        if palm is not None:
+            d.line(geo.template(k, palm), fill=(60, 150, 235), width=3)
+    img.save(path, "PNG")
+
+
+def write_rows(out: Path, ts: str, rows: list[dict]) -> None:
+    for m in dict.fromkeys(r["model"] for r in rows):
+        mine = [r for r in rows if r["model"] == m]
+        (out / f"{ts}-{m}.json").write_text(json.dumps(mine, indent=1), encoding="utf-8")
+        with open(out / f"{ts}-{m}.csv", "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=list(mine[0]))
+            w.writeheader()
+            for r in mine:
+                w.writerow({k: json.dumps(v) if isinstance(v, dict) else v for k, v in r.items()})
 
 
 def main(argv: list[str] | None = None, settings: Settings | None = None) -> int:
     a = parse_args(argv)
     s = settings or Settings()
     models = a.models.split(",") if a.models else [s.palm_model]
-    client = FakeClient()
-    photos = []
-    for pid, hand, group, jpeg, lm in synthetic_set():
-        prep = ip.prepare(jpeg)
-        client.register(prep.jpeg, lm)
-        photos.append(Photo(pid, hand, True, "", group, "", prep, lm))
-    rows = asyncio.run(run(a, client, models, photos))
-    out = a.out.resolve()
+    photos_dir, out = a.photos.resolve(), a.out.resolve()
+    # Public repo: never read photos from, or write results into, a tracked path (Pitfall 9)
+    for d in ([] if a.synthetic else [photos_dir]) + [out]:
+        if not ignored(d):
+            print(f"refusing to run: {d} is not git-ignored", file=sys.stderr)
+            return 2
+    key = ""
+    if not a.fake:
+        key = s.anthropic_api_key.get_secret_value().strip() if s.anthropic_api_key else ""
+        if not key:
+            print("ANTHROPIC_API_KEY missing in backend/.env", file=sys.stderr)
+            return 2
+    if not a.synthetic and not (photos_dir / "labels.csv").exists():
+        print(f"no labels.csv in {photos_dir}", file=sys.stderr)
+        return 2
+    if a.fake:
+        client, owned = FakeClient(), False
+    else:
+        # 120 s: no call is cut at a latency the bake-off judges; no retries: every 429,
+        # 5xx and timeout stays a visible row instead of a hidden re-send
+        client, owned = anthropic.AsyncAnthropic(api_key=key, timeout=120.0, max_retries=0), True
+    if a.synthetic:
+        photos = [Photo(i, h, True, "", g, "", ip.prepare(j), lm) for i, h, g, j, lm in synthetic_set()]
+    else:
+        photos = load_photos(photos_dir)
+    photos = photos[: a.limit] if a.limit else photos
+    locales = a.locales.split(",")
+    # Repeat by repeat, photo by photo, models alternating: a budget stop leaves equal coverage
+    calls = [
+        Call("bake", p, m, loc, rep, p.prep)
+        for rep in range(a.repeats)
+        for p in photos
+        for loc in locales
+        for m in models
+    ]
+    if a.fake:
+        for c in calls:
+            client.register(c.prep.jpeg, c.photo.landmarks, c.injection[2] if c.injection else None)
+    st = asyncio.run(run(a, client, calls, owned))
+    rows = st["rows"]
     out.mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d-%H%M%S")
-    for m in models:
-        mine = [r for r in rows if r["model"] == m]
-        (out / f"{ts}-{m}.json").write_text(json.dumps(mine, indent=1), encoding="utf-8")
-    text = summary(rows, models)
+    write_rows(out, ts, [r for r in rows if r["kind"] == "bake"])
+    (out / "overlays").mkdir(exist_ok=True)
+    for (pid, m), (call, llm) in st["first"].items():
+        overlay(call, llm, out / "overlays" / f"{pid}-{m}.png")
+    text = summary(a, rows, photos, st)
     (out / f"{ts}-summary.md").write_text(text, encoding="utf-8")
     print(text)
+    if st["skipped"]:
+        print(f"budget stop: charged ${st['spent']:.4f} > --max-usd {a.max_usd}")
     return 0
 
 

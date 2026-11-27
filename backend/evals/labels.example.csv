@@ -1,0 +1,3 @@
+file,hand_side,expected_ok,expected_reason,group,notes
+p01.jpg,right,true,,a,medium skin; no rings
+p02.jpg,right,false,jewelry,a,ring on index

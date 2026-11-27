@@ -3,6 +3,8 @@ settings() so no test reads backend/.env or can build a real client (D-16)."""
 
 import csv
 import json
+import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -184,3 +186,58 @@ def test_schedule_alternates_models_photo_by_photo(tmp_path):
     assert run_eval.main(argv, settings=settings()) == 0
     order = [(r["photo"], r["model"]) for r in rows_of(tmp_path)]
     assert order == [("syn1", SONNET), ("syn1", HAIKU), ("syn2", SONNET), ("syn2", HAIKU)]
+
+
+def test_make_landmarks_help_needs_no_mediapipe(monkeypatch):
+    from evals import make_landmarks
+
+    monkeypatch.setitem(sys.modules, "mediapipe", None)  # import would fail
+    with pytest.raises(SystemExit) as e:
+        make_landmarks.main(["--help"])
+    assert e.value.code == 0
+
+
+def test_make_landmarks_runs_image_mode_on_prepared_output(tmp_path, monkeypatch, capsys):
+    from evals import make_landmarks
+
+    seen = {"sizes": []}
+
+    class Landmarker:
+        @classmethod
+        def create_from_options(cls, opts):
+            seen["opts"] = opts
+            return cls()
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def detect(self, img):
+            seen["sizes"].append(img.data.size)
+            pts = [SimpleNamespace(x=0.5, y=0.5, z=0.0)] * 21
+            return SimpleNamespace(hand_landmarks=[pts] if len(seen["sizes"]) == 1 else [])
+
+    vision = SimpleNamespace(
+        HandLandmarker=Landmarker,
+        HandLandmarkerOptions=lambda **kw: kw,
+        RunningMode=SimpleNamespace(IMAGE="image"),
+    )
+    mp = SimpleNamespace(
+        Image=lambda image_format, data: SimpleNamespace(data=data),
+        ImageFormat=SimpleNamespace(SRGB="srgb"),
+        tasks=SimpleNamespace(BaseOptions=lambda model_asset_path: model_asset_path, vision=vision),
+    )
+    monkeypatch.setitem(sys.modules, "mediapipe", mp)
+    monkeypatch.setitem(sys.modules, "numpy", SimpleNamespace(asarray=lambda img: img))
+    lm = run_eval.SYN_LANDMARKS
+    (tmp_path / "a.jpg").write_bytes(run_eval.synthetic_jpeg(lm, size=(1700, 2200)))
+    (tmp_path / "b.jpg").write_bytes(run_eval.synthetic_jpeg(lm))
+    argv = ["--photos", str(tmp_path), "--model", str(tmp_path / "m.task")]
+    assert make_landmarks.main(argv) == 0
+    assert seen["opts"]["running_mode"] == "image" and seen["opts"]["num_hands"] == 1
+    assert max(seen["sizes"][0]) == 1568  # prepare() output, not the raw 2200 px file
+    assert len(json.loads((tmp_path / "a.landmarks.json").read_text(encoding="utf-8"))) == 21
+    assert json.loads((tmp_path / "b.landmarks.json").read_text(encoding="utf-8")) is None
+    assert capsys.readouterr().out.strip() == "2 photos processed, 1 with a hand"
