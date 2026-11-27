@@ -1,7 +1,13 @@
 package app.palm.core.designsystem
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import kotlin.math.roundToInt
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
@@ -47,6 +53,21 @@ fun Modifier.nocturneGlow(shadow: NocturneShadow, shape: Shape): Modifier = drop
         offset = DpOffset(shadow.offsetX, shadow.offsetY),
     ),
 )
+
+/**
+ * Paints [draw] once per size into a bitmap and blits it behind the content: static card art then costs one
+ * layer per frame while the sky animates behind it, instead of one per gradient (FND-03 jank, Home overdraw).
+ */
+fun Modifier.rasterizedBehind(draw: DrawScope.() -> Unit): Modifier = drawWithCache {
+    val w = size.width.roundToInt()
+    val h = size.height.roundToInt()
+    val image = if (w > 0 && h > 0) {
+        ImageBitmap(w, h).also { CanvasDrawScope().draw(this, layoutDirection, Canvas(it), size, draw) }
+    } else {
+        null
+    }
+    onDrawBehind { image?.let { drawImage(it) } }
+}
 
 /** CSS linear-gradient line: through the centre along (sin a, -cos a), length |w sin a| + |h cos a|. */
 internal fun gradientLine(angleDegrees: Float, size: Size): Pair<Offset, Offset> {

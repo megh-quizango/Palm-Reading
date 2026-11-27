@@ -25,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -51,6 +50,7 @@ import app.palm.core.designsystem.components.NocturneButtonStyle
 import app.palm.core.designsystem.devanagariSafe
 import app.palm.core.designsystem.nocturneBrush
 import app.palm.core.designsystem.nocturneGlow
+import app.palm.core.designsystem.rasterizedBehind
 
 private val HeroShape = RoundedCornerShape(NocturneRadius.Lg)
 
@@ -69,19 +69,15 @@ fun HeroCard(onScan: () -> Unit, modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .nocturneGlow(NocturneShadows.GlowPrimary, HeroShape)
             .clip(HeroShape)
-            .drawWithCache {
+            .rasterizedBehind {
                 val r = size.maxDimension * 0.7f
-                val heart = Brush.radialGradient(
-                    listOf(NocturneColors.PalmHeart.copy(alpha = 0.45f), Color.Transparent), Offset.Zero, r,
+                drawRect(aurora)
+                drawRect(Brush.radialGradient(listOf(NocturneColors.PalmHeart.copy(alpha = 0.45f), Color.Transparent), Offset.Zero, r))
+                drawRect(
+                    Brush.radialGradient(
+                        listOf(NocturneColors.PalmHead.copy(alpha = 0.25f), Color.Transparent), Offset(size.width, size.height), r,
+                    ),
                 )
-                val head = Brush.radialGradient(
-                    listOf(NocturneColors.PalmHead.copy(alpha = 0.25f), Color.Transparent), Offset(size.width, size.height), r,
-                )
-                onDrawBehind {
-                    drawRect(aurora)
-                    drawRect(heart)
-                    drawRect(head)
-                }
             }
             .border(NocturneBorderWidth, edge, HeroShape)
             .padding(NocturneSpace.S24),

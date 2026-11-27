@@ -21,7 +21,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -43,8 +44,10 @@ import app.palm.core.designsystem.NocturneShadows
 import app.palm.core.designsystem.NocturneSpace
 import app.palm.core.designsystem.nocturneBrush
 import app.palm.core.designsystem.nocturneGlow
+import app.palm.core.designsystem.rasterizedBehind
 
 private val CardShape = RoundedCornerShape(NocturneRadius.Lg)
+private val SlotHeight = 132.dp
 
 /** S06 feature tile: optional 132 dp art slot with a badge, then the title row with a decorative arrow disc. */
 @Composable
@@ -65,27 +68,23 @@ fun FeatureCard(
     Column(
         modifier
             .nocturneGlow(NocturneShadows.GlowCard, CardShape)
-            .background(fill, CardShape)
-            .border(NocturneBorderWidth, foil, CardShape)
             .clip(CardShape)
+            .rasterizedBehind {
+                drawRect(fill)
+                if (illustration != null) {
+                    // The opaque art slot covers the card fill, so it is painted over it here, not as a second layer
+                    val slot = Size(size.width, SlotHeight.toPx())
+                    drawRect(slotFill, size = slot)
+                    drawRect(Brush.radialGradient(listOf(NocturneShadows.GlowOrb.color, Color.Transparent), slot.center, slot.width * 0.55f), size = slot)
+                }
+            }
+            .border(NocturneBorderWidth, foil, CardShape)
             .then(if (soonCd != null) Modifier.semantics { contentDescription = soonCd } else Modifier)
             .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier),
     ) {
         if (illustration != null) {
             Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height(132.dp)
-                    .background(slotFill)
-                    .drawBehind {
-                        drawRect(
-                            Brush.radialGradient(
-                                listOf(NocturneShadows.GlowOrb.color, Color.Transparent),
-                                center,
-                                size.width * 0.55f,
-                            ),
-                        )
-                    },
+                Modifier.fillMaxWidth().height(SlotHeight),
                 contentAlignment = Alignment.Center,
             ) {
                 Image(illustration, null, Modifier.size(112.dp))
