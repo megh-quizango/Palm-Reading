@@ -17,9 +17,9 @@
 
 - [x] **ONB-01**: User sees a branded splash on launch that hands off to onboarding (first run) or Home (returning)
 - [x] **ONB-02**: User can pick the app language (English, Hindi) on first run
-- [ ] **ONB-03**: User can page through 3 intro screens with Next / Get started
-- [ ] **ONB-04**: User can enter a first name (validated: at least 2 letters) and optionally choose a gender
-- [ ] **ONB-05**: User can enter a birth date and optionally a birth time, with an "I don't know my birth time" option
+- [x] **ONB-03**: User can page through 3 intro screens with Next / Get started
+- [x] **ONB-04**: User can enter a first name (validated: at least 2 letters) and optionally choose a gender
+- [x] **ONB-05**: User can enter a birth date and optionally a birth time, with an "I don't know my birth time" option
 - [x] **ONB-06**: Onboarding is shown only once; the profile survives app restarts (DataStore, excluded from backup)
 
 ### Home
@@ -130,9 +130,9 @@
 | FND-05 | Phase 1 | Complete |
 | ONB-01 | Phase 3 | Complete |
 | ONB-02 | Phase 3 | Complete |
-| ONB-03 | Phase 3 | Pending |
-| ONB-04 | Phase 3 | Pending |
-| ONB-05 | Phase 3 | Pending |
+| ONB-03 | Phase 3 | Complete |
+| ONB-04 | Phase 3 | Complete |
+| ONB-05 | Phase 3 | Complete |
 | ONB-06 | Phase 3 | Complete |
 | HOME-01 | Phase 3 | Complete |
 | HOME-02 | Phase 3 | Pending |

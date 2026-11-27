@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-11-27T08:39:03.127Z"
+stopped_at: Completed 03-03-PLAN.md
+last_updated: "2026-11-27T10:55:11.452Z"
 last_activity: 2026-11-27
 last_activity_desc: Phase 2 execution started
-state_head: bee3d6f1493f7d0ca369a56a8fd25f22c7ba2ba4
+state_head: e2d36befc6b6814bb247339e5980bc9a0242df84
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 19
-  completed_plans: 14
+  completed_plans: 15
   percent: 17
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-11-26)
 ## Current Position
 
 Phase: 3 (Client Shell) — PLANNED, ready to execute (Phase 2: 02-08/02-09 deferred, not verified)
-Plan: 2 of 5 (waves: 03-01+03-02, 03-03+03-04, 03-05)
+Plan: 3 of 5 (waves: 03-01+03-02, 03-03+03-04, 03-05)
 Status: Phase 3 plans checked (2 rounds, passed). UI-SPEC checker still flags typography/spacing counts against the Phase 1 token scale and generic OK/Cancel on pickers; accepted, revisit in UI review
 Last activity: 2026-11-27 — Phase 3 planned
 
@@ -70,6 +70,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 02 P07 | 15min | 3 tasks | 6 files |
 | Phase 03 P01 | 16min | 3 tasks | 33 files |
 | Phase 03 P02 | 10min | 3 tasks | 26 files |
+| Phase 03 P03 | 135min | 2 tasks | 20 files |
 
 ## Accumulated Context
 
@@ -115,6 +116,9 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-01: LanguageScreen takes onContinue; entries decide the next step so 03-03 only edits OnboardingEntries
 - [Phase 03]: 03-02: the sky clock is a MutableLongState read as a primitive in onDrawBehind (-1 = rest); no clock when animate=false, animator scale 0 or battery saver
 - [Phase 03]: 03-02: Phase 3 illustrations are ported from our own 2026-11-26 design-session SVG (Figma MCP unavailable); tips and hero_orbit are hand-authored stand-ins under final names
+- [Phase 03]: Only the birth step completes onboarding; Language Continue pushes Intro
+- [Phase 03]: Birth time picker uses BasicAlertDialog, not an experimental time-picker dialog wrapper
+- [Phase 03]: Instrumented Back uses sendKeyDownUpSync(KEYCODE_BACK); no pressBack dependency added
 
 ### Pending Todos
 
@@ -140,6 +144,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-27T08:39:02.998Z
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-11-27T10:55:11.309Z
+Stopped at: Completed 03-03-PLAN.md
 Resume file: None
