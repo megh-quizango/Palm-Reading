@@ -23,14 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-26)
 
 **Core value:** The palm scan moment: live on-device hand guidance, then a believable Palm / Love / Career reading with the detected lines drawn over the user's own photo, in under 30 seconds.
-**Current focus:** Phase 2 — Reading Pipeline
+**Current focus:** Phase 3 — Client Shell (planned)
 
 ## Current Position
 
-Phase: 2 (Reading Pipeline) — EXECUTING
-Plan: 8 of 9
-Status: 02-08/02-09 deferred (template mode); Phase 2 not verified
-Last activity: 2026-11-27 — Phase 2 execution started
+Phase: 3 (Client Shell) — PLANNED, ready to execute (Phase 2: 02-08/02-09 deferred, not verified)
+Plan: 0 of 5 (waves: 03-01+03-02, 03-03+03-04, 03-05)
+Status: Phase 3 plans checked (2 rounds, passed). UI-SPEC checker still flags typography/spacing counts against the Phase 1 token scale and generic OK/Cancel on pickers; accepted, revisit in UI review
+Last activity: 2026-11-27 — Phase 3 planned
 
 Progress: [██░░░░░░░░] 17%
 
