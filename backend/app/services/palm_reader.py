@@ -2,12 +2,13 @@
 
 import json
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any, Final
 
 from app.schemas.llm import LlmReading
 from app.schemas.palm import PalmReading
+from app.services import line_geometry as geo
 from app.services.claude_client import PROMPT_VERSION, PalmModel
 
 LINE_ORDER: Final = ("heart", "head", "life", "fate", "sun")
@@ -35,6 +36,8 @@ class ReadResult:
     llm: LlmReading
     usage: Any
     model: str
+    # per line: the first D-10 rule its LLM trace failed, or pass (eval data for D-11)
+    line_checks: dict[str, str] = field(default_factory=dict)
 
 
 def _base(*, w: int, h: int, hand: str, locale: str, model: str) -> dict:
@@ -73,29 +76,43 @@ def _clamp(v: float) -> float:
     return min(1.0, max(0.0, round(v, 4)))
 
 
-def assemble(
-    llm: LlmReading, *, w: int, h: int, hand: str, locale: str, model: str, landmarks: Any
-) -> PalmReading:
-    if not llm.verdict.ok:
-        # "none" with ok=false is contradictory; the closest contract reason is no_palm_lines
-        reason = llm.verdict.reason if llm.verdict.reason != "none" else "no_palm_lines"
-        return invalid_reading(reason, w=w, h=h, hand=hand, locale=locale, model=model)
+def _norm(pts: list[geo.Pt], w: int, h: int) -> list[list[float]]:
+    return [[_clamp(x / w), _clamp(y / h)] for x, y in pts]
+
+
+def _lines(llm: LlmReading, *, w: int, h: int, locale: str, landmarks: Any):
+    palm = geo.palm_from_landmarks(landmarks, w, h)
+    checks: dict[str, str] = {}
     lines = []
     for key in LINE_ORDER:
         line = getattr(llm.lines, key)
-        trace = [[_clamp(p.x / w), _clamp(p.y / h)] for p in line.points] if line.present else []
-        if len(trace) < 2:
-            trace = []
+        pts = [(float(p.x), float(p.y)) for p in line.points] if line.present else []
+        trace: list[geo.Pt] = []
+        source = "none"
+        if palm is not None and pts:
+            checks[key] = geo.validate(pts, palm)
+            trace, source = (pts, "llm") if checks[key] == "pass" else (geo.template(key, palm), "template")
         lines.append(
             {
                 "type": key,
                 "label": LABELS[locale][key],
                 "present": line.present,
-                "trace": trace,
-                "trace_source": "llm" if trace else "none",
+                "trace": _norm(trace, w, h),
+                "trace_source": source,
                 "interpretation": line.interpretation,
             }
         )
+    return lines, checks
+
+
+def assemble(
+    llm: LlmReading, *, w: int, h: int, hand: str, locale: str, model: str, landmarks: Any
+) -> tuple[PalmReading, dict[str, str]]:
+    if not llm.verdict.ok:
+        # "none" with ok=false is contradictory; the closest contract reason is no_palm_lines
+        reason = llm.verdict.reason if llm.verdict.reason != "none" else "no_palm_lines"
+        return invalid_reading(reason, w=w, h=h, hand=hand, locale=locale, model=model), {}
+    lines, checks = _lines(llm, w=w, h=h, locale=locale, landmarks=landmarks)
     payload = _base(w=w, h=h, hand=hand, locale=locale, model=model)
     payload |= {
         "verdict": {"ok": True, "reason": None},
@@ -112,7 +129,7 @@ def assemble(
             "ideal_industries": llm.ideal_industries,
         },
     }
-    return _validate(payload)
+    return _validate(payload), checks
 
 
 class PalmReader:
@@ -123,7 +140,7 @@ class PalmReader:
         self, jpeg: bytes, w: int, h: int, hand: str, locale: str, landmarks: Any
     ) -> ReadResult:
         reply = await self.model.read_once(jpeg, w, h, hand, locale)
-        reading = assemble(
+        reading, checks = assemble(
             reply.parsed, w=w, h=h, hand=hand, locale=locale, model=reply.model, landmarks=landmarks
         )
-        return ReadResult(reading, reply.parsed, reply.usage, reply.model)
+        return ReadResult(reading, reply.parsed, reply.usage, reply.model, checks)
