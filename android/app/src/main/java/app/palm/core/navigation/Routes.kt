@@ -37,4 +37,9 @@ fun NavBackStack<NavKey>.replaceAll(key: NavKey) {
     subList(0, size - 1).clear()
 }
 
+/** Push [to] only while [from] is on top, so a double tap cannot push the same step twice. */
+fun NavBackStack<NavKey>.pushFrom(from: NavKey, to: NavKey) {
+    if (lastOrNull() == from) add(to)
+}
+
 fun startRoute(profile: Profile): Route = if (profile.onboardingComplete) Home else Language

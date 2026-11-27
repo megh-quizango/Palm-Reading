@@ -161,3 +161,8 @@ The first-run journey (ROADMAP Phase 3 criterion 1) holds on the reference phone
 
 - All created files listed above exist.
 - Commits fbe29cf, a8e3e33 and e2d36be are ancestors of HEAD. plan_head_before..HEAD counts 3 commits.
+
+## Review fixes
+
+- **[major] Onboarding forward navigation was not idempotent.** A double tap on Get started (or a second in-flight `continueTo` / `save`) pushed the same step twice, so Back needed two presses (breaks D-01). Added `NavBackStack.pushFrom(from, to)` in `core/navigation/Routes.kt`, which pushes only while `from` is on top; the Language, Intro and Name lambdas in `OnboardingEntries.kt` use it. Checking at push time also covers the async ViewModel callbacks, so no ViewModel change. Birth already uses `replaceAll(Home)`, which is idempotent.
+- Test: `PushFromTest` (double tap pushes once; late callback after the push is ignored). `:app:testDebugUnitTest` all green; `OnboardingFlowTest` on the reference phone (Redmi Note 10T 5G, API 33): 2 tests, 0 failures.
