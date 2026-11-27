@@ -1,11 +1,13 @@
 import json
 import math
 import os
+import time
 import uuid
 
 import pytest
 from fastapi.testclient import TestClient
 
+from app import jobs
 from app.main import create_app
 from app.schemas.palm import PalmReading
 from app.services.image_prep import MAX_BYTES
@@ -191,3 +193,69 @@ def test_malformed_multipart_rejected(case):
             )
         assert_rejected(c, fake, r)
         assert "detail" not in r.text
+
+
+def _hdrs(install=None, key=None) -> dict:
+    h = {"X-Install-Id": install or str(uuid.uuid4())}
+    if key is not None:
+        h["Idempotency-Key"] = key
+    return h
+
+
+def test_idempotent_retry_returns_same_job():
+    fake = FakeSdk()
+    hdrs = _hdrs(key=str(uuid.uuid4()))
+    with client_factory(fake) as c:
+        first = post_job(c, headers=hdrs).json()["job_id"]
+        poll(c, first)
+        again = post_job(c, headers=hdrs)
+    assert again.status_code == 202 and again.json()["job_id"] == first
+    assert len(fake.calls) == 1
+
+
+def test_idempotency_key_must_be_uuid():
+    with client_factory() as c:
+        bad = post_job(c, headers=_hdrs(key="abc"))
+        none = post_job(c, headers=_hdrs())
+    assert bad.status_code == 422 and bad.json() == {"error": {"code": "bad_request"}}
+    assert none.status_code == 202
+
+
+def test_single_flight_same_install_shares_running_job():
+    fake = FakeSdk([0.3])
+    install = str(uuid.uuid4())
+    with client_factory(fake) as c:
+        a = post_job(c, headers=_hdrs(install, str(uuid.uuid4()))).json()["job_id"]
+        b = post_job(c, headers=_hdrs(install, str(uuid.uuid4()))).json()["job_id"]
+        assert poll(c, a)["status"] == "done"
+    assert a == b and len(fake.calls) == 1
+
+
+def test_single_flight_never_crosses_installs():
+    with client_factory(FakeSdk([0.3])) as c:
+        a = post_job(c, headers=_hdrs(key=str(uuid.uuid4()))).json()["job_id"]
+        b = post_job(c, headers=_hdrs(key=str(uuid.uuid4()))).json()["job_id"]
+    assert a != b
+
+
+def test_single_flight_keyed_by_hand():
+    install = str(uuid.uuid4())
+    with client_factory(FakeSdk([0.3])) as c:
+        a = post_job(c, headers=_hdrs(install, str(uuid.uuid4()))).json()["job_id"]
+        b = post_job(c, hand="left", headers=_hdrs(install, str(uuid.uuid4()))).json()["job_id"]
+    assert a != b
+
+
+def test_expired_job_is_404_and_key_is_released(monkeypatch):
+    fake = FakeSdk()
+    hdrs = _hdrs(key=str(uuid.uuid4()))
+    with client_factory(fake) as c:
+        old = post_job(c, headers=hdrs).json()["job_id"]
+        poll(c, old)
+        t0 = time.monotonic()
+        monkeypatch.setattr(jobs, "now", lambda: t0 + jobs.JOB_TTL_S + 1)
+        gone = c.get(f"/v1/palm/jobs/{old}")
+        new = post_job(c, headers=hdrs).json()["job_id"]
+        poll(c, new)
+    assert gone.status_code == 404 and gone.json() == {"error": {"code": "not_found"}}
+    assert new != old and len(fake.calls) == 2
