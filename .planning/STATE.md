@@ -23,14 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-26)
 
 **Core value:** The palm scan moment: live on-device hand guidance, then a believable Palm / Love / Career reading with the detected lines drawn over the user's own photo, in under 30 seconds.
-**Current focus:** Phase 4 — next (Phase 3 complete, hardware perf gate deferred)
+**Current focus:** Phase 4 — Scan Loop (planned)
 
 ## Current Position
 
-Phase: 3 (Client Shell) — COMPLETE (user approved 2026-11-27; Phase 2: 02-08/02-09 deferred, not verified)
-Plan: 5 of 5
-Status: Phase 3 complete. Verification human_needed 10/12: cold start < 2 s and <= 5% jank measured only on the emulator, hardware run deferred to the next phone session. User approved the screens vs Figma and the A7/A10 gate choices
-Last activity: 2026-11-27 — Phase 3 executed and approved
+Phase: 4 (Scan Loop) — PLANNED, ready to execute (Phase 3 complete 2026-11-27, hardware perf gate folded into 04-05; Phase 2: 02-08/02-09 deferred)
+Plan: 0 of 5 (waves: 04-01, 04-02+04-03+04-04, 04-05)
+Status: Phase 4 plans checked (2 rounds; the last blocker, heifwriter minSdk 29 vs app 26, fixed in a final revision via an androidTest-only overrideLibrary). Execution needs download consent (CameraX 1.7.0, MediaPipe 1.2.3 + hand_landmarker.task, exifinterface, heifwriter test-only) and a physical phone for 04-01 tracer and 04-05
+Last activity: 2026-11-27 — Phase 4 planned
 
 Progress: [██░░░░░░░░] 17%
 
