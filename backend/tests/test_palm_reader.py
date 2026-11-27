@@ -10,6 +10,7 @@ from app.services import line_geometry as geo
 from app.services import palm_reader
 from app.services.claude_client import PalmModel
 from app.services.palm_reader import PalmReader
+from app.services.safety import NEUTRAL
 
 W, H = 960, 1280
 
@@ -82,3 +83,22 @@ def test_template_first_switch(monkeypatch):
     res, lines = read(ok_reply())
     assert all(line.trace_source == "template" for line in lines.values())
     assert set(res.line_checks.values()) == {"pass"}
+
+
+def test_death_prediction_is_rewritten():
+    r = ok_reply()
+    before = r.parsed_output.model_dump()
+    r.parsed_output = r.parsed_output.model_copy(
+        update={"how_you_love": "Your life line shows an early death, so love fast."}
+    )
+    res, _ = read(r)
+    love = res.reading.love
+    assert love.how_you_love == NEUTRAL["en"]["how_you_love"]
+    assert res.safety_hits == 1
+    assert (love.ideal_partner, love.challenges) == (before["ideal_partner"], before["love_challenges"])
+    assert res.reading.palm.summary == before["summary"]
+    assert [ln.interpretation for ln in res.reading.lines] == [
+        before["lines"][k]["interpretation"] for k in palm_reader.LINE_ORDER
+    ]
+    # ReadResult.llm keeps the model's own text for the eval
+    assert "early death" in res.llm.how_you_love

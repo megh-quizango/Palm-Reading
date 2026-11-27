@@ -9,6 +9,7 @@ from typing import Any, Final
 from app.schemas.llm import LlmReading
 from app.schemas.palm import REQUIRED_LINES, PalmReading
 from app.services import line_geometry as geo
+from app.services import safety
 from app.services.claude_client import PROMPT_VERSION, PalmModel
 
 LINE_ORDER: Final = ("heart", "head", "life", "fate", "sun")
@@ -40,6 +41,8 @@ class ReadResult:
     model: str
     # per line: the first D-10 rule its LLM trace failed, or pass (eval data for D-11)
     line_checks: dict[str, str] = field(default_factory=dict)
+    # prose fields the D-13 filter rewrote (eval: the prompt's own compliance)
+    safety_hits: int = 0
 
 
 def _base(*, w: int, h: int, hand: str, locale: str, model: str) -> dict:
@@ -157,7 +160,9 @@ class PalmReader:
         self, jpeg: bytes, w: int, h: int, hand: str, locale: str, landmarks: Any
     ) -> ReadResult:
         reply = await self.model.read_once(jpeg, w, h, hand, locale)
+        # llm stays the unfiltered model output (eval enum agreement); only the reading is served
+        safe, safety_hits = safety.filter_llm(reply.parsed, locale)
         reading, checks = assemble(
-            reply.parsed, w=w, h=h, hand=hand, locale=locale, model=reply.model, landmarks=landmarks
+            safe, w=w, h=h, hand=hand, locale=locale, model=reply.model, landmarks=landmarks
         )
-        return ReadResult(reading, reply.parsed, reply.usage, reply.model, checks)
+        return ReadResult(reading, reply.parsed, reply.usage, reply.model, checks, safety_hits)
