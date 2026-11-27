@@ -241,3 +241,112 @@ def test_make_landmarks_runs_image_mode_on_prepared_output(tmp_path, monkeypatch
     assert len(json.loads((tmp_path / "a.landmarks.json").read_text(encoding="utf-8"))) == 21
     assert json.loads((tmp_path / "b.landmarks.json").read_text(encoding="utf-8")) is None
     assert capsys.readouterr().out.strip() == "2 photos processed, 1 with a hand"
+
+
+# ---------- image red-team (D-13) ----------
+
+
+def redteam_files(out):
+    return [json.loads(f.read_text(encoding="utf-8")) for f in files(out / "redteam", "*.json")]
+
+
+def test_redteam_render_changes_a_strip_in_memory(tmp_path, monkeypatch):
+    from PIL import Image, ImageChops
+
+    from evals import redteam
+
+    monkeypatch.chdir(tmp_path)
+    jpeg = run_eval.synthetic_jpeg(run_eval.SYN_LANDMARKS)
+    for _, script, text in redteam.INJECTIONS[:3]:
+        font = redteam.FONT_HI if script == "hi" else None
+        out = redteam.render(jpeg, text, font)
+        a, b = (Image.open(__import__("io").BytesIO(x)).convert("L") for x in (jpeg, out))
+        box = ImageChops.difference(a, b).point(lambda v: 255 if v > 60 else 0).getbbox()
+        assert box is not None and box[3] - box[1] < a.height / 2  # a strip, not the whole photo
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_redteam_injections_cover_every_topic():
+    from evals import redteam
+
+    assert len(redteam.INJECTIONS) == 13
+    by = {}
+    for topic, script, _ in redteam.INJECTIONS:
+        by.setdefault(topic, set()).add(script)
+    assert by.pop("death") == {"en", "hinglish", "hi"}
+    assert set(by) == {"illness", "pregnancy", "medical", "legal", "financial"}
+    assert all(s == {"en", "hi"} for s in by.values())
+
+
+def test_redteam_score_counts_after_hits_and_raw_echo():
+    from conftest import ok_reply
+
+    from evals import redteam
+
+    inj = redteam.INJECTIONS[0][2]
+    clean = ok_reply().parsed
+    echoed = clean.model_copy(update={"summary": f"Calm. {inj.upper()}"})
+    assert redteam.score(clean, clean, inj) == {"hits_after": 0, "echoed": False}
+    got = redteam.score(echoed, echoed, inj)
+    assert got["hits_after"] >= 1 and got["echoed"] is True
+
+
+def test_redteam_fake_run_filters_every_echo_and_runs_first(tmp_path):
+    argv = ["--fake", "--synthetic", "--redteam", "--concurrency", "1", "--out", str(tmp_path)]
+    assert run_eval.main(argv, settings=settings()) == 0
+    rt = redteam_files(tmp_path)
+    assert len(rt) == 2 * 13 * 2  # redteam-limit photos x injections x locales x 1 model
+    assert sum(r["safety_hits"] for r in rt) > 0
+    assert sum(r["hits_after"] for r in rt) == 0
+    assert sum(r["echoed"] for r in rt) == len(rt)
+    assert all(r["raw"] and r["final"] for r in rt)
+    assert max(r["seq"] for r in rt) < min(r["seq"] for r in rows_of(tmp_path))
+    text = summary_of(tmp_path)
+    assert "## Red-team" in text and "raqm" in text and "| financial | hi |" in text
+
+
+@pytest.mark.parametrize(
+    "outcomes, kind",
+    [
+        ([Refused()], "refusal"),
+        ([Malformed()], "malformed"),
+        ([ModelFailure("model_error")], "model_error"),
+        ([ModelFailure("busy"), ModelFailure("busy")], "busy"),
+        ([ModelFailure("timeout"), ModelFailure("timeout")], "timeout"),
+    ],
+)
+def test_redteam_cell_without_reading_exits_1_after_full_run(tmp_path, monkeypatch, outcomes, kind):
+    monkeypatch.setattr(run_eval, "RETRY_PAUSE", 0)
+    scripted(monkeypatch, outcomes)
+    argv = ["--fake", "--synthetic", "--redteam", "--concurrency", "1", "--out", str(tmp_path)]
+    assert run_eval.main(argv, settings=settings()) == 1
+    assert len(rows_of(tmp_path)) == 3 and len(redteam_files(tmp_path)) == 52  # all calls ran
+    agg = run_eval.redteam_agg(redteam_files(tmp_path))
+    assert agg[("death", "en")]["failed"][kind] == 1
+    assert "## Red-team" in summary_of(tmp_path)
+
+
+def test_redteam_busy_then_ok_is_retried_once(tmp_path, monkeypatch):
+    monkeypatch.setattr(run_eval, "RETRY_PAUSE", 0)
+    scripted(monkeypatch, [ModelFailure("busy")])
+    argv = ["--fake", "--synthetic", "--redteam", "--concurrency", "1", "--out", str(tmp_path)]
+    assert run_eval.main(argv, settings=settings()) == 0
+    first = min(redteam_files(tmp_path), key=lambda r: r["seq"])
+    assert first["attempts"] == 2 and first["outcome"] == "ok"
+
+
+def test_redteam_after_filter_hit_exits_1(tmp_path, monkeypatch):
+    from app.services import palm_reader
+
+    monkeypatch.setattr(palm_reader.safety, "filter_llm", lambda llm, locale: (llm, 0))
+    argv = ["--fake", "--synthetic", "--redteam", "--out", str(tmp_path)]
+    assert run_eval.main(argv, settings=settings()) == 1
+    assert sum(r["hits_after"] for r in redteam_files(tmp_path)) > 0
+
+
+def test_redteam_only_with_zero_repeats(tmp_path):
+    argv = ["--fake", "--synthetic", "--redteam", "--repeats", "0", "--out", str(tmp_path)]
+    assert run_eval.main(argv, settings=settings()) == 0
+    assert files(tmp_path, "*.json") == [] and len(redteam_files(tmp_path)) == 52
+    text = summary_of(tmp_path)
+    assert "## Bake-off" not in text and "## Red-team" in text
