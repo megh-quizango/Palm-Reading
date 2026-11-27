@@ -7,11 +7,13 @@ from datetime import UTC, datetime
 from typing import Any, Final
 
 from app.schemas.llm import LlmReading
-from app.schemas.palm import PalmReading
+from app.schemas.palm import REQUIRED_LINES, PalmReading
 from app.services import line_geometry as geo
 from app.services.claude_client import PROMPT_VERSION, PalmModel
 
 LINE_ORDER: Final = ("heart", "head", "life", "fate", "sun")
+# D-11: True draws every present line from its template; the eval (02-09) decides the default
+TEMPLATE_FIRST: Final = False
 LABELS: Final = {
     "en": {
         "heart": "Heart line",
@@ -83,20 +85,35 @@ def _norm(pts: list[geo.Pt], w: int, h: int) -> list[list[float]]:
 def _lines(llm: LlmReading, *, w: int, h: int, locale: str, landmarks: Any):
     palm = geo.palm_from_landmarks(landmarks, w, h)
     checks: dict[str, str] = {}
+    pts: dict[str, list[geo.Pt]] = {}
+    for key in LINE_ORDER:
+        line = getattr(llm.lines, key)
+        if line.present and line.points:
+            pts[key] = [(float(p.x), float(p.y)) for p in line.points]
+            if palm is not None:
+                checks[key] = geo.validate(pts[key], palm)
+        elif line.present or key in REQUIRED_LINES:
+            checks[key] = "omitted"
+    if checks.get("heart") == checks.get("head") == "pass" and not geo.pair_ok(
+        pts["heart"], pts["head"], palm
+    ):
+        checks["heart"] = checks["head"] = "pair"
     lines = []
     for key in LINE_ORDER:
         line = getattr(llm.lines, key)
-        pts = [(float(p.x), float(p.y)) for p in line.points] if line.present else []
+        present = line.present or key in REQUIRED_LINES
         trace: list[geo.Pt] = []
         source = "none"
-        if palm is not None and pts:
-            checks[key] = geo.validate(pts, palm)
-            trace, source = (pts, "llm") if checks[key] == "pass" else (geo.template(key, palm), "template")
+        if present and palm is not None:
+            if checks.get(key) == "pass" and not TEMPLATE_FIRST:
+                trace, source = pts[key], "llm"
+            else:
+                trace, source = geo.template(key, palm), "template"
         lines.append(
             {
                 "type": key,
                 "label": LABELS[locale][key],
-                "present": line.present,
+                "present": present,
                 "trace": _norm(trace, w, h),
                 "trace_source": source,
                 "interpretation": line.interpretation,

@@ -11,6 +11,13 @@ PALM: Final = (0, 1, 2, 5, 9, 13, 17)  # wrist, thumb CMC/MCP, index/middle/ring
 HULL_EXPAND: Final = 1.15  # palm hull scaled about its centroid
 MIN_INSIDE: Final = 0.8  # share of trace points that must sit inside the expanded hull
 MIN_L_PX: Final = 20.0  # wrist to middle MCP below this: landmarks unusable
+MIN_POINTS: Final = 4
+MAX_POINTS: Final = 24
+MIN_LEN: Final = 0.25  # polyline length bounds, in units of L (A4: start values, eval tunes)
+MAX_LEN: Final = 2.2
+MAX_FOLD_DEG: Final = 150.0  # a turn sharper than this between segments is a fold
+MAX_FOLDS: Final = 1
+PAIR_MIN_GAP: Final = 0.05  # heart mean s must exceed head mean s by this, units of L
 
 # (s, t): s along wrist -> middle MCP in units of L (1.0 = MCP row), t across (+ pinky side).
 # Start -> end. Tuned from RESEARCH Pattern 7 so every point sits inside the landmark hull (A3).
@@ -99,8 +106,32 @@ def template(kind: str, palm: Palm) -> list[Pt]:
     return [palm.world(s, t) for s, t in TEMPLATES[kind]]
 
 
+def _turn_deg(a: Pt, b: Pt, c: Pt) -> float:
+    d1 = (b[0] - a[0], b[1] - a[1])
+    d2 = (c[0] - b[0], c[1] - b[1])
+    cos = (d1[0] * d2[0] + d1[1] * d2[1]) / (math.hypot(*d1) * math.hypot(*d2))
+    return math.degrees(math.acos(max(-1.0, min(1.0, cos))))
+
+
 def validate(pts: list[Pt], palm: Palm) -> str:
-    """Name of the first D-10 rule the trace fails, or "pass"."""
+    """Name of the first D-10 rule the trace fails ("count", "hull", "length", "folds"), or "pass"."""
+    pts = [p for i, p in enumerate(pts) if i == 0 or p != pts[i - 1]]
+    if not MIN_POINTS <= len(pts) <= MAX_POINTS:
+        return "count"
     if sum(inside(palm.hull, p) for p in pts) < MIN_INSIDE * len(pts):
         return "hull"
+    if not MIN_LEN <= sum(math.dist(a, b) for a, b in zip(pts, pts[1:])) / palm.L <= MAX_LEN:
+        return "length"
+    folds = sum(_turn_deg(*pts[i : i + 3]) > MAX_FOLD_DEG for i in range(len(pts) - 2))
+    if folds > MAX_FOLDS:
+        return "folds"
     return "pass"
+
+
+def pair_ok(heart: list[Pt], head: list[Pt], palm: Palm) -> bool:
+    """Heart sits above (farther from the wrist than) the head line in the hand frame."""
+
+    def mean_s(pts: list[Pt]) -> float:
+        return sum(palm.local(p)[0] for p in pts) / len(pts)
+
+    return mean_s(heart) - mean_s(head) >= PAIR_MIN_GAP
