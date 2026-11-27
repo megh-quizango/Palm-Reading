@@ -23,6 +23,7 @@ import app.palm.core.designsystem.LocalNocturne
 import app.palm.core.designsystem.NocturneBackground
 import app.palm.core.designsystem.NocturneDurations
 import app.palm.core.designsystem.NocturneEasings
+import app.palm.debug.debugEntries
 import app.palm.feature.handselect.handSelectEntries
 import app.palm.feature.home.homeEntries
 import app.palm.feature.onboarding.onboardingEntries
@@ -66,6 +67,7 @@ fun AppNavDisplay(start: Route?) {
                 onboardingEntries(backStack)
                 homeEntries(backStack)
                 handSelectEntries(backStack)
+                debugEntries() // the showcase in debug builds, nothing in release (D-03)
             },
         )
     }

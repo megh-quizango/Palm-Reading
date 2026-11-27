@@ -1,5 +1,19 @@
 package app.palm.feature.home
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import app.palm.core.designsystem.NocturneDurations
+import app.palm.core.designsystem.NocturneEasings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -49,9 +63,16 @@ fun HomeScreen(
     onGreetingLongPress: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
+    var askExit by rememberSaveable { mutableStateOf(false) }
+    // Innermost enabled handler, so it wins over NavDisplay's pop on the one-entry stack (D-13)
+    BackHandler(enabled = !askExit) { askExit = true }
+    if (askExit) ExitDialog(onStay = { askExit = false })
+
     val profile by viewModel.profile.collectAsStateWithLifecycle()
     val p = profile ?: return
-    val type = LocalNocturne.current.type
+    val nocturne = LocalNocturne.current
+    val type = nocturne.type
+    val entry = rememberEntryClock(still = nocturne.reduceMotion)
     Column(
         modifier
             .fillMaxSize()
@@ -59,7 +80,21 @@ fun HomeScreen(
             .verticalScroll(rememberScrollState())
             .padding(start = NocturneSpace.S16, end = NocturneSpace.S16, top = NocturneSpace.S8, bottom = NocturneSpace.S24),
     ) {
-        Column(Modifier.fillMaxWidth().heightIn(min = 64.dp), verticalArrangement = Arrangement.Center) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .heightIn(min = 64.dp)
+                .entryMotion(entry, index = 0, rise = false)
+                .then(
+                    // Debug-only hook (D-03): no affordance and no semantics action
+                    if (onGreetingLongPress != null) {
+                        Modifier.pointerInput(onGreetingLongPress) { detectTapGestures(onLongPress = { onGreetingLongPress() }) }
+                    } else {
+                        Modifier
+                    },
+                ),
+            verticalArrangement = Arrangement.Center,
+        ) {
             Text(
                 stringResource(greetingRes(dayPart(LocalTime.now())), p.firstName),
                 style = type.overline.devanagariSafe(),
@@ -73,7 +108,7 @@ fun HomeScreen(
             )
         }
         Spacer(Modifier.height(NocturneSpace.S16))
-        HeroCard(onScan)
+        HeroCard(onScan, Modifier.entryMotion(entry, index = 1))
         Spacer(Modifier.height(NocturneSpace.S24))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(painterResource(R.drawable.ic_sparkle), null, Modifier.size(24.dp), tint = NocturneColors.AccentGold)
@@ -93,7 +128,7 @@ fun HomeScreen(
                     row.forEach { feature ->
                         FeatureCard(
                             title = stringResource(feature.titleRes),
-                            modifier = Modifier.weight(1f).fillMaxHeight(),
+                            modifier = Modifier.weight(1f).fillMaxHeight().entryMotion(entry, index = 2 + feature.ordinal),
                             onClick = { if (feature == Feature.PALM) onScan() else onFeature(feature) },
                             illustration = painterResource(feature.artRes),
                             badge = if (feature == Feature.PALM) null else stringResource(R.string.home_soon_badge),
@@ -103,6 +138,32 @@ fun HomeScreen(
             }
         }
     }
+}
+
+// Once per process: coming back to Home (or rotating) does not replay the entry motion
+private var entryPlayed = false
+
+private const val STAGGER_MS = 60f
+private const val ENTRY_END_MS = NocturneDurations.Standard + STAGGER_MS * (2 + 7)
+
+/** One clock in ms drives the whole stagger; item i starts at i * 60 ms and runs Standard. */
+@Composable
+private fun rememberEntryClock(still: Boolean): Animatable<Float, *> {
+    val clock = remember { Animatable(if (entryPlayed || still) ENTRY_END_MS else 0f) }
+    LaunchedEffect(Unit) {
+        entryPlayed = true
+        clock.animateTo(ENTRY_END_MS, tween(ENTRY_END_MS.toInt(), easing = LinearEasing))
+    }
+    return clock
+}
+
+/** Fade (and a 16 dp rise) read in the graphicsLayer lambda, so the stagger never recomposes Home. */
+private fun Modifier.entryMotion(clock: Animatable<Float, *>, index: Int, rise: Boolean = true) = graphicsLayer {
+    val f = NocturneEasings.EmphasizedDecelerate.transform(
+        ((clock.value - index * STAGGER_MS) / NocturneDurations.Standard).coerceIn(0f, 1f),
+    )
+    alpha = f
+    if (rise) translationY = (1f - f) * 16.dp.toPx()
 }
 
 /** D-12 order; the odd 7th tile (Ask [Guide]) spans both columns. */

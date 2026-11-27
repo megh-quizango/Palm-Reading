@@ -13,6 +13,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.core.os.LocaleListCompat
+import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -24,12 +25,13 @@ import dagger.hilt.android.EntryPointAccessors
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** S06 Home: header, hero, the 7 tiles, Palm reading -> hand selection, the coming-soon sheet over Home. */
+/** S06 Home: header, hero, the 7 tiles, Palm reading -> hand selection, the coming-soon sheet over Home, exit confirm. */
 @OptIn(ExperimentalTestApi::class)
 @RunWith(AndroidJUnit4::class)
 class HomeTest {
@@ -101,5 +103,22 @@ class HomeTest {
         back()
         compose.waitUntilDoesNotExist(hasText("Coming soon"), 5_000)
         compose.onNodeWithText("Read your palm").assertExists()
+        compose.onNodeWithText("Leave [AppName]?").assertDoesNotExist() // Back closed the sheet, not Home
+    }
+
+    @Test fun backOnHomeAsksBeforeLeaving() {
+        waitForText("Asha")
+        back()
+        waitForText("Leave [AppName]?")
+        compose.onNodeWithText("Stay").performClick()
+        compose.waitUntilDoesNotExist(hasText("Leave [AppName]?"), 5_000)
+        compose.onNodeWithText("Read your palm").assertExists()
+
+        back()
+        waitForText("Leave [AppName]?")
+        compose.onNodeWithText("Leave").performClick()
+        val deadline = System.currentTimeMillis() + 5_000
+        while (scenario.state != Lifecycle.State.DESTROYED && System.currentTimeMillis() < deadline) Thread.sleep(50)
+        assertEquals(Lifecycle.State.DESTROYED, scenario.state)
     }
 }

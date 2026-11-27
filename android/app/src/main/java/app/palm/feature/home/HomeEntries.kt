@@ -10,6 +10,7 @@ import app.palm.core.navigation.HandSelect
 import app.palm.core.navigation.Home
 import app.palm.core.navigation.popFrom
 import app.palm.core.navigation.pushFrom
+import app.palm.debug.debugHomeLongPress
 
 fun EntryProviderScope<NavKey>.homeEntries(backStack: NavBackStack<NavKey>) {
     entry<Home> {
@@ -17,7 +18,7 @@ fun EntryProviderScope<NavKey>.homeEntries(backStack: NavBackStack<NavKey>) {
             viewModel = hiltViewModel(),
             onScan = { backStack.pushFrom(Home, HandSelect) },
             onFeature = { backStack.pushFrom(Home, ComingSoon(it)) },
-            onGreetingLongPress = null,
+            onGreetingLongPress = debugHomeLongPress?.let { key -> { backStack.pushFrom(Home, key) } },
         )
     }
     entry<ComingSoon>(metadata = BottomSheetSceneStrategy.bottomSheet()) { key ->

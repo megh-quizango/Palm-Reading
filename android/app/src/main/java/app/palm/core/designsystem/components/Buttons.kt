@@ -1,23 +1,32 @@
 package app.palm.core.designsystem.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import app.palm.core.designsystem.LocalNocturne
 import app.palm.core.designsystem.NocturneBorderWidth
 import app.palm.core.designsystem.NocturneColors
+import app.palm.core.designsystem.NocturneDurations
+import app.palm.core.designsystem.NocturneEasings
 import app.palm.core.designsystem.NocturneGradientAngles
 import app.palm.core.designsystem.NocturneGradients
 import app.palm.core.designsystem.NocturneSemantic
@@ -30,6 +39,7 @@ import app.palm.core.designsystem.nocturneGlow
 enum class NocturneButtonStyle { Primary, Secondary, Ghost, OnHero }
 
 private const val DISABLED_ALPHA = 0.38f // lower emphasis with the same colours
+private const val PRESSED_SCALE = 0.97f
 
 @Composable
 fun NocturneButton(
@@ -54,12 +64,24 @@ fun NocturneButton(
         NocturneButtonStyle.Ghost -> NocturneColors.BrandLink
         NocturneButtonStyle.OnHero -> NocturneColors.BrandPrimaryDeep
     }
+    val interaction = remember { MutableInteractionSource() }
+    val pressed by interaction.collectIsPressedAsState()
+    val still = LocalNocturne.current.reduceMotion
+    val scale = animateFloatAsState(
+        if (pressed && !still) PRESSED_SCALE else 1f,
+        tween(NocturneDurations.Press, easing = NocturneEasings.Standard),
+        label = "press",
+    )
     Row(
         modifier
+            .graphicsLayer {
+                scaleX = scale.value
+                scaleY = scale.value
+            }
             .alpha(if (enabled) 1f else DISABLED_ALPHA)
             .then(look)
             .clip(PillShape)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+            .clickable(interaction, LocalIndication.current, enabled = enabled, role = Role.Button, onClick = onClick)
             .defaultMinSize(minWidth = NocturneSize.TouchMin, minHeight = NocturneSize.Button)
             .padding(horizontal = NocturneSpace.S24),
         horizontalArrangement = Arrangement.spacedBy(NocturneSpace.S8, Alignment.CenterHorizontally),
