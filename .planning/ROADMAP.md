@@ -57,12 +57,12 @@ Plans:
   5. A red-team set (death, illness, pregnancy, medical, legal, financial, injected text in the image; English and Hindi) never yields a forbidden directive in a returned reading, and a client over its rate limit or a tripped daily spend cap gets a clean "busy" response instead of a model call.
 
 **Research flag**: Needs deeper research and a spike (`/gsd-plan-phase` with research): palm model bake-off (default Sonnet 5.5 vs Haiku 5.5, Opus as quality ceiling only), polyline quality, multilingual denylist, Anthropic data-retention terms. Prerequisite: a consented palm photo set (20-40 labelled photos covering skin tones, henna, rings, blur, backlight), kept out of git. The winning model needs user sign-off (cost and latency trade).
-**Plans:** 2/9 plans executed
+**Plans:** 3/9 plans executed
 
 Plans:
 - [x] 02-01-PLAN.md — Tracer: POST a palm photo, poll a contract-valid reading (Claude mocked at the SDK); package legitimacy checkpoint; input validation and EXIF strip (wave 1)
 - [x] 02-02-PLAN.md — Lines validated against the landmarks, template fallback, required lines, template-first switch (wave 2)
-- [ ] 02-03-PLAN.md — Failure states: malformed retried once, refusal, busy/timeout/model_error, idempotency, single-flight, job expiry (wave 2)
+- [x] 02-03-PLAN.md — Failure states: malformed retried once, refusal, busy/timeout/model_error, idempotency, single-flight, job expiry (wave 2)
 - [ ] 02-04-PLAN.md — Safety filter: en/hi/Hinglish denylist with field rewrite and a red-team gate (wave 3)
 - [ ] 02-05-PLAN.md — Install-scoped dHash result cache, blur/dark pre-gate, rate limit and daily spend cap (wave 3)
 - [ ] 02-06-PLAN.md — Privacy proof: no image on disk or in logs, no landmarks stored, after success, failure and timeout (wave 4)
@@ -143,7 +143,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6. After Phase 1,
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundations & Contract | 5/5 | Complete    | 2026-11-26 |
-| 2. Reading Pipeline | 2/9 | In Progress | - |
+| 2. Reading Pipeline | 3/9 | In Progress | - |
 | 3. Client Shell | 0/TBD | Not started | - |
 | 4. Scan Loop | 0/TBD | Not started | - |
 | 5. Result Against the Fixture | 0/TBD | Not started | - |
