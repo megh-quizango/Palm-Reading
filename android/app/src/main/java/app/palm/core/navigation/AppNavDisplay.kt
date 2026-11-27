@@ -56,6 +56,8 @@ fun AppNavDisplay(start: Route?) {
                 rememberSaveableStateHolderNavEntryDecorator(),
                 rememberViewModelStoreNavEntryDecorator(),
             ),
+            // The single-pane fallback is implicit (Nav3 1.2 calculateSceneWithSinglePaneFallback)
+            sceneStrategies = listOf(BottomSheetSceneStrategy()),
             transitionSpec = { spec(endPx) },
             popTransitionSpec = { spec(-endPx) },
             predictivePopTransitionSpec = { spec(-endPx) },

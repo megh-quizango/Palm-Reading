@@ -23,15 +23,20 @@ import app.palm.core.designsystem.NocturneSpace
 internal val PillShape = RoundedCornerShape(50) // radius.pill (999 px) on any height
 
 @Composable
-fun NocturneChip(text: String, modifier: Modifier = Modifier, dotColor: Color? = null) {
+fun NocturneChip(
+    text: String,
+    modifier: Modifier = Modifier,
+    dotColor: Color? = null,
+    textColor: Color = NocturneSemantic.Foreground,
+) {
     Row(
         modifier.background(NocturneSemantic.Muted, PillShape)
-            .padding(horizontal = NocturneSpace.S12, vertical = NocturneSpace.S8),
+            .padding(horizontal = NocturneSpace.S8, vertical = NocturneSpace.S4),
         horizontalArrangement = Arrangement.spacedBy(NocturneSpace.S8),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (dotColor != null) Box(Modifier.size(NocturneSpace.S8).background(dotColor, CircleShape))
-        Text(text, style = LocalNocturne.current.type.labelM, color = NocturneSemantic.Foreground)
+        Text(text, style = LocalNocturne.current.type.labelM, color = textColor)
     }
 }
 
