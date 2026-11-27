@@ -33,6 +33,8 @@ class BirthViewModel @Inject constructor(private val repo: ProfileRepository) : 
         _state.update { it.copy(time = time) }
     }
 
+    fun onTimeUnknown(checked: Boolean) {} // RED stub, implemented in the GREEN step
+
     /** The last onboarding step: saves the birth data, then marks onboarding complete. */
     fun finish(next: () -> Unit) {
         val s = _state.value

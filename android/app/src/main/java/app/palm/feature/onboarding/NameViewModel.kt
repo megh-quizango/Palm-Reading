@@ -35,6 +35,8 @@ class NameViewModel @Inject constructor(private val repo: ProfileRepository) : V
         _state.update { it.copy(gender = if (it.gender == gender) null else gender) }
     }
 
+    fun revealError() {} // RED stub, implemented in the GREEN step
+
     fun save(next: () -> Unit) {
         val s = _state.value
         if (s.check != NameCheck.OK) return

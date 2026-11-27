@@ -1,5 +1,6 @@
 package app.palm.feature.onboarding
 
+import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assert
@@ -62,12 +63,21 @@ class OnboardingFlowTest {
         setLocales("")
     }
 
-    @Test fun firstRunReachesHomeWithProfileSaved() {
+    private fun back() {
+        instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
+        compose.waitForIdle()
+    }
+
+    private fun continueInEnglish() {
         // The locale from @Before can arrive after the first frame (API 33+), so pick English explicitly
         waitForText("हिन्दी")
         compose.onNodeWithText("English").performClick()
         waitForText("Continue in English")
         compose.onNodeWithText("Continue in English").performClick()
+    }
+
+    @Test fun firstRunReachesHomeWithProfileSaved() {
+        continueInEnglish()
 
         waitForText("Your palm, your story")
         compose.onNodeWithText("Your palm, your story").performTouchInput { swipeLeft() }
@@ -101,5 +111,32 @@ class OnboardingFlowTest {
         assertEquals(Gender.FEMALE, p.gender)
         assertEquals(LocalDate.of(2000, 1, 15), p.birthDate)
         assertTrue(p.onboardingComplete)
+    }
+
+    @Test fun timeUnknownAndBackWalkTheStepsInOrder() {
+        continueInEnglish()
+        waitForText("Your palm, your story")
+        compose.onNodeWithText("Next").performClick()
+        waitForText("Your stars, day by day")
+        compose.onNodeWithText("Next").performClick()
+        waitForText("Meet [Guide]")
+        compose.onNodeWithText("Get started").performClick()
+        waitForText("What should we call you?")
+        compose.onNode(hasSetTextAction()).performTextInput("Asha")
+        compose.onNodeWithText("Continue").performClick()
+
+        waitForText("When were you born?")
+        compose.onNodeWithText("Choose a time").assertIsEnabled()
+        compose.onNodeWithText("I don't know my birth time").performClick()
+        waitForText("No problem.")
+        compose.onNodeWithText("Choose a time").assertIsNotEnabled()
+
+        back()
+        waitForText("What should we call you?")
+        compose.onNode(hasSetTextAction()).assert(hasText("Asha"))
+        back()
+        waitForText("Get started")
+        back()
+        waitForText("Choose your language")
     }
 }
