@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-11-28T02:29:12.611Z"
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-11-28T02:43:09.757Z"
 last_activity: 2026-11-28
 last_activity_desc: Phase 2 execution started
-state_head: c1f8b9098d84a0f5c436ce36ee3bbd95e5365b34
+state_head: 8dd2c630e50807cac1e038ef5925d1a99858caea
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 24
-  completed_plans: 19
+  completed_plans: 20
   percent: 33
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-11-26)
 ## Current Position
 
 Phase: 4 (Scan Loop) — EXECUTING (Phase 3 complete 2026-11-27, hardware perf gate folded into 04-05; Phase 2: 02-08/02-09 deferred)
-Plan: 3 of 5 (waves: 04-01, 04-02+04-03+04-04, 04-05); 04-01 and 04-02 complete
+Plan: 4 of 5 (waves: 04-01, 04-02+04-03+04-04, 04-05); 04-01 and 04-02 complete
 Status: Executing on emulator-5554 ("emulator now, phone later"); real-palm, torch, focus and TalkBack checks of 04-01 and 04-02 are listed in their SUMMARYs for the 04-05 phone session
 Last activity: 2026-11-28 — 04-02 complete (stable guidance, overlay, held-palm capture, focus, torch)
 
@@ -74,6 +74,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 03 P04 | 82min | 3 tasks | 24 files |
 | Phase 04 P01 | 70 min | 3 tasks | 36 files |
 | Phase 4 P02 | 30 min | 3 tasks | 49 files |
+| Phase 04 P03 | 5 min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -136,6 +137,7 @@ Recent decisions affecting current work:
 - [Phase 4]: ScannerUi emits only stabilised values; palm centre and frame size stay private in ScannerViewModel (per-frame data goes to the debug flow only, T-04-09)
 - [Phase 4]: Guidance thresholds live in GuidanceConfig.Default (research starting values); tools/gen_landmark_fixtures.py mirrors the band values and must change with them
 - [Phase 4]: Preview semantics (description, focus onClick) sit on the overlay node because the AndroidView holder is invisible to accessibility
+- [Phase 04]: 04-03: Camera Denied vs PermanentlyDenied derived from the real request answer plus shouldShowRequestPermissionRationale, no stored has-asked flag; a saveable asked flag prevents a second in-flight request on recreation
 
 ### Pending Todos
 
@@ -167,6 +169,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-28T02:29:12.388Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-11-28T02:43:09.529Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None
