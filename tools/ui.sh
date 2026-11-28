@@ -69,14 +69,14 @@ case "$CMD" in
   hold) # long press: a zero-length swipe held for 1 s
     find_xy "$1"
     "${A[@]}" shell input swipe "${xy%,*}" "${xy#*,}" "${xy%,*}" "${xy#*,}" 1000 ;;
-  scroll-to) # uiautomator lists only on-screen Compose nodes, so swipe up by half the screen until REGEX shows (max 8)
+  scroll-to) # uiautomator lists only on-screen Compose nodes, so drag up by half the screen until REGEX shows (max 20: long readings at font scale 2.0)
     size="$("${A[@]}" shell wm size | tr -d '\r' | grep -oE '[0-9]+x[0-9]+' | tail -n 1)"
     w="${size%x*}"; h="${size#*x}"
     d="$(dump)"
     n=0
     until printf '%s\n' "$d" | grep -qE -- "$1"; do
-      if [ "$n" -ge 8 ]; then printf '%s\n' "$d"; echo "ui FAILED: scroll-to $1" >&2; exit 1; fi
-      "${A[@]}" shell input swipe $((w / 2)) $((h * 3 / 4)) $((w / 2)) $((h / 4)) 300
+      if [ "$n" -ge 20 ]; then printf '%s\n' "$d"; echo "ui FAILED: scroll-to $1" >&2; exit 1; fi
+      "${A[@]}" shell input swipe $((w / 2)) $((h * 3 / 4)) $((w / 2)) $((h / 4)) 1000 # slow drag, no fling: a fling skipped list items at font scale 2.0
       n=$((n + 1))
       sleep 0.5
       d="$(dump)"

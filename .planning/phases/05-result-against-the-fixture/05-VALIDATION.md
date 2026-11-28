@@ -4,7 +4,7 @@ slug: "result-against-the-fixture"
 # status lifecycle: draft (seeded by plan-phase) → validated (set by validate-phase §6)
 # audit-milestone §5.5 distinguishes NOT-VALIDATED (draft) from PARTIAL (validated + nyquist_compliant: false) (#2117)
 status: draft
-nyquist_compliant: false
+nyquist_compliant: true
 wave_0_complete: true
 created: "2026-11-28"
 ---
@@ -55,7 +55,7 @@ Class-only entries under "Automated Command" run with the quick command's Gradle
 | 05-05-T1 | 05-05 | 2 | RES-02, RES-03, READ-03 (D-02, D-04, D-06) | T-05-16, T-05-17, T-05-SC | Strict decode + ReadingRules for every variant; release twin of the variant seam returns null; only the fixtures.dir build line added | unit + build | `--tests 'app.palm.core.reading.FixturesTest' --tests 'app.palm.core.reading.FixtureRepositoryTest'` (en/invalid fixture == contracts; hi mirrors en; 14 variants valid with their property; stamping id/hand/size/locale/time, no landmarks); `bash tools/gradlew.sh :app:compileReleaseKotlin :app:assembleDebug` | ❌ W0 (TDD in task; adds the fixtures.dir property) | ✅ green |
 | 05-05-T2 | 05-05 | 2 | D-05, D-06 (RES-02, READ-03 reachability) | T-05-16 | Lab and its choice object only in src/debug | build + device | `bash tools/gradlew.sh :app:assembleDebug :app:compileReleaseKotlin`; emulator `result-open.sh --aspect 1:1 --variant all_llm` -> expect "^Fate  \("; `--aspect 9:16 --skin dark --variant hindi` -> scroll-to the hi summary (captured with `python -I -X utf8`); lab "Delete all readings" (pinned bar outside the scrolling pickers) -> Home has no "Your last reading" | ✅ (result-open.sh from 05-01) | ✅ green |
 | 05-06-T1 | 05-06 | 3 | all 9 | T-05-03, T-05-06, T-05-SC | No lab symbol in main/release; no log calls in reading/result except the debug aspect warning; en/hi key parity; catalog unchanged | unit + build + instrumented + static | `bash tools/gradlew.sh :app:testDebugUnitTest :app:assembleRelease`; full `:app:connectedDebugAndroidTest` with the zero-test guard and the 13-class presence loop; static gate command in 05-06 Task 1 | ✅ (all created by earlier plans) | ✅ green |
-| 05-06-T2 | 05-06 | 3 | all 9 | T-05-18, T-05-19 | Screenshots git-ignored; font scale and app locale restored by a trap | device + human check | `ADB_SERIAL=emulator-5554 bash tools/device-lock.sh bash tools/result-walk.sh` + at least 40 `phase5-*.png` + `git check-ignore` + font scale not 2.0 afterwards; `tools/res_pattern.py` check (en invalid_no_palm_lines_title pattern matches "We couldn't see your palm lines" through `grep -E`; hi keys print without UnicodeEncodeError); `<human-check>` visual sign-off (including the halo alpha 0.55 vs D-10's ~30%) for `/gsd-verify-work` | ❌ W0 (result-walk.sh and res_pattern.py created by this task) | ⬜ pending |
+| 05-06-T2 | 05-06 | 3 | all 9 | T-05-18, T-05-19 | Screenshots git-ignored; font scale and app locale restored by a trap | device + human check | `ADB_SERIAL=emulator-5554 bash tools/device-lock.sh bash tools/result-walk.sh` + at least 40 `phase5-*.png` + `git check-ignore` + font scale not 2.0 afterwards; `tools/res_pattern.py` check (en invalid_no_palm_lines_title pattern matches "We couldn't see your palm lines" through `grep -E`; hi keys print without UnicodeEncodeError); `<human-check>` visual sign-off (including the halo alpha 0.55 vs D-10's ~30%) for `/gsd-verify-work` | ❌ W0 (result-walk.sh and res_pattern.py created by this task) | ✅ green (automated; human check pending) |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -85,17 +85,26 @@ Each item is created by the task that first needs it (TDD tasks write their test
 | Every lab variant in en and hi at font scale 2.0 (no clipping, disclaimer visible) | RES-01, RES-03, RES-04 (D-24) | Layout under large text and Hindi script is a visual check | `adb shell settings put system font_scale 2.0`, walk all variants in en and hi, screenshot; restore with `adb shell settings put system font_scale 1.0` |
 | API 26-27 share capture path (`LayerSnapshotV22`) | RES-06 | No API 26-27 system image installed; phone (API 30) covers V28 only | Accept as unverified; record in the phase summary |
 
+**05-06-T2 results (2026-11-28, emulator-5554, `tools/result-walk.sh`, 42 screenshots in `tools/adb/shots/phase5-*.png`, git-ignored):**
+
+| Behavior | Emulator result | Still open |
+|----------|-----------------|------------|
+| Share sheet | `phase5-share-sheet.png`: the system chooser (com.android.intentresolver) opens with the card thumbnail and "My palm reading from [AppName]"; targets Quick Share, Google, Print, Drive, Maps | Picking a target and checking the received 1080 x 1350 PNG (human check); MIUI phone share (phone session) |
+| Overlay / halo / legend | 14 variants x en/hi, every aspect with both skins; all_none shows no overlay, no legend and the "couldn't trace" note. The walk found the 9:16 photo box overflowing onto the top bar and the legend (fixed in `057a726`, regression test `ResultScreenTest.aTallPhotoStaysAboveItsLegend`) | Halo alpha 0.55 vs D-10 0.30 decision and line placement judgement (human check); real light-skin palm (phone session, Phase 6) |
+| Font scale 2.0 en/hi | `phase5-{en,hi}-{mixed,long_text,invalid_jewelry,home}-fs2.png` captured; font scale and app locale restored by the trap (verified 1.0 / [en]) | Clipping judgement (human check) |
+| API 26-27 capture path | Not run (no system image) | Accepted as unverified; phone-session list |
+
 All four rows are run (or recorded as phone-session items) in 05-06-T2 through `tools/result-walk.sh` screenshots and its `<human-check>`; the walk covers the 13 D-06 variants plus the long-text variant (05-05) in en and hi.
 
 ---
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 120s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 120s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** automated sign-off 2026-11-28 (05-06); the visual `<human-check>` (halo alpha, overlay, Hindi, font scale, share target) is collected by `/gsd-verify-work`
