@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Drive the phone UI through uiautomator dumps (tools/adb/ui.py lines: "label  (cx,cy) flags", first line "activity: ...").
 # Usage: bash tools/ui.sh launch | reset | expect REGEX... | absent REGEX... | tap REGEX | hold REGEX | scroll-to REGEX | type TEXT | back | swipe-left
+# tap/hold use the first line REGEX matches: anchor (^) a label that is part of another, e.g. hi Denied title contains "कैमरे की अनुमति दें".
 # Env: PKG (default app.palm.dev.debug), UI_TIMEOUT seconds for expect/tap (default 15), UI_SETTLE seconds for absent (default 2).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
