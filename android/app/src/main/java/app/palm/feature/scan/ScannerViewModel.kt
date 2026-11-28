@@ -39,8 +39,8 @@ data class ScannerUi(
     val torchOn: Boolean = false,
 )
 
-/** Per-frame sample for the debug HUD (04-05) only; never logged. */
-data class ScanDebugSample(val frame: HandFrame?, val reading: GuidanceReading, val viewWidth: Int, val viewHeight: Int)
+/** Per-frame sample for the debug HUD (04-05) only; never logged. [timestampMs] keeps equal no-hand frames distinct. */
+data class ScanDebugSample(val frame: HandFrame?, val reading: GuidanceReading, val viewWidth: Int, val viewHeight: Int, val timestampMs: Long)
 
 /** Live guidance (D-07, D-08): frame -> HandGuidance -> GuidanceStabilizer -> ScannerUi. */
 @HiltViewModel
@@ -104,7 +104,7 @@ class ScannerViewModel @Inject constructor() : ViewModel() {
                 val changed = it.shown != stable.shown
                 enabled(it.copy(shown = stable.shown, wrongHand = stable.wrongHand, captureFailed = it.captureFailed && !changed))
             }
-            _debug.value = ScanDebugSample(frame, reading, viewWidth, viewHeight)
+            _debug.value = ScanDebugSample(frame, reading, viewWidth, viewHeight, timestampMs)
         }
     }
 

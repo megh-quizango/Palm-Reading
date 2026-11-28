@@ -124,11 +124,11 @@ private fun HudPanel(samples: StateFlow<ScanDebugSample?>, hand: HandSide) {
     var recording by remember { mutableStateOf(false) }
     var fps by remember { mutableFloatStateOf(0f) }
 
-    // Frame rate over the last second; a StateFlow drops equal samples, so a still no-hand scene reads low
+    // Analysed frames over the last second
     LaunchedEffect(samples) {
         val times = ArrayDeque<Long>()
         samples.collect { s ->
-            val now = s?.frame?.timestampMs ?: SystemClock.uptimeMillis()
+            val now = s?.timestampMs ?: SystemClock.uptimeMillis()
             times.addLast(now)
             while (times.isNotEmpty() && now - times.first() > 1000) times.removeFirst()
             fps = times.size.toFloat()
@@ -183,7 +183,7 @@ private fun HudPanel(samples: StateFlow<ScanDebugSample?>, hand: HandSide) {
                         val got = mutableListOf<Pair<Long, ScanDebugSample>>()
                         withTimeoutOrNull(3_000) {
                             samples.collect { s ->
-                                if (s != null) got += (s.frame?.timestampMs ?: SystemClock.uptimeMillis()) to s
+                                if (s != null) got += s.timestampMs to s
                             }
                         }
                         val name = recorder.write(hand, picked, got)
