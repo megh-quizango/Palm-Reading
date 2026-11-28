@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -133,7 +134,8 @@ private fun Found(
     }
     var tab by rememberSaveable { mutableIntStateOf(0) }
     Column(modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(top = NocturneSpace.S24)) {
-        PalmPhoto(photo, reading.lines, Modifier.fillMaxWidth().heightIn(max = maxPhotoHeight).aspectRatio(ratio), revealKey = readingId)
+        // wrapContentWidth drops fillMaxWidth's min width, so a photo taller than the cap narrows (centred) instead of overflowing
+        PalmPhoto(photo, reading.lines, Modifier.fillMaxWidth().wrapContentWidth().heightIn(max = maxPhotoHeight).aspectRatio(ratio), revealKey = readingId)
         if (image != null) { // D-12: legend and notes only once the photo is drawn
             val anyDrawn = reading.lines.any { it.isDrawn() }
             if (anyDrawn) {

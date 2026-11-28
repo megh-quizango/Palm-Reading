@@ -69,8 +69,8 @@ class ResultScreenTest {
     }
 
     /** Seeds a reading (summary = marker so the newest card is ours), optionally deletes its photo, opens it from Home. */
-    private fun open(deletePhoto: Boolean = false, edit: (PalmReadingDto) -> PalmReadingDto = { it }): String {
-        val id = runBlocking { seedReading(app, store) { r -> edit(r).let { it.copy(palm = it.palm?.copy(summary = marker)) } } }
+    private fun open(deletePhoto: Boolean = false, width: Int = 960, height: Int = 1280, edit: (PalmReadingDto) -> PalmReadingDto = { it }): String {
+        val id = runBlocking { seedReading(app, store, width = width, height = height) { r -> edit(r).let { it.copy(palm = it.palm?.copy(summary = marker)) } } }
         created += id
         if (deletePhoto) assertTrue(File(app.filesDir, "readings/$id.jpg").delete())
         scenario = ActivityScenario.launch(MainActivity::class.java)
@@ -143,6 +143,18 @@ class ResultScreenTest {
         open()
         shown("Lines are drawn approximately.")
         compose.onNode(hasText("We couldn't trace your lines clearly on this photo.")).assertDoesNotExist()
+    }
+
+    // A 9:16 photo is taller than the 55% cap: the box must shrink in width, not overflow onto the top bar and legend
+    @Test fun aTallPhotoStaysAboveItsLegend() {
+        open(width = 720, height = 1280)
+        wait(hasText("Heart"))
+        val box = compose.onNodeWithContentDescription("Your palm photo with lines drawn", substring = true).fetchSemanticsNode()
+        val chip = compose.onNode(hasText("Heart")).fetchSemanticsNode()
+        val root = compose.onAllNodes(SemanticsMatcher("root") { it.parent == null }).fetchSemanticsNodes().first()
+        assertTrue("photo ${box.boundsInRoot} overlaps legend ${chip.boundsInRoot}", box.boundsInRoot.bottom <= chip.boundsInRoot.top)
+        assertTrue("photo ${box.boundsInRoot} taller than 55% of ${root.size}", box.boundsInRoot.height <= root.size.height * 0.55f + 1f)
+        assertTrue("photo ${box.boundsInRoot} not 9:16", kotlin.math.abs(box.boundsInRoot.width / box.boundsInRoot.height - 720f / 1280f) < 0.01f)
     }
 
     @Test fun noDrawnLinesShowTheNoLinesNote() {
