@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-11-26)
 
 Phase: 4 (Scan Loop) — EXECUTING (Phase 3 complete 2026-11-27, hardware perf gate folded into 04-05; Phase 2: 02-08/02-09 deferred)
 Plan: 5 of 5 (waves: 04-01, 04-02+04-03+04-04, 04-05); 04-01 and 04-02 complete
-Status: Executing on emulator-5554 ("emulator now, phone later"); real-palm, torch, focus and TalkBack checks of 04-01 and 04-02 are listed in their SUMMARYs for the 04-05 phone session
+Status: 04-05 partially done on emulator-5554 (emulator part complete 2026-11-28); waits for the reference phone for Task 2/3 and every hardware gate (see 04-05-SUMMARY "Phone session still required")
 Last activity: 2026-11-28 — 04-02 complete (stable guidance, overlay, held-palm capture, focus, torch)
 
 Progress: [███░░░░░░░] 33%
@@ -156,7 +156,8 @@ None yet.
 - ~~[Phase 1]: MIUI on the Redmi asks "Install via USB?" for every adb install and auto-denies after about 10 s (INSTALL_FAILED_USER_RESTRICTED). Unattended installs need the user to tick "Remember my choice" once on that prompt~~ RESOLVED (user ticked "Remember my choice"; plan 01-03 ran 4 installs unattended)
 - [Phase 2, 4]: No consented palm photo set exists yet (20-40 labelled photos, kept out of git); needed for the model bake-off and guidance calibration
 - [Phase 2]: Palm model winner (Sonnet 5.5 vs Haiku 5.5) needs user sign-off after the eval
-- [Phase 4]: Handedness and palm-facing thresholds need on-device calibration; verify MediaPipe 16 KB-aligned native libs
+- [Phase 4]: Handedness and palm-facing thresholds need on-device calibration (still open: 04-05 Task 2 + Task 3 on the reference phone); ~~verify MediaPipe 16 KB-aligned native libs~~ 16 KB part RESOLVED 2026-11-28 (D-15): every release .so (arm64-v8a and armeabi-v7a, incl. libmediapipe_tasks_jni.so) has LOAD align 0x4000 and `zipalign -c -P 16 -v 4` reports "Verification successful"
+- [Phase 4]: 04-05 PARTIAL (emulator part done 2026-11-28, "Continue on emulator"): HUD/recorder, tools/check-scan-session.sh, 16 KB, release-APK checks, emulator session and Phase 3 gate numbers (emulator, not a gate) recorded in 04-05-SUMMARY; the release build cannot run the scanner on emulator-5554 (arm64-only MediaPipe segfaults under the x86_64 native bridge), so the release SCAN-07 session, the Phase 3 hardware gates, Task 2 (real hands, blocking-human) and Task 3 (calibration, fixtures decision) wait for the phone; checklist in 04-05-SUMMARY "Phone session still required"
 - [Phase 3]: all Hindi strings (values-hi) are Claude-written; native-speaker review needed before release (D-06)
 - [Phase 3]: per-app locale: the API 33+ LocaleManager path is verified (vivo V2225 API 35 reference phone, Redmi Note 10T API 33, emulator API 35); the API 26-32 AppCompat path is unverified on hardware (no API 26-32 device)
 - [Phase 3]: 03-05 performance gates (release cold start < 2 s, <= 5% deadline-missed frames on Home idle and intro swipes) were measured only on the x86 emulator, which is not a gate; the hardware run is deferred to the next phone session (debug intro swipe on the Redmi was 37.5%, so fix the intro pager if release is still over 5%)
@@ -175,5 +176,5 @@ Items acknowledged and deferred at milestone close, most recent first:
 ## Session Continuity
 
 Last session: 2026-11-28T03:02:05.570Z
-Stopped at: Completed 04-04-PLAN.md
-Resume file: None
+Stopped at: 04-05 emulator part done; phone session pending (Task 2 checkpoint)
+Resume file: .planning/phases/04-scan-loop/04-05-SUMMARY.md
