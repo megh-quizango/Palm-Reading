@@ -212,7 +212,8 @@ def main(argv):
     if "--check" in argv:
         for name, text in files.items():
             path = OUT / name
-            if not path.exists() or path.read_bytes() != text.encode("utf-8"):
+            # CRLF-tolerant: Windows checkouts with core.autocrlf rewrite line endings
+            if not path.exists() or path.read_bytes().replace(b"\r\n", b"\n") != text.encode("utf-8"):
                 print(f"fixture differs or is missing: {path.relative_to(ROOT)}", file=sys.stderr)
                 return 1
         print(f"fixtures OK: {len(files)} files")
