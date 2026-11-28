@@ -163,7 +163,7 @@ private fun Found(
             }
         }
         Spacer(Modifier.height(NocturneSpace.S24))
-        ResultActions(reading, image, onScanAgain, onAskGuide)
+        ResultActions(reading, photo, onScanAgain, onAskGuide)
         Spacer(Modifier.height(NocturneSpace.S32))
     }
 }

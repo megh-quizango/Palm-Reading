@@ -13,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -40,7 +39,7 @@ private enum class ShareStatus { Idle, Preparing, Failed }
 @Composable
 fun ResultActions(
     reading: PalmReadingDto,
-    photo: ImageBitmap?,
+    photo: PhotoState,
     onScanAgain: () -> Unit,
     onAskGuide: () -> Unit,
     modifier: Modifier = Modifier,
@@ -77,8 +76,9 @@ fun ResultActions(
                 )
             }
         }
-        if (share == ShareStatus.Preparing) {
-            ShareCapture(reading, photo?.let { PhotoState.Ready(it) } ?: PhotoState.Unavailable) { image ->
+        // A tap while the photo still decodes stays Preparing until it resolves, so it never shares a "Photo unavailable" card
+        if (share == ShareStatus.Preparing && photo !is PhotoState.Loading) {
+            ShareCapture(reading, photo) { image ->
                 scope.launch {
                     share = try {
                         val file = writeSharePng(context.cacheDir, image)

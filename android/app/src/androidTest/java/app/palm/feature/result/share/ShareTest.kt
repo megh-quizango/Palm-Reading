@@ -54,6 +54,7 @@ import app.palm.contract.PalmReadingDto
 import app.palm.core.designsystem.NocturneTheme
 import app.palm.core.reading.ContractJson
 import app.palm.feature.result.PhotoState
+import app.palm.feature.result.ResultActions
 import java.io.File
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -224,6 +225,21 @@ class ShareTest {
             runBlocking { store.delete(id) }
             instrumentation.runOnMainSync { AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList()) }
         }
+    }
+
+    @Test fun shareTappedWhileThePhotoDecodesWaitsForIt() {
+        var state by mutableStateOf<PhotoState>(PhotoState.Loading)
+        val png = File(shareDir(), "reading.png").apply { delete() }
+        compose.setContent { NocturneTheme { Box(Modifier.fillMaxSize()) { ResultActions(sample, state, {}, {}) } } }
+        compose.onNodeWithText(context.getString(R.string.result_share)).performClick()
+        compose.waitForIdle()
+        // Still Loading: no "Photo unavailable" card is captured or written
+        compose.onNodeWithText(context.getString(R.string.result_share_preparing)).assertExists()
+        assertFalse(png.exists())
+        compose.runOnIdle { state = PhotoState.Ready(photo()) }
+        compose.waitUntil(timeoutMillis = 10_000) { png.exists() }
+        assertTrue("share sheet did not open", waitFor { CHOOSER.containsMatchIn(topActivity()) })
+        InstrumentationRegistry.getInstrumentation().uiAutomation.executeShellCommand("input keyevent ${KeyEvent.KEYCODE_BACK}").close()
     }
 
     private fun waitFor(condition: () -> Boolean): Boolean {
