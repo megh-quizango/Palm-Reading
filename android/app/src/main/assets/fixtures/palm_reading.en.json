@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "reading_id": "3f2b6c1e-8a4d-4e7b-9c15-2d6f0a9b7e41",
+  "hand_side": "right",
+  "meta": {
+    "model": "claude-sonnet-5-5",
+    "prompt_version": "palm_v1.0",
+    "generated_at": "2026-11-26T09:30:00Z",
+    "locale": "en"
+  },
+  "image_size": {
+    "w": 960,
+    "h": 1280
+  },
+  "verdict": {
+    "ok": true,
+    "reason": null
+  },
+  "lines": [
+    {
+      "type": "heart",
+      "label": "Heart line",
+      "present": true,
+      "trace": [
+        [0.82, 0.41],
+        [0.7, 0.38],
+        [0.58, 0.37],
+        [0.46, 0.39],
+        [0.35, 0.43]
+      ],
+      "trace_source": "llm",
+      "interpretation": "A long, gently curving heart line suggests you feel things deeply and show warmth in small, steady ways."
+    },
+    {
+      "type": "head",
+      "label": "Head line",
+      "present": true,
+      "trace": [
+        [0.3, 0.5],
+        [0.42, 0.52],
+        [0.55, 0.55],
+        [0.67, 0.6]
+      ],
+      "trace_source": "llm",
+      "interpretation": "Your head line slopes softly, a sign of an imaginative mind that likes to turn ideas over before settling on one."
+    },
+    {
+      "type": "life",
+      "label": "Life line",
+      "present": true,
+      "trace": [
+        [0.33, 0.47],
+        [0.36, 0.6],
+        [0.4, 0.72],
+        [0.46, 0.83],
+        [0.52, 0.9]
+      ],
+      "trace_source": "template",
+      "interpretation": "A wide arc around the thumb is read as lively energy and a love of trying new places and routines."
+    },
+    {
+      "type": "fate",
+      "label": "Fate line",
+      "present": false,
+      "trace": [],
+      "trace_source": "none",
+      "interpretation": "No clear fate line shows here, which palm readers often take as a path you shape freely as you go."
+    },
+    {
+      "type": "sun",
+      "label": "Sun line",
+      "present": true,
+      "trace": [
+        [0.6, 0.78],
+        [0.62, 0.66],
+        [0.63, 0.55]
+      ],
+      "trace_source": "template",
+      "interpretation": "A faint sun line hints at a quiet creative streak that shines brightest when you share it with friends."
+    }
+  ],
+  "palm": {
+    "summary": "Your palm paints a picture of a warm, curious person who leads with feeling and enjoys a bit of adventure.",
+    "traits": [
+      "Warm-hearted",
+      "Imaginative",
+      "Adventurous"
+    ]
+  },
+  "love": {
+    "how_you_love": "You love with patience and attention, remembering the little details that make people feel seen.",
+    "ideal_partner": "Someone playful and open who enjoys long talks as much as spontaneous weekend plans.",
+    "challenges": "You can keep worries to yourself; saying them out loud tends to bring you closer."
+  },
+  "career": {
+    "strengths": "You connect ideas in fresh ways and bring calm energy to group work.",
+    "challenges": "Routine tasks can feel slow to you, so variety keeps your spark alive.",
+    "ideal_industries": [
+      "Design",
+      "Travel and hospitality",
+      "Education"
+    ]
+  }
+}

@@ -39,12 +39,13 @@ private const val PALM = "palm."
 private const val HINDI_SAMPLE = "हृदय रेखा · ज्ञान · क्षत्रिय"
 
 @Composable
-fun ShowcaseScreen(statusViewModel: BackendStatusViewModel) {
+fun ShowcaseScreen(statusViewModel: BackendStatusViewModel, onFixtureLab: () -> Unit) {
     val s16 = NocturneSpace.S16
     val padding = WindowInsets.safeDrawing.add(WindowInsets(s16, s16, s16, s16)).asPaddingValues()
     val (palm, roles) = NocturneColors.ByPath.entries.partition { it.key.startsWith(PALM) }
     NocturneBackground {
         LazyColumn(contentPadding = padding, verticalArrangement = Arrangement.spacedBy(NocturneSpace.S24)) {
+            item { NocturneButton("Fixture lab", onClick = onFixtureLab, modifier = Modifier.fillMaxWidth()) }
             item { Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall) }
             item { BackendStatusRow(statusViewModel) }
             item { Section("Components") { Components() } }

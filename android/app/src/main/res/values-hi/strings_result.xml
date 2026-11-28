@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Claude-written Hindi, flagged for native-speaker review (UI-SPEC Copywriting Contract) -->
+<resources>
+    <string name="result_title">आपकी हस्तरेखा रीडिंग</string>
+    <string name="result_tab_palm">हथेली</string>
+    <string name="result_tab_love">प्रेम</string>
+    <string name="result_tab_career">करियर</string>
+
+    <string name="result_line_heart">हृदय</string>
+    <string name="result_line_head">मस्तिष्क</string>
+    <string name="result_line_life">जीवन</string>
+    <string name="result_line_fate">भाग्य</string>
+    <string name="result_line_sun">सूर्य</string>
+    <string name="result_line_heart_full">हृदय रेखा</string>
+    <string name="result_line_head_full">मस्तिष्क रेखा</string>
+    <string name="result_line_life_full">जीवन रेखा</string>
+    <string name="result_line_fate_full">भाग्य रेखा</string>
+    <string name="result_line_sun_full">सूर्य रेखा</string>
+
+    <string name="result_badge_approx">अनुमानित</string>
+    <string name="result_badge_not_visible">साफ़ नहीं दिखी</string>
+    <string name="result_legend_note">रेखाएँ अनुमान से बनाई गई हैं।</string>
+    <string name="result_no_lines_drawn">इस फ़ोटो पर हम आपकी रेखाएँ साफ़ नहीं बना पाए।</string>
+    <string name="result_disclaimer">केवल मनोरंजन के लिए। हस्तरेखा रीडिंग कोई भविष्यवाणी नहीं है, और न ही चिकित्सा, कानूनी या वित्तीय सलाह है।</string>
+
+    <string name="result_overview">सारांश</string>
+    <string name="result_your_lines">आपकी रेखाएँ</string>
+    <string name="result_love_how">आप कैसे प्यार करते हैं</string>
+    <string name="result_love_partner">आदर्श साथी</string>
+    <string name="result_love_challenges">चुनौतियाँ</string>
+    <string name="result_career_strengths">खूबियाँ</string>
+    <string name="result_career_challenges">चुनौतियाँ</string>
+    <string name="result_career_industries">आपके लिए सही क्षेत्र</string>
+
+    <string name="result_scan_again">फिर से स्कैन करें</string>
+    <string name="result_share">शेयर करें</string>
+    <string name="result_share_preparing">तैयार हो रहा है…</string>
+    <string name="result_share_failed">शेयर इमेज नहीं बन पाई। कृपया फिर कोशिश करें।</string>
+    <string name="result_share_chooser">अपनी रीडिंग शेयर करें</string>
+    <string name="result_share_text">[AppName] से मेरी हस्तरेखा रीडिंग</string>
+    <string name="share_card_title">मेरी हस्तरेखा रीडिंग</string>
+    <string name="share_card_footer">[AppName] में अपनी हथेली पढ़वाएँ</string>
+
+    <string name="result_photo_unavailable">फ़ोटो उपलब्ध नहीं है</string>
+    <string name="result_missing_title">यह रीडिंग खुल नहीं पाई</string>
+    <string name="result_missing_body">हो सकता है यह इस फ़ोन से हट गई हो। होम से नया स्कैन शुरू करें।</string>
+    <string name="common_back_home">होम पर लौटें</string>
+
+    <string name="invalid_title">फ़ोटो स्वीकार नहीं हुई</string>
+    <string name="invalid_blurry_or_dark_title">आपकी फ़ोटो बहुत धुंधली या अँधेरी है</string>
+    <string name="invalid_blurry_or_dark_tip">अच्छी रोशनी में फ़ोन स्थिर रखें और फ़ोकस होने दें।</string>
+    <string name="invalid_too_far_title">आपका हाथ बहुत दूर है</string>
+    <string name="invalid_too_far_tip">पास आएँ, ताकि हथेली पूरे फ़्रेम में आ जाए।</string>
+    <string name="invalid_jewelry_title">गहने आपकी हथेली को ढक रहे हैं</string>
+    <string name="invalid_jewelry_tip">अँगूठियाँ और कंगन उतारें, फिर कोशिश करें।</string>
+    <string name="invalid_bent_title">आपका हाथ मुड़ा हुआ है</string>
+    <string name="invalid_bent_tip">हाथ सीधा और कैमरे की ओर खुला रखें।</string>
+    <string name="invalid_fingers_tight_title">आपकी उँगलियाँ बहुत सटी हुई हैं</string>
+    <string name="invalid_fingers_tight_tip">उँगलियों को थोड़ा फैलाएँ।</string>
+    <string name="invalid_incomplete_title">हथेली का कुछ हिस्सा फ़ोटो में नहीं है</string>
+    <string name="invalid_incomplete_tip">कलाई से उँगलियों के सिरों तक पूरी हथेली फ़्रेम में रखें।</string>
+    <string name="invalid_no_palm_lines_title">हमें आपकी हथेली की रेखाएँ नहीं दिखीं</string>
+    <string name="invalid_no_palm_lines_tip">तेज़ रोशनी में हथेली खुली और सीधी रखें।</string>
+
+    <string name="result_photo_cd">आपकी हथेली की फ़ोटो, बनाई गई रेखाएँ: %1$s</string>
+    <string name="result_photo_cd_plain">आपकी हथेली की फ़ोटो</string>
+</resources>

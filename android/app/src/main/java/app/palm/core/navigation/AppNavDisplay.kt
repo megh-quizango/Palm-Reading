@@ -26,6 +26,7 @@ import app.palm.core.designsystem.NocturneEasings
 import app.palm.debug.debugEntries
 import app.palm.feature.handselect.handSelectEntries
 import app.palm.feature.home.homeEntries
+import app.palm.feature.result.resultEntries
 import app.palm.feature.scan.scanEntries
 import app.palm.feature.onboarding.onboardingEntries
 
@@ -69,7 +70,8 @@ fun AppNavDisplay(start: Route?) {
                 homeEntries(backStack)
                 handSelectEntries(backStack)
                 scanEntries(backStack)
-                debugEntries() // the showcase in debug builds, nothing in release (D-03)
+                resultEntries(backStack)
+                debugEntries(backStack) // the showcase and fixture lab in debug builds, nothing in release (D-03, D-05)
             },
         )
     }

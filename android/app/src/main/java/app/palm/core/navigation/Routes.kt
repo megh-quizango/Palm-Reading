@@ -28,16 +28,20 @@ data class Scan(val hand: HandSide) : Route {
 /** The processed photo before upload (D-01); the capture itself lives in ScanResultHolder. */
 @Serializable data object ScanReady : Route
 
+/** S10 Result for a saved reading (D-07); the reading itself lives in Room. */
+@Serializable data class Result(val readingId: String) : Route
+
 @Serializable
 enum class Feature { PALM, TAROT, HOROSCOPE, BIRTH_CHART, LOVE_TEST, DAILY_REPORT, ASK_GUIDE }
 
 @Serializable
 data class ComingSoon(val feature: Feature) : Route
 
-/** Replace the whole stack with [key]; adds first so the list is never empty. */
-fun NavBackStack<NavKey>.replaceAll(key: NavKey) {
-    add(key)
-    subList(0, size - 1).clear()
+/** Replace the whole stack with [keys]; adds first so the list is never empty. */
+fun NavBackStack<NavKey>.replaceAll(vararg keys: NavKey) {
+    require(keys.isNotEmpty())
+    addAll(keys)
+    subList(0, size - keys.size).clear()
 }
 
 /** Push [to] only while [from] is on top, so a double tap cannot push the same step twice. */

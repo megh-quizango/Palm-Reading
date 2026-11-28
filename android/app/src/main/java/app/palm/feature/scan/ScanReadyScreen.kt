@@ -24,6 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,7 +36,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -80,15 +83,25 @@ private fun PhotoGone(onRetake: () -> Unit) {
     }
 }
 
-/** ScanReady placeholder (D-01): the processed photo with its 21 landmarks; Back = Retake (D-12). */
+/** ScanReady (D-01, D-03): the processed photo with its 21 landmarks and "Read my palm"; Back = Retake (D-12). */
 @Composable
-fun ScanReadyScreen(onRetake: () -> Unit, viewModel: ScanReadyViewModel = hiltViewModel()) {
+fun ScanReadyScreen(onRetake: () -> Unit, onSaved: (String) -> Unit, viewModel: ScanReadyViewModel = hiltViewModel()) {
     val capture = viewModel.capture
+    val readState by viewModel.readState.collectAsStateWithLifecycle()
+    val busy = readState == ReadState.Reading || readState is ReadState.Saved
     val retake = {
-        viewModel.retake()
-        onRetake()
+        if (!busy) {
+            viewModel.retake()
+            onRetake()
+        }
     }
+    // Always enabled, so Back while reading is swallowed instead of popping the screen (RESEARCH Pitfall 2)
     BackHandler(onBack = retake)
+    LaunchedEffect(readState) {
+        val saved = readState as? ReadState.Saved ?: return@LaunchedEffect
+        onSaved(saved.readingId)
+        viewModel.consumeSaved()
+    }
     val gone by viewModel.gone.collectAsStateWithLifecycle()
     if (capture == null || gone) {
         PhotoGone(retake)
@@ -157,13 +170,34 @@ fun ScanReadyScreen(onRetake: () -> Unit, viewModel: ScanReadyViewModel = hiltVi
             )
         }
         Spacer(Modifier.height(NocturneSpace.S16))
-        NocturneButton(stringResource(R.string.scan_ready_read), onClick = {}, modifier = Modifier.fillMaxWidth(), enabled = false)
+        if (readState == ReadState.Failed) {
+            Text(
+                stringResource(R.string.scan_ready_error),
+                style = type.caption,
+                color = NocturneColors.StatusError,
+                modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
+            )
+            Spacer(Modifier.height(NocturneSpace.S8))
+        }
+        NocturneButton(
+            stringResource(
+                when (readState) {
+                    ReadState.Failed -> R.string.scan_ready_retry
+                    ReadState.Idle -> R.string.scan_ready_read
+                    else -> R.string.scan_ready_reading
+                },
+            ),
+            onClick = viewModel::read,
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !busy,
+        )
         Spacer(Modifier.height(NocturneSpace.S8))
         NocturneButton(
             stringResource(R.string.scan_retake),
             onClick = retake,
             modifier = Modifier.fillMaxWidth(),
             style = NocturneButtonStyle.Ghost,
+            enabled = !busy,
         )
     }
 }

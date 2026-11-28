@@ -29,7 +29,10 @@
     <string name="scan_source_camera">Camera</string>
     <string name="scan_source_gallery">Gallery</string>
     <string name="scan_ready_meta">%1$d hand points · %2$d × %3$d px</string>
-    <string name="scan_ready_read">Read my palm (next update)</string>
+    <string name="scan_ready_read">Read my palm</string>
+    <string name="scan_ready_reading">Reading your palm…</string>
+    <string name="scan_ready_error">Something went wrong while reading. Please try again.</string>
+    <string name="scan_ready_retry">Try again</string>
 
     <string name="scan_processing">Preparing your photo…</string>
     <string name="scan_choose_another">Choose another photo</string>

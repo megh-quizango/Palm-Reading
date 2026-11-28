@@ -30,7 +30,10 @@
     <string name="scan_source_camera">कैमरा</string>
     <string name="scan_source_gallery">गैलरी</string>
     <string name="scan_ready_meta">%1$d हाथ के बिंदु · %2$d × %3$d px</string>
-    <string name="scan_ready_read">मेरी हथेली पढ़ें (अगले अपडेट में)</string>
+    <string name="scan_ready_read">मेरी हथेली पढ़ें</string>
+    <string name="scan_ready_reading">आपकी हथेली पढ़ी जा रही है…</string>
+    <string name="scan_ready_error">पढ़ते समय कुछ गड़बड़ हो गई। कृपया फिर कोशिश करें।</string>
+    <string name="scan_ready_retry">फिर कोशिश करें</string>
 
     <string name="scan_processing">आपकी फ़ोटो तैयार हो रही है…</string>
     <string name="scan_choose_another">दूसरी फ़ोटो चुनें</string>

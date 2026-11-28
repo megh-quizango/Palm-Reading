@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="result_title">Your palm reading</string>
+    <string name="result_tab_palm">Palm</string>
+    <string name="result_tab_love">Love</string>
+    <string name="result_tab_career">Career</string>
+
+    <string name="result_line_heart">Heart</string>
+    <string name="result_line_head">Head</string>
+    <string name="result_line_life">Life</string>
+    <string name="result_line_fate">Fate</string>
+    <string name="result_line_sun">Sun</string>
+    <string name="result_line_heart_full">Heart line</string>
+    <string name="result_line_head_full">Head line</string>
+    <string name="result_line_life_full">Life line</string>
+    <string name="result_line_fate_full">Fate line</string>
+    <string name="result_line_sun_full">Sun line</string>
+
+    <string name="result_badge_approx">Approximate</string>
+    <string name="result_badge_not_visible">Not clearly visible</string>
+    <string name="result_legend_note">Lines are drawn approximately.</string>
+    <string name="result_no_lines_drawn">We couldn\'t trace your lines clearly on this photo.</string>
+    <string name="result_disclaimer">For entertainment only. Palm reading is not a prediction and is not medical, legal or financial advice.</string>
+
+    <string name="result_overview">Overview</string>
+    <string name="result_your_lines">Your lines</string>
+    <string name="result_love_how">How you love</string>
+    <string name="result_love_partner">Ideal partner</string>
+    <string name="result_love_challenges">Challenges</string>
+    <string name="result_career_strengths">Strengths</string>
+    <string name="result_career_challenges">Challenges</string>
+    <string name="result_career_industries">Ideal industries</string>
+
+    <string name="result_scan_again">Scan again</string>
+    <string name="result_share">Share</string>
+    <string name="result_share_preparing">Preparing…</string>
+    <string name="result_share_failed">Couldn\'t create the share image. Please try again.</string>
+    <string name="result_share_chooser">Share your reading</string>
+    <string name="result_share_text">My palm reading from [AppName]</string>
+    <string name="share_card_title">My palm reading</string>
+    <string name="share_card_footer">Read your palm in [AppName]</string>
+
+    <string name="result_photo_unavailable">Photo unavailable</string>
+    <string name="result_missing_title">We couldn\'t open this reading</string>
+    <string name="result_missing_body">It may have been removed from this phone. Start a new scan from Home.</string>
+    <string name="common_back_home">Back to Home</string>
+
+    <string name="invalid_title">Photo not accepted</string>
+    <string name="invalid_blurry_or_dark_title">Your photo is too blurry or dark</string>
+    <string name="invalid_blurry_or_dark_tip">Hold the phone steady in good light and let it focus.</string>
+    <string name="invalid_too_far_title">Your hand is too far away</string>
+    <string name="invalid_too_far_tip">Move closer so your palm fills the frame.</string>
+    <string name="invalid_jewelry_title">Jewellery is covering your palm</string>
+    <string name="invalid_jewelry_tip">Take off rings and bracelets, then try again.</string>
+    <string name="invalid_bent_title">Your hand is bent</string>
+    <string name="invalid_bent_tip">Hold your hand flat and facing the camera.</string>
+    <string name="invalid_fingers_tight_title">Your fingers are too close together</string>
+    <string name="invalid_fingers_tight_tip">Spread your fingers a little apart.</string>
+    <string name="invalid_incomplete_title">Part of your palm is missing</string>
+    <string name="invalid_incomplete_tip">Fit your whole palm, wrist to fingertips, in the frame.</string>
+    <string name="invalid_no_palm_lines_title">We couldn\'t see your palm lines</string>
+    <string name="invalid_no_palm_lines_tip">Use brighter light and keep your palm open and flat.</string>
+
+    <string name="result_photo_cd">Your palm photo with lines drawn: %1$s</string>
+    <string name="result_photo_cd_plain">Your palm photo</string>
+</resources>
