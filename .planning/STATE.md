@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 05-05-PLAN.md
-last_updated: "2026-11-28T08:12:51.392Z"
+stopped_at: Completed 05-06-PLAN.md
+last_updated: "2026-11-28T09:41:45.372Z"
 last_activity: 2026-11-28
 last_activity_desc: Phase 2 execution started
-state_head: a252185bda6dd98692edf135988d2c57999ee31b
+state_head: 6ad69ddfdc949151e502e14af335d221cee0988f
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 30
-  completed_plans: 27
+  completed_plans: 28
   percent: 33
 ---
 
@@ -81,6 +81,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 05 P03 | 5min | 2 tasks | 12 files |
 | Phase 05 P04 | 14min | 2 tasks | 7 files |
 | Phase 05 P05 | 8min | 2 tasks | 11 files |
+| Phase 05 P06 | 86min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -156,6 +157,8 @@ Recent decisions affecting current work:
 - [Phase 05]: 05-04: RESEARCH A1 confirmed on API 35, share card ships on the Compose GraphicsLayer path (Canvas fallback unused); API 26-27 capture unverified
 - [Phase 05]: 05-04: Share state is plain remember so a recreated process never re-shares by itself
 - [Phase 05]: 05-05: Lab Delete all readings closes its dialog only after store.deleteAll() completes (am start -S in scripts would kill an in-flight delete)
+- [Phase 05]: 05-06: a photo taller than the 55% cap narrows (fillMaxWidth().wrapContentWidth().heightIn().aspectRatio()) instead of overflowing the legend
+- [Phase 05]: 05-06: ui.sh scroll-to is a slow 1000 ms drag with a 20-drag cap (flings skipped items at font scale 2.0)
 
 ### Pending Todos
 
@@ -188,6 +191,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-28T08:12:50.971Z
-Stopped at: Completed 05-05-PLAN.md
+Last session: 2026-11-28T09:41:44.954Z
+Stopped at: Completed 05-06-PLAN.md
 Resume file: None
