@@ -3,6 +3,8 @@ package app.palm.feature.scan
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.palm.contract.HandSide
+import app.palm.core.camera.ScanCamera
+import app.palm.core.photo.PhotoSource
 import app.palm.core.vision.FillCenterMapping
 import app.palm.core.vision.GuidanceReading
 import app.palm.core.vision.GuidanceStabilizer
@@ -12,12 +14,15 @@ import app.palm.core.vision.HandGuidance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 const val CAPTURE_ERROR_MS = 4_000L // UI-SPEC: the capture-failed chip stays up this long
 
@@ -30,6 +35,8 @@ data class ScannerUi(
     val capturing: Boolean = false,
     val captureFailed: Boolean = false,
     val focusPoint: Pair<Float, Float>? = null, // view pixels; the overlay draws the focus ring there
+    val hasFlash: Boolean = false,
+    val torchOn: Boolean = false,
 )
 
 /** Per-frame sample for the debug HUD (04-05) only; never logged. */
@@ -52,6 +59,10 @@ class ScannerViewModel @Inject constructor() : ViewModel() {
     private var viewWidth = 0
     private var viewHeight = 0
     private var stableCapture = false
+    private var palmPx: Pair<Float, Float>? = null // last palm centre in analysis-image pixels
+    private var frameWidth = 0
+    private var frameHeight = 0
+    private var focusJob: Job? = null
 
     fun setHand(hand: HandSide) {
         synchronized(lock) {
@@ -83,6 +94,12 @@ class ScannerViewModel @Inject constructor() : ViewModel() {
             val reading = g.read(frame, visible)
             val stable = stabilizer.update(reading.raw, reading.wrongHand, timestampMs)
             stableCapture = stable.captureEnabled
+            val centre = reading.palmCenter
+            if (frame != null && centre != null) {
+                palmPx = centre.x * frame.width to centre.y * frame.height
+                frameWidth = frame.width
+                frameHeight = frame.height
+            }
             _ui.update {
                 val changed = it.shown != stable.shown
                 enabled(it.copy(shown = stable.shown, wrongHand = stable.wrongHand, captureFailed = it.captureFailed && !changed))
@@ -93,12 +110,73 @@ class ScannerViewModel @Inject constructor() : ViewModel() {
 
     fun onGuideError() = _ui.update { enabled(it.copy(guideUnavailable = true)) }
 
-    fun onCaptureStarted() = _ui.update { enabled(it.copy(capturing = true, captureFailed = false)) }
+    /** Called once the camera is bound: the torch toggle shows only with a flash unit. */
+    fun onCameraReady(camera: ScanCamera) = _ui.update { it.copy(hasFlash = camera.hasFlash) }
 
-    fun onCaptureDone() = _ui.update { enabled(it.copy(capturing = false)) }
+    /**
+     * Focus-then-capture (D-05): only while capture is enabled; focus and metering at the palm centre for at
+     * most 1 s (a failed or unsupported focus still captures: fixed-focus lenses), then the JPEG.
+     */
+    fun capture(camera: ScanCamera, onCaptured: (PhotoSource.Capture) -> Unit) {
+        if (!_ui.value.captureEnabled) return
+        focusJob?.cancel()
+        val point = palmViewPoint()
+        _ui.update { enabled(it.copy(capturing = true, captureFailed = false, focusPoint = point)) }
+        viewModelScope.launch {
+            val photo = try {
+                if (point != null) focusCapped(camera, point.first, point.second)
+                camera.takeJpeg()
+            } catch (_: Exception) {
+                currentCoroutineContext().ensureActive()
+                null
+            }
+            _ui.update { enabled(it.copy(capturing = false, focusPoint = null)) }
+            if (photo == null) showCaptureFailed() else onCaptured(photo)
+        }
+    }
 
-    fun onCaptureFailed() {
-        _ui.update { enabled(it.copy(capturing = false, captureFailed = true)) }
+    /** Tap-to-focus at a view point; the ring shows until the result or the 1 s cap. */
+    fun focusAt(camera: ScanCamera, viewX: Float, viewY: Float) {
+        if (_ui.value.capturing) return
+        focusJob?.cancel()
+        _ui.update { it.copy(focusPoint = viewX to viewY) }
+        focusJob = viewModelScope.launch {
+            focusCapped(camera, viewX, viewY)
+            _ui.update { it.copy(focusPoint = null) }
+        }
+    }
+
+    fun toggleTorch(camera: ScanCamera) {
+        if (!camera.hasFlash) return
+        val on = !_ui.value.torchOn
+        camera.setTorch(on)
+        _ui.update { it.copy(torchOn = on) }
+    }
+
+    fun torchOff(camera: ScanCamera) {
+        camera.setTorch(false)
+        _ui.update { it.copy(torchOn = false) }
+    }
+
+    private suspend fun focusCapped(camera: ScanCamera, x: Float, y: Float) {
+        try {
+            withTimeoutOrNull(1_000) { camera.focusAt(x, y) }
+        } catch (_: Exception) {
+            currentCoroutineContext().ensureActive() // a failed or cancelled focus future is not our cancellation
+        }
+    }
+
+    private fun palmViewPoint(): Pair<Float, Float>? = synchronized(lock) {
+        val p = palmPx
+        if (p == null || viewWidth <= 0 || viewHeight <= 0 || frameWidth <= 0) {
+            null
+        } else {
+            FillCenterMapping(frameWidth, frameHeight, viewWidth, viewHeight).imageToView(p.first, p.second)
+        }
+    }
+
+    private fun showCaptureFailed() {
+        _ui.update { enabled(it.copy(captureFailed = true)) }
         failedJob?.cancel()
         failedJob = viewModelScope.launch {
             delay(CAPTURE_ERROR_MS)

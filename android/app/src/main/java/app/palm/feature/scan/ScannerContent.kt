@@ -1,12 +1,12 @@
 package app.palm.feature.scan
 
+import android.content.pm.ActivityInfo
 import android.util.Size
+import androidx.activity.compose.LocalActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.CameraState
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
 import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.core.resolutionselector.ResolutionStrategy
@@ -14,8 +14,7 @@ import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,9 +31,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.add
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -45,20 +42,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -71,14 +68,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.currentStateAsState
 import app.palm.R
 import app.palm.contract.HandSide
-import app.palm.core.designsystem.NocturneBorderWidth
 import app.palm.core.designsystem.NocturneColors
-import app.palm.core.designsystem.NocturneGradientAngles
-import app.palm.core.designsystem.NocturneGradients
 import app.palm.core.designsystem.NocturneRadius
 import app.palm.core.designsystem.NocturneSpace
 import app.palm.core.designsystem.components.NocturneChip
-import app.palm.core.designsystem.nocturneBrush
+import app.palm.core.camera.CameraXScanCamera
 import app.palm.core.photo.PhotoSource
 import app.palm.core.vision.GuidanceState
 import app.palm.core.vision.LiveHandTracker
@@ -87,8 +81,6 @@ import java.util.concurrent.Executors
 
 enum class CameraProblem { NoBackCamera, OpenFailed }
 
-private val ControlSize = 52.dp
-private val ShutterSize = 76.dp
 private val TopGradientHeight = 128.dp
 
 private val OpenFailedCodes = setOf(
@@ -139,6 +131,7 @@ fun ScannerContent(
         LifecycleCameraController(context).apply {
             cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
             setEnabledUseCases(CameraController.IMAGE_ANALYSIS or CameraController.IMAGE_CAPTURE)
+            isTapToFocusEnabled = false // our overlay handles taps and draws the ring
             setAutoRotationEnabled(false) // rotation follows the display, not the motion sensor (Pitfall 2)
             previewResolutionSelector = ResolutionSelector.Builder()
                 .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
@@ -166,6 +159,15 @@ fun ScannerContent(
             keepScreenOn = true // only while the scanner is composed: a slow scan never sleeps the phone
         }
     }
+    val camera = remember { CameraXScanCamera(controller, previewView, captureExecutor) }
+
+    // Portrait lock on Scan only (UI-SPEC Layout); restored on leave
+    val activity = LocalActivity.current
+    DisposableEffect(activity) {
+        val saved = activity?.requestedOrientation
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        onDispose { if (saved != null) activity.requestedOrientation = saved }
+    }
 
     DisposableEffect(controller, tracker) {
         tracker.start()
@@ -187,12 +189,14 @@ fun ScannerContent(
                 return@addListener
             }
             controller.setImageAnalysisAnalyzer(tracker.executor, tracker)
+            viewModel.onCameraReady(camera)
             controller.cameraInfo?.cameraState?.observe(lifecycleOwner) { state ->
                 if (state.error?.code in OpenFailedCodes) problem(CameraProblem.OpenFailed)
             }
         }, main)
         onDispose {
             disposed = true
+            viewModel.torchOff(camera)
             controller.clearImageAnalysisAnalyzer()
             tracker.close()
             controller.unbind()
@@ -202,39 +206,9 @@ fun ScannerContent(
 
     val lifecycle by lifecycleOwner.lifecycle.currentStateAsState()
     val analysing = lifecycle.isAtLeast(Lifecycle.State.RESUMED) && !busy
-    LaunchedEffect(analysing) { tracker.active = analysing }
-
-    val takePhoto = {
-        viewModel.onCaptureStarted()
-        val main = ContextCompat.getMainExecutor(context)
-        controller.takePicture(
-            captureExecutor,
-            object : ImageCapture.OnImageCapturedCallback() {
-                override fun onCaptureSuccess(image: ImageProxy) {
-                    val source = try {
-                        val rotation = image.imageInfo.rotationDegrees
-                        val buffer = image.planes[0].buffer
-                        PhotoSource.Capture(ByteArray(buffer.remaining()).also(buffer::get), rotation)
-                    } catch (_: Exception) {
-                        null
-                    } finally {
-                        image.close()
-                    }
-                    main.execute {
-                        if (source == null) {
-                            viewModel.onCaptureFailed()
-                        } else {
-                            viewModel.onCaptureDone()
-                            captured(source)
-                        }
-                    }
-                }
-
-                override fun onError(exception: ImageCaptureException) {
-                    main.execute { viewModel.onCaptureFailed() }
-                }
-            },
-        )
+    LaunchedEffect(analysing) {
+        tracker.active = analysing
+        if (!analysing) viewModel.torchOff(camera) // paused or processing: the torch never stays on (T-04-10)
     }
 
     LaunchedEffect(hand) { viewModel.setHand(hand) }
@@ -251,14 +225,16 @@ fun ScannerContent(
             .fillMaxSize()
             .background(NocturneColors.BgCamera)
             .onGloballyPositioned { rootTop = it.positionInRoot().y }
-            .semantics { this.paneTitle = paneTitle },
+            .semantics {
+                this.paneTitle = paneTitle
+                isTraversalGroup = true // TalkBack: back, hand chip, guidance chip, preview, gallery, shutter, torch
+            },
     ) {
         AndroidView(
             factory = { previewView },
             modifier = Modifier
                 .fillMaxSize()
-                .onSizeChanged { viewModel.onViewSize(it.width, it.height) }
-                .semantics { contentDescription = previewCd },
+                .onSizeChanged { viewModel.onViewSize(it.width, it.height) },
         )
         Box(
             Modifier
@@ -273,7 +249,15 @@ fun ScannerContent(
             focusPoint = ui.focusPoint,
             freeTop = { chipBottom - rootTop + gap },
             freeBottom = { barTop - rootTop - gap },
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(camera) { detectTapGestures { viewModel.focusAt(camera, it.x, it.y) } }
+                // the preview's semantics live here: the AndroidView holder is invisible to accessibility
+                .semantics {
+                    contentDescription = previewCd
+                    traversalIndex = 1f
+                    onClick { viewModel.focusAt(camera, previewView.width / 2f, previewView.height / 2f); true }
+                },
         )
         Column(
             Modifier
@@ -288,6 +272,7 @@ fun ScannerContent(
                     stringResource(R.string.common_back),
                     onBack,
                     Modifier.align(Alignment.CenterStart),
+                    floating = true,
                 )
                 NocturneChip(stringResource(handLabel(hand)), Modifier.align(Alignment.Center), textColor = NocturneColors.TextPrimary)
             }
@@ -299,6 +284,7 @@ fun ScannerContent(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .onGloballyPositioned { barTop = it.boundsInRoot().top }
+                .semantics { traversalIndex = 2f }
                 .background(
                     NocturneColors.SurfaceScrim.copy(alpha = 0.6f),
                     RoundedCornerShape(topStart = NocturneRadius.Xl, topEnd = NocturneRadius.Xl),
@@ -309,50 +295,18 @@ fun ScannerContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            CameraIconButton(R.drawable.ic_gallery, stringResource(R.string.scan_choose_gallery), onGallery, enabled = !busy)
-            Shutter(enabled = ui.captureEnabled && !busy, onClick = takePhoto)
-            Spacer(Modifier.size(ControlSize))
-        }
-    }
-}
-
-@Composable
-internal fun CameraIconButton(icon: Int, description: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
-    Box(
-        modifier
-            .size(ControlSize)
-            .alpha(if (enabled) 1f else 0.38f)
-            .clip(CircleShape)
-            .background(NocturneColors.SurfaceScrim.copy(alpha = 0.72f), CircleShape)
-            .border(NocturneBorderWidth, NocturneColors.BorderHairline.copy(alpha = 0.35f), CircleShape)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-            .semantics { contentDescription = description },
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(painterResource(icon), contentDescription = null, tint = NocturneColors.TextPrimary, modifier = Modifier.size(24.dp))
-    }
-}
-
-@Composable
-private fun Shutter(enabled: Boolean, onClick: () -> Unit) {
-    val brush = remember { nocturneBrush(NocturneGradients.Primary, NocturneGradientAngles.Primary) }
-    val description = stringResource(R.string.scan_capture_cd)
-    Box(
-        Modifier
-            .size(ShutterSize)
-            .alpha(if (enabled) 1f else 0.6f)
-            .border(4.dp, if (enabled) NocturneColors.StatusSuccess else NocturneColors.TextPrimary.copy(alpha = 0.4f), CircleShape)
-            .clip(CircleShape)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-            .semantics { contentDescription = description },
-        contentAlignment = Alignment.Center,
-    ) {
-        val disc = Modifier.size(60.dp)
-        Box(
-            if (enabled) disc.background(brush, CircleShape) else disc.background(NocturneColors.TextPrimary.copy(alpha = 0.18f), CircleShape),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(painterResource(R.drawable.ic_camera), contentDescription = null, tint = NocturneColors.TextOnPrimary, modifier = Modifier.size(24.dp))
+            val idle = !busy && !ui.capturing
+            CameraIconButton(R.drawable.ic_gallery, stringResource(R.string.scan_choose_gallery), onGallery, enabled = idle)
+            ShutterButton(
+                enabled = ui.captureEnabled && !busy,
+                busy = ui.capturing,
+                onClick = { viewModel.capture(camera) { captured(it) } },
+            )
+            if (ui.hasFlash) {
+                TorchButton(on = ui.torchOn, enabled = idle, onToggle = { viewModel.toggleTorch(camera) })
+            } else {
+                Spacer(Modifier.size(ControlSize)) // keeps the shutter centred
+            }
         }
     }
 }
