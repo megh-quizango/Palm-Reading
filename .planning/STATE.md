@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-11-28T07:34:26.001Z"
+stopped_at: Completed 05-03-PLAN.md
+last_updated: "2026-11-28T07:42:46.329Z"
 last_activity: 2026-11-28
 last_activity_desc: Phase 2 execution started
-state_head: f30975a4bc26b535614e6a74782ff2d875bf8a00
+state_head: 30cc1883e6927b80c210199c4bf036a386ed434e
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 30
-  completed_plans: 24
+  completed_plans: 25
   percent: 33
 ---
 
@@ -78,6 +78,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 04 P04 | 12 min | 3 tasks | 26 files |
 | Phase 05 P01 | 17min | 3 tasks | 47 files |
 | Phase 05 P02 | 11min | 2 tasks | 11 files |
+| Phase 05 P03 | 5min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -148,6 +149,8 @@ Recent decisions affecting current work:
 - [Phase 05]: 05-01: ReadingStore accepts only lower-case UUID ids and resolves photos only inside filesDir/readings; deleteAll sweeps rows via the DAO
 - [Phase 05]: 05-02: HALO_ALPHA 0.55 (BgDeep, 9 dp) deviates from D-10's about 30%; user approves or asks for 0.30 in 05-06
 - [Phase 05]: 05-02: ResultViewModel distinctUntilChanged after byId so unrelated Room writes do not re-decode the photo
+- [Phase 05]: Phase 6: free-scan counter (BL-1) increments only inside ReadingStore.save, never on read or an invalid verdict (D-15)
+- [Phase 05]: Invalid verdict deletes the capture at the verdict, before InvalidPhoto opens (Pitfall 11)
 
 ### Pending Todos
 
@@ -180,6 +183,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-28T07:34:25.586Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-11-28T07:42:45.935Z
+Stopped at: Completed 05-03-PLAN.md
 Resume file: None
