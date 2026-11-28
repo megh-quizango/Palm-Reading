@@ -1,5 +1,6 @@
 package app.palm.feature.scan
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.palm.contract.HandSide
@@ -11,7 +12,11 @@ import app.palm.core.photo.ScanResultHolder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,13 +39,21 @@ class ScanViewModel @Inject constructor(
     private val _ui = MutableStateFlow(ScanUi())
     val ui: StateFlow<ScanUi> = _ui.asStateFlow()
 
+    @VisibleForTesting internal var io: CoroutineDispatcher = Dispatchers.IO
+
+    private var job: Job? = null
+    private var cleanup: Job? = null
+
     fun process(source: PhotoSource, origin: PhotoOrigin, hand: HandSide, onReady: () -> Unit) {
         if (_ui.value.processing) return
         _ui.update { it.copy(processing = true, rejected = null) }
-        viewModelScope.launch {
+        val previousCleanup = cleanup
+        job = viewModelScope.launch {
+            previousCleanup?.join() // a cancelled photo's deletion never races this one's put()
             val reason = when (val result = processor.process(source)) {
                 is ProcessResult.Ok -> try {
-                    withContext(Dispatchers.IO) {
+                    withContext(io) {
+                        ensureActive() // a result that arrives after cancel() is dropped
                         holder.put(result.jpeg, result.width, result.height, hand, result.landmarks, origin)
                     }
                     null
@@ -51,14 +64,28 @@ class ScanViewModel @Inject constructor(
                 ProcessResult.Unsupported -> RejectReason.Unsupported
                 ProcessResult.Failed -> RejectReason.Failed
             }
+            ensureActive()
             if (reason == null) {
                 _ui.update { it.copy(processing = false) }
                 onReady()
             } else {
                 // Nothing is kept from a refused photo (D-12)
-                withContext(Dispatchers.IO) { holder.clear() }
+                withContext(io) { holder.clear() }
                 _ui.update { it.copy(processing = false, rejected = Rejection(reason, origin)) }
             }
+        }
+    }
+
+    /** Back while processing: stop, keep nothing, stay on the current screen (D-12). */
+    fun cancel() {
+        if (!_ui.value.processing) return
+        val running = job ?: return
+        running.cancel()
+        _ui.update { it.copy(processing = false) }
+        // NonCancellable: also deletes a capture a late put() may have written just before the cancel landed
+        cleanup = viewModelScope.launch(io + NonCancellable) {
+            running.join()
+            holder.clear()
         }
     }
 
