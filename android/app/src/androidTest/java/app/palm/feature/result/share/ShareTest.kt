@@ -232,18 +232,18 @@ class ShareTest {
         val png = File(shareDir(), "reading.png").apply { delete() }
         compose.setContent { NocturneTheme { Box(Modifier.fillMaxSize()) { ResultActions(sample, state, {}, {}) } } }
         compose.onNodeWithText(context.getString(R.string.result_share)).performClick()
-        compose.waitForIdle()
-        // Still Loading: no "Photo unavailable" card is captured or written
+        // Still Loading: no "Photo unavailable" card is captured or written (the write runs on IO, which
+        // Compose idling does not track, so give it time to appear before asserting it never did)
+        assertFalse("a card was written while the photo was Loading", waitFor(2_000) { png.exists() })
         compose.onNodeWithText(context.getString(R.string.result_share_preparing)).assertExists()
-        assertFalse(png.exists())
         compose.runOnIdle { state = PhotoState.Ready(photo()) }
         compose.waitUntil(timeoutMillis = 10_000) { png.exists() }
         assertTrue("share sheet did not open", waitFor { CHOOSER.containsMatchIn(topActivity()) })
         InstrumentationRegistry.getInstrumentation().uiAutomation.executeShellCommand("input keyevent ${KeyEvent.KEYCODE_BACK}").close()
     }
 
-    private fun waitFor(condition: () -> Boolean): Boolean {
-        val deadline = System.currentTimeMillis() + 10_000
+    private fun waitFor(timeoutMs: Long = 10_000, condition: () -> Boolean): Boolean {
+        val deadline = System.currentTimeMillis() + timeoutMs
         while (System.currentTimeMillis() < deadline) {
             if (condition()) return true
             Thread.sleep(100)
