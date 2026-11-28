@@ -179,3 +179,7 @@ None. T-05-16: the release twin returns null, FixtureLabChoice exists only in sr
 
 - Files exist: FixtureVariant.kt, palm_reading.hi.json, palm_reading.invalid.json, debug and release FixtureChoice.kt, FixturesTest.kt, FixtureRepositoryTest.kt
 - Commits on HEAD: 031f2fe, a252185
+
+## Review fixes (post-phase)
+
+- 70a51c5: `all_llm` and `all_template` drew the fate line but kept its "no clear fate line" text (en and hi). A line that was absent in the fixture now gets a short neutral present interpretation in the fixture's locale; lines already present keep their text. New `FixturesTest.aLineForcedPresentLosesItsAbsentTextInBothLocales`.

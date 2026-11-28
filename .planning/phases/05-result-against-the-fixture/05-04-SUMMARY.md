@@ -184,3 +184,7 @@ None. T-05-12: the provider is not exported, its only path is cache-path share/,
 
 - Files exist: ShareCard.kt, Share.kt, share_paths.xml, ShareTest.kt
 - Commits on HEAD: ef55d2e, 122579c
+
+## Review fixes (post-phase)
+
+- 18a431f: a Share tap while the photo was still decoding shared a "Photo unavailable" card, because Result passed only the Ready image and Loading became Unavailable. `ResultActions` now takes `PhotoState` and composes the capture only once the photo is Ready or Unavailable; until then the button stays "Preparing". New `ShareTest.shareTappedWhileThePhotoDecodesWaitsForIt` (emulator-5554: ShareTest tests="7", failures="0", errors="0").
