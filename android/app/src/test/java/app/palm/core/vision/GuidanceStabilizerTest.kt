@@ -4,6 +4,7 @@ import app.palm.contract.HandSide
 import app.palm.core.vision.GuidanceState.Moving
 import app.palm.core.vision.GuidanceState.NoHand
 import app.palm.core.vision.GuidanceState.PalmDetected
+import app.palm.core.vision.GuidanceState.TooFar
 import app.palm.testing.LandmarkFixtures
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -42,6 +43,15 @@ class GuidanceStabilizerTest {
         for (i in 1..40) {
             assertEquals(PalmDetected, s.update(if (i % 2 == 0) PalmDetected else Moving, null, 250L + i * 83).shown)
         }
+    }
+
+    @Test fun alternatingTwoNonPalmStatesStillEndsPalmAndClosesCapture() {
+        showPalm()
+        assertTrue(s.update(PalmDetected, null, 800).captureEnabled)
+        val out = (1..6).map { i -> s.update(if (i % 2 == 0) NoHand else TooFar, null, 800L + i * 83) }
+        // Raw left PalmDetected at 883; frame 4 (1,132) is 249 ms later, frame 5 (1,215) switches.
+        assertTrue(out.take(4).all { it.shown == PalmDetected })
+        assertTrue(out.drop(4).all { it.shown != PalmDetected && !it.captureEnabled })
     }
 
     @Test fun stillSequenceChangesShownExactlyOnce() {

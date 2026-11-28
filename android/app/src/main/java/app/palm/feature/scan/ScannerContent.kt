@@ -40,6 +40,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -163,10 +164,12 @@ fun ScannerContent(
 
     // Portrait lock on Scan only (UI-SPEC Layout); restored on leave
     val activity = LocalActivity.current
+    // Saveable so the relaunch PORTRAIT may cause does not record PORTRAIT as the value to restore
+    val saved = rememberSaveable { activity?.requestedOrientation ?: ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED }
     DisposableEffect(activity) {
-        val saved = activity?.requestedOrientation
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        onDispose { if (saved != null) activity.requestedOrientation = saved }
+        // Skip during the relaunch PORTRAIT itself causes: the restored Scan entry locks portrait again.
+        onDispose { if (activity != null && !activity.isChangingConfigurations) activity.requestedOrientation = saved }
     }
 
     DisposableEffect(controller, tracker) {

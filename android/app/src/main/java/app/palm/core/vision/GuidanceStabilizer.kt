@@ -5,16 +5,17 @@ import app.palm.contract.HandSide
 data class StableGuidance(val shown: GuidanceState, val captureEnabled: Boolean, val wrongHand: HandSide?)
 
 /**
- * What the chip shows (D-08, research Pattern 3): a raw state replaces the shown one only after it
- * persisted dwellMs; while PalmDetected is shown, NoHand needs max(dwellMs, dropoutMs); capture
+ * What the chip shows (D-08, research Pattern 3): shown changes to the latest raw state once raw has
+ * differed from it for dwellMs; while PalmDetected is shown, NoHand needs max(dwellMs, dropoutMs); capture
  * opens once PalmDetected has been shown holdMs. The wrong-hand hint has its own dwell.
  * Uses the frame timestamps passed in, never a clock.
  */
 class GuidanceStabilizer(private val config: GuidanceConfig = GuidanceConfig.Default) {
     private var shown = GuidanceState.NoHand
     private var shownSince = 0L
-    private var candidate: GuidanceState? = null
-    private var candidateSince = 0L
+    private var leaving = false
+    private var leftSince = 0L
+    private var onlyNoHand = true
 
     private var hint: HandSide? = null
     private var hintCandidate: HandSide? = null
@@ -22,22 +23,26 @@ class GuidanceStabilizer(private val config: GuidanceConfig = GuidanceConfig.Def
     private var hintSince = 0L
 
     fun update(raw: GuidanceState, wrongHand: HandSide?, timestampMs: Long): StableGuidance {
+        // Time how long raw has differed from shown, not how long one candidate lasted, so raw
+        // alternating between two other states (TooFar/NoHand flicker) still moves shown off PalmDetected.
         if (raw == shown) {
-            candidate = null
+            leaving = false
         } else {
-            if (raw != candidate) {
-                candidate = raw
-                candidateSince = timestampMs
+            if (!leaving) {
+                leaving = true
+                leftSince = timestampMs
+                onlyNoHand = true
             }
-            val need = if (shown == GuidanceState.PalmDetected && raw == GuidanceState.NoHand) {
+            onlyNoHand = onlyNoHand && raw == GuidanceState.NoHand
+            val need = if (shown == GuidanceState.PalmDetected && onlyNoHand) {
                 maxOf(config.dwellMs, config.dropoutMs)
             } else {
                 config.dwellMs
             }
-            if (timestampMs - candidateSince >= need) {
+            if (timestampMs - leftSince >= need) {
                 shown = raw
                 shownSince = timestampMs
-                candidate = null
+                leaving = false
             }
         }
 
