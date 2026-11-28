@@ -30,4 +30,10 @@
     <string name="scan_source_gallery">Gallery</string>
     <string name="scan_ready_meta">%1$d hand points · %2$d × %3$d px</string>
     <string name="scan_ready_read">Read my palm (next update)</string>
+
+    <string name="scan_processing">Preparing your photo…</string>
+    <string name="scan_choose_another">Choose another photo</string>
+    <string name="common_close">Close</string>
+    <string name="scan_ready_gone_title">This photo is gone</string>
+    <string name="scan_ready_gone_body">Take a new photo to continue.</string>
 </resources>

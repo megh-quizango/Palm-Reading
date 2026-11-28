@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import app.palm.core.photo.ProcessedCapture
 import app.palm.core.photo.ScanResultHolder
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
@@ -24,11 +25,22 @@ class ScanReadyViewModel @Inject constructor(private val holder: ScanResultHolde
     private val _bitmap = MutableStateFlow<ImageBitmap?>(null)
     val bitmap: StateFlow<ImageBitmap?> = _bitmap.asStateFlow()
 
+    /** No capture (process death: the holder was cleared at app start) or its file no longer decodes. */
+    private val _gone = MutableStateFlow(capture == null)
+    val gone: StateFlow<Boolean> = _gone.asStateFlow()
+
     init {
         val file = capture?.file
         if (file != null) {
             viewModelScope.launch {
-                _bitmap.value = withContext(Dispatchers.IO) { BitmapFactory.decodeFile(file.path)?.asImageBitmap() }
+                val image = withContext(Dispatchers.IO) {
+                    try {
+                        BitmapFactory.decodeFile(file.path)?.asImageBitmap()
+                    } catch (_: IOException) {
+                        null
+                    }
+                }
+                if (image == null) _gone.value = true else _bitmap.value = image
             }
         }
     }

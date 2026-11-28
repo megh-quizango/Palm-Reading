@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,7 +24,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -47,11 +48,37 @@ import app.palm.core.designsystem.NocturneRadius
 import app.palm.core.designsystem.NocturneSpace
 import app.palm.core.designsystem.components.NocturneButton
 import app.palm.core.designsystem.components.NocturneButtonStyle
+import app.palm.core.designsystem.components.NocturneStateBlock
 import app.palm.core.designsystem.components.NocturneTopBar
 import app.palm.core.photo.PhotoOrigin
 import app.palm.feature.handselect.handLabel
 
 private val PhotoShape = RoundedCornerShape(NocturneRadius.Lg)
+
+/** UI-SPEC ScanReady "Photo gone": no broken image, one way back to the scanner. */
+@Composable
+private fun PhotoGone(onRetake: () -> Unit) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.safeDrawing)
+            .padding(start = NocturneSpace.S16, end = NocturneSpace.S16, bottom = NocturneSpace.S16),
+    ) {
+        NocturneTopBar(stringResource(R.string.scan_ready_title), onBack = onRetake)
+        Column(
+            Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()).padding(top = NocturneSpace.S24),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            NocturneStateBlock(
+                painterResource(R.drawable.ic_camera),
+                NocturneColors.BrandLink,
+                stringResource(R.string.scan_ready_gone_title),
+                stringResource(R.string.scan_ready_gone_body),
+                primary = stringResource(R.string.scan_retake) to onRetake,
+            )
+        }
+    }
+}
 
 /** ScanReady placeholder (D-01): the processed photo with its 21 landmarks; Back = Retake (D-12). */
 @Composable
@@ -62,9 +89,11 @@ fun ScanReadyScreen(onRetake: () -> Unit, viewModel: ScanReadyViewModel = hiltVi
         onRetake()
     }
     BackHandler(onBack = retake)
-    // shortcut: no capture (process death) goes straight back; 04-04 adds the "photo gone" state block
-    LaunchedEffect(capture) { if (capture == null) onRetake() }
-    if (capture == null) return
+    val gone by viewModel.gone.collectAsStateWithLifecycle()
+    if (capture == null || gone) {
+        PhotoGone(retake)
+        return
+    }
 
     val type = LocalNocturne.current.type
     val bitmap by viewModel.bitmap.collectAsStateWithLifecycle()

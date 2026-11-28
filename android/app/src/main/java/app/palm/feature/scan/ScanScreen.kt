@@ -1,5 +1,6 @@
 package app.palm.feature.scan
 
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,10 +40,12 @@ fun ScanScreen(hand: HandSide, onBack: () -> Unit, onReady: () -> Unit, viewMode
                 onBack = onBack,
             )
         }
+        ProcessingOverlayHost(ui.processing)
     }
+    // Composed after the gate and scanner, so it wins over their Back handlers while processing (UI-SPEC Back behaviour)
+    BackHandler(enabled = ui.processing) { viewModel.cancel() }
     val rejected = ui.rejected
     if (rejected != null) {
-        // 04-04 adds the per-origin buttons (Choose another photo / Close for gallery imports)
         val (title, body) = when (rejected.reason) {
             RejectReason.NoHand -> R.string.scan_reject_no_hand_title to R.string.scan_reject_no_hand_body
             RejectReason.Unsupported -> R.string.scan_reject_unsupported_title to R.string.scan_reject_unsupported_body
@@ -51,7 +54,15 @@ fun ScanScreen(hand: HandSide, onBack: () -> Unit, onReady: () -> Unit, viewMode
         NocturneDialog(
             title = stringResource(title),
             body = stringResource(body),
-            confirm = stringResource(R.string.scan_retake) to viewModel::dismissRejection,
+            confirm = if (rejected.origin == PhotoOrigin.GALLERY) {
+                stringResource(R.string.scan_choose_another) to {
+                    viewModel.dismissRejection()
+                    openGallery()
+                }
+            } else {
+                stringResource(R.string.scan_retake) to viewModel::dismissRejection
+            },
+            dismiss = if (rejected.origin == PhotoOrigin.GALLERY) stringResource(R.string.common_close) to viewModel::dismissRejection else null,
             onDismissRequest = viewModel::dismissRejection,
         )
     }
