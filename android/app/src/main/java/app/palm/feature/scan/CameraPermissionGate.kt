@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
@@ -34,7 +35,8 @@ fun CameraPermissionGate(
     val context = LocalContext.current
     val activity = LocalActivity.current
     fun checkGranted() = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-    var granted by rememberSaveable { mutableStateOf(checkGranted()) }
+    // Not saved: after process death (a Settings revoke kills the process) it must come from the system, not the old answer
+    var granted by remember { mutableStateOf(checkGranted()) }
     var asked by rememberSaveable { mutableStateOf(false) } // a request is in flight or answered: no second launch on recreation
     var requested by rememberSaveable { mutableStateOf(false) }
     var showRationale by rememberSaveable { mutableStateOf(false) }
@@ -45,7 +47,7 @@ fun CameraPermissionGate(
         showRationale = activity != null &&
             ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CAMERA)
     }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(granted) { // keyed on granted: a permission lost on resume before any request asks again
         if (!granted && !asked) {
             asked = true
             launcher.launch(Manifest.permission.CAMERA)

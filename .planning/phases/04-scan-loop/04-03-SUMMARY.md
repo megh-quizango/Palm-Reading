@@ -107,3 +107,9 @@ None beyond the plan's threat model. T-04-11 (aapt2 manifest check), T-04-12 (Ur
 ## Self-Check: PASSED
 
 - All created files exist; commits 54ef4c1 and 8dd2c63 are ancestors of HEAD.
+
+## Review fixes
+
+- **[major] Stuck on the blank Requesting screen after process death** (CameraPermissionGate.kt): `granted` was a `rememberSaveable`, so after a Settings revoke (which kills the process) it came back as the old `true`, the entry request never ran and ON_RESUME then left the gate on Requesting with no request. Fix: `granted` is a plain `remember` (re-read from the system on recreation) and the request effect is keyed on `granted`, so a missing permission with no request made in this screen always asks. Reducer unchanged (Unknown -> Requesting is still correct while the dialog is up).
+- Verified on emulator-5554: unit tests 125/125 pass; device walk `scan-open.sh --grant` -> scanner -> HOME -> `pm revoke` + `pm clear-permission-flags ... user-set user-fixed` (process gone) -> `am start` restores the task -> the system dialog appears (GrantPermissionsActivity on top) -> "While using the app" -> live scanner, CAMERA left granted. Without clearing the flags, `pm revoke` makes the system auto-deny and the gate shows "Camera access is off" with Open settings (also not stuck). ScanFallbackTest does not use the gate, so it was not re-run.
+- Deferred to the 04-05 phone session: the same walk with a real Settings toggle (grant, open the scanner, Recents -> Settings -> turn Camera off, return via Recents). Expected: the permission dialog appears, not a blank screen.
