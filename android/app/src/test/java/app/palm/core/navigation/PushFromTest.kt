@@ -21,6 +21,18 @@ class PushFromTest {
         assertEquals(listOf(Language, Intro, Name), stack.toList())
     }
 
+    @Test fun replaceAllWithSeveralKeys() {
+        val stack = NavBackStack<NavKey>(Home, HandSelect, Scan(app.palm.contract.HandSide.RIGHT), ScanReady)
+        stack.replaceAll(Home, Result("a"))
+        assertEquals(listOf(Home, Result("a")), stack.toList())
+    }
+
+    @Test fun replaceAllWithOneKey() {
+        val stack = NavBackStack<NavKey>(Splash)
+        stack.replaceAll(Home)
+        assertEquals(listOf(Home), stack.toList())
+    }
+
     @Test fun doubleBackPopsOnce() {
         val stack = NavBackStack<NavKey>(Home, HandSelect)
         stack.popFrom(HandSelect)
