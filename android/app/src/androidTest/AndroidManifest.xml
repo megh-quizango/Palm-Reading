@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:tools="http://schemas.android.com/tools">
+    <!-- heifwriter declares minSdk 29: only PhotoProcessorTest#heicImport uses it, and that test is skipped below API 29 -->
+    <uses-sdk tools:overrideLibrary="androidx.heifwriter" />
+</manifest>

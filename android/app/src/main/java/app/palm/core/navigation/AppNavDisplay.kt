@@ -26,6 +26,7 @@ import app.palm.core.designsystem.NocturneEasings
 import app.palm.debug.debugEntries
 import app.palm.feature.handselect.handSelectEntries
 import app.palm.feature.home.homeEntries
+import app.palm.feature.scan.scanEntries
 import app.palm.feature.onboarding.onboardingEntries
 
 /** Enter: fade in + 24 dp slide from the end (start on pop). Exit: fade out (UI-SPEC Motion). */
@@ -67,6 +68,7 @@ fun AppNavDisplay(start: Route?) {
                 onboardingEntries(backStack)
                 homeEntries(backStack)
                 handSelectEntries(backStack)
+                scanEntries(backStack)
                 debugEntries() // the showcase in debug builds, nothing in release (D-03)
             },
         )

@@ -39,7 +39,4 @@
     <string name="tips_bad_cd">Avoid: %1$s</string>
     <string name="hand_requirement">Use the back camera in good light, and take off rings if you can.</string>
     <string name="hand_privacy">Your photo is only used to make your reading and is deleted right after.</string>
-
-    <string name="scan_placeholder_title">Scanner arrives in the next update</string>
-    <string name="scan_placeholder_hand">Hand: %1$s</string>
 </resources>

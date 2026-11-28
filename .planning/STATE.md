@@ -146,6 +146,8 @@ None yet.
 - [Phase 3]: all Hindi strings (values-hi) are Claude-written; native-speaker review needed before release (D-06)
 - [Phase 3]: per-app locale: the API 33+ LocaleManager path is verified (vivo V2225 API 35 reference phone, Redmi Note 10T API 33, emulator API 35); the API 26-32 AppCompat path is unverified on hardware (no API 26-32 device)
 - [Phase 3]: 03-05 performance gates (release cold start < 2 s, <= 5% deadline-missed frames on Home idle and intro swipes) were measured only on the x86 emulator, which is not a gate; the hardware run is deferred to the next phone session (debug intro swipe on the Redmi was 37.5%, so fix the intro pager if release is still over 5%)
+- [Phase 4]: MediaPipe tasks-core sends usage metrics through Google datatransport (no opt-out API); disclose in the privacy policy and Play Data safety before release (REL-02/REL-03). Accepted by the user at the 04-01 consent (2026-11-28)
+- [Phase 4]: native ABIs: debug APK lib/ has arm64-v8a, armeabi-v7a, x86, x86_64 (MediaPipe: libmediapipe_tasks_jni.so in all four; release keeps only armeabi-v7a + arm64-v8a); emulator-5554 abilist x86_64,arm64-v8a; the reference phone's abilist is still to be read in the 04-05 phone session (`adb shell getprop ro.product.cpu.abilist`)
 - [Phase 3]: the Redmi Note 10T may have a test setting left changed (animations / font scale / battery saver) from an interrupted 03-05 run; check it next time it is connected
 
 ## Deferred Items

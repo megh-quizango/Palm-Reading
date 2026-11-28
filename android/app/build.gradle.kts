@@ -26,6 +26,7 @@ android {
         release {
             signingConfig = signingConfigs.getByName("debug") // shortcut: debug-signed only for on-device timing (D-16), replace with the upload key at REL-03
             buildConfigField("String", "BASE_URL", "\"https://api.invalid\"")
+            ndk { abiFilters += listOf("armeabi-v7a", "arm64-v8a") } // release ABIs; debug keeps all so the x86_64 emulator runs
         }
     }
     compileOptions {
@@ -35,6 +36,7 @@ android {
     androidResources {
         // Ship only our two languages; drops library translations (AGP 8.8+ replacement for resourceConfigurations)
         localeFilters += listOf("en", "hi")
+        noCompress += "task" // MediaPipe maps the model straight from the APK, so it must be stored (D-06)
     }
     buildFeatures {
         compose = true
@@ -70,6 +72,13 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.mediapipe.tasks.vision)
+    implementation(libs.androidx.exifinterface)
+    implementation(libs.androidx.concurrent.futures.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -77,5 +86,6 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.heifwriter) // only PhotoProcessorTest#heicImport (D-16)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="scan_title">Scan your palm</string>
+    <string name="scan_preview_cd">Camera preview. Tap to focus.</string>
+    <string name="scan_guide_no_hand">Place your palm inside the frame</string>
+    <string name="scan_guide_palm_detected">Palm detected. Tap to scan</string>
+    <string name="scan_guide_capture_failed">Couldn\'t take the photo. Try again.</string>
+    <string name="scan_guide_unavailable">The hand guide couldn\'t start. Go back and try again.</string>
+    <string name="scan_capture_cd">Take photo</string>
+    <string name="scan_choose_gallery">Choose from gallery</string>
+
+    <string name="scan_perm_title">Allow the camera to scan</string>
+    <string name="scan_perm_body">[AppName] uses the back camera to guide your palm into the frame and take one photo. You can also pick a palm photo from your gallery.</string>
+    <string name="scan_perm_allow">Allow camera</string>
+    <string name="scan_no_camera_title">Camera not available</string>
+    <string name="scan_no_camera_body">This phone has no back camera we can use. You can still read a palm photo from your gallery.</string>
+
+    <string name="scan_reject_no_hand_title">No hand found</string>
+    <string name="scan_reject_no_hand_body">We couldn\'t find a hand in this photo. Try a clear photo of your open palm.</string>
+    <string name="scan_reject_unsupported_title">Can\'t open this photo</string>
+    <string name="scan_reject_unsupported_body">This photo type doesn\'t open on this phone. Try a JPEG or PNG photo.</string>
+    <string name="scan_reject_failed_title">Something went wrong</string>
+    <string name="scan_reject_failed_body">We couldn\'t prepare this photo. Please try again.</string>
+    <string name="scan_retake">Retake photo</string>
+
+    <string name="scan_ready_title">Your palm photo</string>
+    <string name="scan_ready_photo_cd">Your palm photo with %1$d hand points marked</string>
+    <string name="scan_ready_source">%1$s · %2$s</string>
+    <string name="scan_source_camera">Camera</string>
+    <string name="scan_source_gallery">Gallery</string>
+    <string name="scan_ready_meta">%1$d hand points · %2$d × %3$d px</string>
+    <string name="scan_ready_read">Read my palm (next update)</string>
+</resources>

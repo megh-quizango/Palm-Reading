@@ -25,6 +25,9 @@ data class Scan(val hand: HandSide) : Route {
     override val showsBackground: Boolean get() = false
 }
 
+/** The processed photo before upload (D-01); the capture itself lives in ScanResultHolder. */
+@Serializable data object ScanReady : Route
+
 @Serializable
 enum class Feature { PALM, TAROT, HOROSCOPE, BIRTH_CHART, LOVE_TEST, DAILY_REPORT, ASK_GUIDE }
 

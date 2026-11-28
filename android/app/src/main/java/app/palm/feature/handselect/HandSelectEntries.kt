@@ -15,5 +15,4 @@ fun EntryProviderScope<NavKey>.handSelectEntries(backStack: NavBackStack<NavKey>
             onContinue = { hand -> backStack.pushFrom(HandSelect, Scan(hand)) },
         )
     }
-    entry<Scan> { key -> ScanPlaceholderScreen(hand = key.hand, onBack = { backStack.popFrom(key) }) }
 }

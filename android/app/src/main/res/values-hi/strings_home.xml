@@ -39,7 +39,4 @@
     <string name="tips_bad_cd">इससे बचें: %1$s</string>
     <string name="hand_requirement">अच्छी रोशनी में पीछे वाला कैमरा इस्तेमाल करें, और हो सके तो अंगूठी उतार दें।</string>
     <string name="hand_privacy">आपकी फ़ोटो सिर्फ़ रीडिंग बनाने में इस्तेमाल होती है और उसके तुरंत बाद मिटा दी जाती है।</string>
-
-    <string name="scan_placeholder_title">स्कैनर अगले अपडेट में आएगा</string>
-    <string name="scan_placeholder_hand">हाथ: %1$s</string>
 </resources>

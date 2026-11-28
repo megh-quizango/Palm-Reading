@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Claude-written Hindi, flagged for native-speaker review (UI-SPEC Copywriting Contract) -->
+<resources>
+    <string name="scan_title">अपनी हथेली स्कैन करें</string>
+    <string name="scan_preview_cd">कैमरा प्रीव्यू। फ़ोकस करने के लिए टैप करें।</string>
+    <string name="scan_guide_no_hand">अपनी हथेली फ़्रेम के अंदर रखें</string>
+    <string name="scan_guide_palm_detected">हथेली मिल गई। स्कैन करने के लिए टैप करें</string>
+    <string name="scan_guide_capture_failed">फ़ोटो नहीं ली जा सकी। फिर से कोशिश करें।</string>
+    <string name="scan_guide_unavailable">हैंड गाइड शुरू नहीं हो सका। वापस जाकर फिर से कोशिश करें।</string>
+    <string name="scan_capture_cd">फ़ोटो लें</string>
+    <string name="scan_choose_gallery">गैलरी से चुनें</string>
+
+    <string name="scan_perm_title">स्कैन के लिए कैमरे की अनुमति दें</string>
+    <string name="scan_perm_body">[AppName] पीछे वाले कैमरे से आपकी हथेली को फ़्रेम में लाने में मदद करता है और एक फ़ोटो लेता है। आप गैलरी से भी हथेली की फ़ोटो चुन सकते हैं।</string>
+    <string name="scan_perm_allow">कैमरे की अनुमति दें</string>
+    <string name="scan_no_camera_title">कैमरा उपलब्ध नहीं है</string>
+    <string name="scan_no_camera_body">इस फ़ोन में ऐसा पीछे वाला कैमरा नहीं है जिसे हम इस्तेमाल कर सकें। आप फिर भी गैलरी से हथेली की फ़ोटो चुन सकते हैं।</string>
+
+    <string name="scan_reject_no_hand_title">हाथ नहीं मिला</string>
+    <string name="scan_reject_no_hand_body">इस फ़ोटो में हमें हाथ नहीं मिला। अपनी खुली हथेली की साफ़ फ़ोटो आज़माएँ।</string>
+    <string name="scan_reject_unsupported_title">यह फ़ोटो नहीं खुल सकी</string>
+    <string name="scan_reject_unsupported_body">यह फ़ोटो इस फ़ोन पर नहीं खुलती। JPEG या PNG फ़ोटो आज़माएँ।</string>
+    <string name="scan_reject_failed_title">कुछ गड़बड़ हो गई</string>
+    <string name="scan_reject_failed_body">हम यह फ़ोटो तैयार नहीं कर सके। कृपया फिर से कोशिश करें।</string>
+    <string name="scan_retake">फ़ोटो फिर से लें</string>
+
+    <string name="scan_ready_title">आपकी हथेली की फ़ोटो</string>
+    <string name="scan_ready_photo_cd">आपकी हथेली की फ़ोटो, %1$d बिंदु चिह्नित</string>
+    <string name="scan_ready_source">%1$s · %2$s</string>
+    <string name="scan_source_camera">कैमरा</string>
+    <string name="scan_source_gallery">गैलरी</string>
+    <string name="scan_ready_meta">%1$d हाथ के बिंदु · %2$d × %3$d px</string>
+    <string name="scan_ready_read">मेरी हथेली पढ़ें (अगले अपडेट में)</string>
+</resources>
