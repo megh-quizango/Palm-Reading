@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="scan_guide_back_of_hand">Turn your palm toward the camera</string>
+    <string name="scan_guide_closed_hand">Open your hand and spread your fingers</string>
+    <string name="scan_guide_too_far">Bring your hand a little closer</string>
+    <string name="scan_guide_moving">Hold still</string>
+    <string name="scan_hint_wrong_hand_left">This looks like your left hand. You chose your right.</string>
+    <string name="scan_hint_wrong_hand_right">This looks like your right hand. You chose your left.</string>
+    <string name="scan_capture_waiting">Waiting for your palm</string>
+    <string name="scan_capture_busy">Taking photo</string>
+    <string name="scan_torch_cd">Flash</string>
+    <string name="common_on">On</string>
+    <string name="common_off">Off</string>
+</resources>

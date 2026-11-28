@@ -30,29 +30,37 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -63,7 +71,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.compose.currentStateAsState
 import app.palm.R
 import app.palm.contract.HandSide
-import app.palm.core.designsystem.LocalNocturne
 import app.palm.core.designsystem.NocturneBorderWidth
 import app.palm.core.designsystem.NocturneColors
 import app.palm.core.designsystem.NocturneGradientAngles
@@ -82,6 +89,7 @@ enum class CameraProblem { NoBackCamera, OpenFailed }
 
 private val ControlSize = 52.dp
 private val ShutterSize = 76.dp
+private val TopGradientHeight = 128.dp
 
 private val OpenFailedCodes = setOf(
     CameraState.ERROR_CAMERA_IN_USE,
@@ -229,11 +237,43 @@ fun ScannerContent(
         )
     }
 
+    LaunchedEffect(hand) { viewModel.setHand(hand) }
+
     val previewCd = stringResource(R.string.scan_preview_cd)
-    Box(modifier.fillMaxSize().background(NocturneColors.BgCamera)) {
+    val paneTitle = stringResource(R.string.scan_title)
+    // layout positions in root px, read only by the overlay's draw cache
+    var rootTop by remember { mutableFloatStateOf(0f) }
+    var chipBottom by remember { mutableFloatStateOf(0f) }
+    var barTop by remember { mutableFloatStateOf(0f) }
+    val gap = with(LocalDensity.current) { NocturneSpace.S16.toPx() }
+    Box(
+        modifier
+            .fillMaxSize()
+            .background(NocturneColors.BgCamera)
+            .onGloballyPositioned { rootTop = it.positionInRoot().y }
+            .semantics { this.paneTitle = paneTitle },
+    ) {
         AndroidView(
             factory = { previewView },
-            modifier = Modifier.fillMaxSize().semantics { contentDescription = previewCd },
+            modifier = Modifier
+                .fillMaxSize()
+                .onSizeChanged { viewModel.onViewSize(it.width, it.height) }
+                .semantics { contentDescription = previewCd },
+        )
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .windowInsetsTopHeight(WindowInsets.statusBars.add(WindowInsets(top = TopGradientHeight)))
+                .background(Brush.verticalGradient(listOf(NocturneColors.SurfaceScrim.copy(alpha = 0.6f), Color.Transparent))),
+        )
+        PalmGuideOverlay(
+            hand = hand,
+            detected = ui.shown == GuidanceState.PalmDetected,
+            busy = busy,
+            focusPoint = ui.focusPoint,
+            freeTop = { chipBottom - rootTop + gap },
+            freeBottom = { barTop - rootTop - gap },
+            modifier = Modifier.fillMaxSize(),
         )
         Column(
             Modifier
@@ -252,12 +292,13 @@ fun ScannerContent(
                 NocturneChip(stringResource(handLabel(hand)), Modifier.align(Alignment.Center), textColor = NocturneColors.TextPrimary)
             }
             Spacer(Modifier.height(NocturneSpace.S8))
-            GuidanceChip(ui)
+            GuidanceChip(ui, Modifier.onGloballyPositioned { chipBottom = it.boundsInRoot().bottom })
         }
         Row(
             Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
+                .onGloballyPositioned { barTop = it.boundsInRoot().top }
                 .background(
                     NocturneColors.SurfaceScrim.copy(alpha = 0.6f),
                     RoundedCornerShape(topStart = NocturneRadius.Xl, topEnd = NocturneRadius.Xl),
@@ -273,26 +314,6 @@ fun ScannerContent(
             Spacer(Modifier.size(ControlSize))
         }
     }
-}
-
-@Composable
-private fun GuidanceChip(ui: ScannerUi) {
-    val message = when {
-        ui.guideUnavailable -> R.string.scan_guide_unavailable
-        ui.captureFailed -> R.string.scan_guide_capture_failed
-        ui.shown == GuidanceState.PalmDetected -> R.string.scan_guide_palm_detected
-        else -> R.string.scan_guide_no_hand
-    }
-    Text(
-        stringResource(message),
-        style = LocalNocturne.current.type.titleM,
-        color = NocturneColors.TextPrimary,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .semantics(mergeDescendants = true) { liveRegion = LiveRegionMode.Polite }
-            .background(NocturneColors.SurfaceScrim.copy(alpha = 0.72f), RoundedCornerShape(NocturneRadius.Lg))
-            .padding(horizontal = NocturneSpace.S16, vertical = NocturneSpace.S8),
-    )
 }
 
 @Composable

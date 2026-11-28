@@ -2,8 +2,13 @@ package app.palm.feature.scan
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.palm.contract.HandSide
+import app.palm.core.vision.FillCenterMapping
+import app.palm.core.vision.GuidanceReading
+import app.palm.core.vision.GuidanceStabilizer
 import app.palm.core.vision.GuidanceState
 import app.palm.core.vision.HandFrame
+import app.palm.core.vision.HandGuidance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job
@@ -16,26 +21,73 @@ import kotlinx.coroutines.launch
 
 const val CAPTURE_ERROR_MS = 4_000L // UI-SPEC: the capture-failed chip stays up this long
 
+/** Shown (stabilised) scanner state. Changes only when the chip, hint or shutter would change, never per frame. */
 data class ScannerUi(
     val shown: GuidanceState = GuidanceState.NoHand,
     val captureEnabled: Boolean = false,
+    val wrongHand: HandSide? = null,
     val guideUnavailable: Boolean = false,
     val capturing: Boolean = false,
     val captureFailed: Boolean = false,
+    val focusPoint: Pair<Float, Float>? = null, // view pixels; the overlay draws the focus ring there
 )
 
-/** Tracer behaviour: raw palm / no palm per result. 04-02 replaces it with the classifier and stabiliser. */
+/** Per-frame sample for the debug HUD (04-05) only; never logged. */
+data class ScanDebugSample(val frame: HandFrame?, val reading: GuidanceReading, val viewWidth: Int, val viewHeight: Int)
+
+/** Live guidance (D-07, D-08): frame -> HandGuidance -> GuidanceStabilizer -> ScannerUi. */
 @HiltViewModel
 class ScannerViewModel @Inject constructor() : ViewModel() {
     private val _ui = MutableStateFlow(ScannerUi())
     val ui: StateFlow<ScannerUi> = _ui.asStateFlow() // StateFlow drops equal values: no emission per unchanged frame
+    private val _debug = MutableStateFlow<ScanDebugSample?>(null)
+    val debug: StateFlow<ScanDebugSample?> = _debug.asStateFlow()
     private var failedJob: Job? = null
 
-    /** Called from the landmarker thread; [timestampMs] feeds 04-02's stabiliser. */
-    fun onFrame(frame: HandFrame?, @Suppress("UNUSED_PARAMETER") timestampMs: Long) {
-        val shown = if (frame != null) GuidanceState.PalmDetected else GuidanceState.NoHand
-        _ui.update {
-            if (it.shown == shown) it else enabled(it.copy(shown = shown, captureFailed = false))
+    // onFrame runs on the landmarker thread, setHand / onViewSize on main
+    private val lock = Any()
+    private var hand: HandSide? = null
+    private var guidance: HandGuidance? = null
+    private var stabilizer = GuidanceStabilizer()
+    private var viewWidth = 0
+    private var viewHeight = 0
+    private var stableCapture = false
+
+    fun setHand(hand: HandSide) {
+        synchronized(lock) {
+            if (this.hand == hand) return
+            this.hand = hand
+            guidance = HandGuidance(hand)
+            stabilizer = GuidanceStabilizer()
+            stableCapture = false
+            _ui.update { enabled(it.copy(shown = GuidanceState.NoHand, wrongHand = null)) }
+        }
+    }
+
+    fun onViewSize(width: Int, height: Int) {
+        synchronized(lock) {
+            viewWidth = width
+            viewHeight = height
+        }
+    }
+
+    /** Called from the landmarker thread with the frame timestamp. Frames before [setHand] are ignored. */
+    fun onFrame(frame: HandFrame?, timestampMs: Long) {
+        synchronized(lock) {
+            val g = guidance ?: return
+            val visible = if (frame != null && viewWidth > 0 && viewHeight > 0) {
+                FillCenterMapping(frame.width, frame.height, viewWidth, viewHeight).visibleRect()
+            } else {
+                null
+            }
+            val reading = g.read(frame, visible)
+            val stable = stabilizer.update(reading.raw, reading.wrongHand, timestampMs)
+            stableCapture = stable.captureEnabled
+            _ui.update {
+                val changed = it.shown != stable.shown
+                enabled(it.copy(shown = stable.shown, wrongHand = stable.wrongHand, captureFailed = it.captureFailed && !changed))
+            }
+            _debug.value = ScanDebugSample(frame, reading, viewWidth, viewHeight)
         }
     }
 
@@ -54,6 +106,5 @@ class ScannerViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private fun enabled(ui: ScannerUi) =
-        ui.copy(captureEnabled = ui.shown == GuidanceState.PalmDetected && !ui.capturing && !ui.guideUnavailable)
+    private fun enabled(ui: ScannerUi) = ui.copy(captureEnabled = stableCapture && !ui.capturing && !ui.guideUnavailable)
 }

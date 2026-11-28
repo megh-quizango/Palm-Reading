@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Claude-written Hindi, flagged for native-speaker review (UI-SPEC Copywriting Contract) -->
+<resources>
+    <string name="scan_guide_back_of_hand">हथेली को कैमरे की तरफ़ घुमाएँ</string>
+    <string name="scan_guide_closed_hand">हाथ खोलें और उंगलियाँ फैलाएँ</string>
+    <string name="scan_guide_too_far">हाथ को थोड़ा पास लाएँ</string>
+    <string name="scan_guide_moving">हाथ स्थिर रखें</string>
+    <string name="scan_hint_wrong_hand_left">यह आपका बायाँ हाथ लगता है। आपने दायाँ हाथ चुना है।</string>
+    <string name="scan_hint_wrong_hand_right">यह आपका दायाँ हाथ लगता है। आपने बायाँ हाथ चुना है।</string>
+    <string name="scan_capture_waiting">आपकी हथेली का इंतज़ार है</string>
+    <string name="scan_capture_busy">फ़ोटो ली जा रही है</string>
+    <string name="scan_torch_cd">फ़्लैश</string>
+    <string name="common_on">चालू</string>
+    <string name="common_off">बंद</string>
+</resources>
