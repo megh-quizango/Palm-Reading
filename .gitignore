@@ -28,3 +28,6 @@ backend/.env
 backend/evals/photos/
 backend/evals/results/
 backend/evals/models/
+
+# Real hand recordings (04-05 debug recorder) are the user's hand geometry: stay local unless the user consents (D-09, public repo)
+android/app/src/test/resources/landmarks/recorded/
