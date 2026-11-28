@@ -45,6 +45,7 @@ android {
     testOptions {
         // JVM tests decode the shared contract samples (FND-05)
         unitTests.all { it.systemProperty("contracts.dir", rootProject.file("../contracts").absolutePath) }
+        unitTests.all { it.systemProperty("fixtures.dir", file("src/main/assets/fixtures").absolutePath) }
     }
 }
 

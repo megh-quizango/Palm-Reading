@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "reading_id": "9d4e2a7c-1b3f-4c8e-a6d2-5f7b0c3e8a19",
+  "hand_side": "right",
+  "meta": {
+    "model": "claude-sonnet-5-5",
+    "prompt_version": "palm_v1.0",
+    "generated_at": "2026-11-26T09:32:00Z",
+    "locale": "en"
+  },
+  "image_size": {
+    "w": 960,
+    "h": 1280
+  },
+  "verdict": {
+    "ok": false,
+    "reason": "jewelry"
+  },
+  "lines": [],
+  "palm": null,
+  "love": null,
+  "career": null
+}
