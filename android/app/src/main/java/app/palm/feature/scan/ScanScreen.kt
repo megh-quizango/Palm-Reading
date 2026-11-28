@@ -9,10 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.palm.R
 import app.palm.contract.HandSide
 import app.palm.core.designsystem.NocturneColors
+import app.palm.core.designsystem.components.NocturneDialog
 import app.palm.core.photo.PhotoOrigin
 import app.palm.core.photo.PhotoSource
 
@@ -36,5 +39,20 @@ fun ScanScreen(hand: HandSide, onBack: () -> Unit, onReady: () -> Unit, viewMode
                 onBack = onBack,
             )
         }
+    }
+    val rejected = ui.rejected
+    if (rejected != null) {
+        // 04-04 adds the per-origin buttons (Choose another photo / Close for gallery imports)
+        val (title, body) = when (rejected.reason) {
+            RejectReason.NoHand -> R.string.scan_reject_no_hand_title to R.string.scan_reject_no_hand_body
+            RejectReason.Unsupported -> R.string.scan_reject_unsupported_title to R.string.scan_reject_unsupported_body
+            RejectReason.Failed -> R.string.scan_reject_failed_title to R.string.scan_reject_failed_body
+        }
+        NocturneDialog(
+            title = stringResource(title),
+            body = stringResource(body),
+            confirm = stringResource(R.string.scan_retake) to viewModel::dismissRejection,
+            onDismissRequest = viewModel::dismissRejection,
+        )
     }
 }

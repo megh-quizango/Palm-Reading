@@ -1,16 +1,14 @@
 package app.palm.feature.handselect
 
+import android.os.ParcelFileDescriptor
 import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
-import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.core.os.LocaleListCompat
@@ -18,20 +16,21 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.palm.MainActivity
+import app.palm.contract.HandSide
 import app.palm.core.data.ProfileEntryPoint
 import app.palm.core.data.ProfileRepository
-import app.palm.core.designsystem.NocturneColors
+import app.palm.core.navigation.Scan
 import dagger.hilt.android.EntryPointAccessors
 import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.junit.After
-import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** Home hero -> hand selection (Right by default, tips) -> Scan(hand) on opaque bg.camera -> Back. */
+/** Home hero -> hand selection (Right by default, tips) -> the real Scan(hand) route with its hand chip -> Back. */
 @OptIn(ExperimentalTestApi::class)
 @RunWith(AndroidJUnit4::class)
 class HandSelectTest {
@@ -51,6 +50,12 @@ class HandSelectTest {
             repo.completeOnboarding()
         }
         setEnglish(instrumentation)
+        // The scanner asks for CAMERA on entry; grant it first (granting does not kill the process).
+        // Reading the descriptor to its end waits until pm has finished.
+        val pm = instrumentation.uiAutomation.executeShellCommand(
+            "pm grant " + instrumentation.targetContext.packageName + " android.permission.CAMERA",
+        )
+        ParcelFileDescriptor.AutoCloseInputStream(pm).use { it.readBytes() }
         scenario = ActivityScenario.launch(MainActivity::class.java)
     }
 
@@ -81,11 +86,11 @@ class HandSelectTest {
         compose.onNodeWithText("Left hand").assertIsSelected()
         compose.onNodeWithText("Continue").performClick()
 
-        waitForText("Scanner arrives in the next update")
-        waitForText("Hand: Left hand")
-        compose.waitForIdle()
-        val image = compose.onRoot().captureToImage()
-        assertEquals(NocturneColors.BgCamera, image.toPixelMap()[0, image.height / 2])
+        // Hand selection has gone, so a "Left hand" text can only be the Scan(LEFT) hand chip
+        compose.waitUntilDoesNotExist(hasText("Which hand should we read?"), 10_000)
+        waitForText("Left hand")
+        // The live preview is a SurfaceView that captureToImage cannot see, so check the route keeps the sky off
+        assertFalse(Scan(HandSide.LEFT).showsBackground)
 
         back()
         waitForText("Which hand should we read?")

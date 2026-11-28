@@ -251,7 +251,7 @@ fun ScannerContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Spacer(Modifier.size(ControlSize))
+            CameraIconButton(R.drawable.ic_gallery, stringResource(R.string.scan_choose_gallery), onGallery, enabled = !busy)
             Shutter(enabled = ui.captureEnabled && !busy, onClick = takePhoto)
             Spacer(Modifier.size(ControlSize))
         }
