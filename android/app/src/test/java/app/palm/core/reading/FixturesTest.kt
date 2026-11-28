@@ -83,4 +83,22 @@ class FixturesTest {
         assertEquals(InvalidReason.entries.toSet(), invalids.map { it.verdict.reason }.toSet())
         assertFalse(d(FixtureVariant.ALL_LLM).lines.single { it.type == LineType.FATE }.trace.isEmpty())
     }
+
+    @Test
+    fun aLineForcedPresentLosesItsAbsentTextInBothLocales() {
+        for (app in listOf(en, hi)) {
+            val absent = app.lines.filterNot { it.present }.map { it.type }
+            assertTrue(absent.isNotEmpty())
+            for (v in listOf(FixtureVariant.ALL_LLM, FixtureVariant.ALL_TEMPLATE)) {
+                val r = v.derive(app, hi, invalid)
+                for (type in absent) {
+                    val text = r.lines.single { it.type == type }.interpretation
+                    assertNotEquals("$v ${app.meta.locale}", app.lines.single { it.type == type }.interpretation, text)
+                    assertEquals(app.meta.locale == "hi", text.any { it in 'ऀ'..'ॿ' })
+                }
+                // Lines that were already present keep their own text
+                assertEquals(app.lines.filter { it.present }.map { it.interpretation }, r.lines.filter { it.type !in absent }.map { it.interpretation })
+            }
+        }
+    }
 }

@@ -30,8 +30,21 @@ private const val LONG_MIN = 600
 
 private fun String.long(): String = generateSequence(this) { "$it $this" }.first { it.length >= LONG_MIN }
 
-private fun PalmReadingDto.allDrawn(source: TraceSource) =
-    copy(lines = lines.map { it.copy(present = true, traceSource = source, trace = it.trace.ifEmpty { FATE_TRACE }) })
+/** Replaces the "no clear line" text of a line a variant forces present, so the card matches the drawing. */
+private fun presentText(locale: String) =
+    if (locale == "hi") "यहाँ एक हल्की रेखा दिखती है, जिसे हस्तरेखा पढ़ने वाले अक्सर धीरे-धीरे बनती दिशा मानते हैं।"
+    else "A faint line shows here, which palm readers often take as a direction that forms gradually."
+
+private fun PalmReadingDto.allDrawn(source: TraceSource) = copy(
+    lines = lines.map {
+        it.copy(
+            present = true,
+            traceSource = source,
+            trace = it.trace.ifEmpty { FATE_TRACE },
+            interpretation = if (it.present) it.interpretation else presentText(meta.locale),
+        )
+    },
+)
 
 /** Pure: [app] is the app-language fixture, [hindi] and [invalid] the other two. */
 fun FixtureVariant.derive(app: PalmReadingDto, hindi: PalmReadingDto, invalid: PalmReadingDto): PalmReadingDto = when (this) {
