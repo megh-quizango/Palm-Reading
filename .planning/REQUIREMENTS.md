@@ -35,8 +35,8 @@
 - [ ] **SCAN-02**: User is asked for camera permission; if denied they see an explanation with "Open settings" and "Choose from gallery"; if the camera is unavailable they see a gallery fallback
 - [ ] **SCAN-03**: While scanning, user sees live guidance that reacts to back of hand, closed hand, too far, moving, and "palm detected" (stable, no flicker)
 - [ ] **SCAN-04**: User can capture only when a palm is detected; user can toggle the flash
-- [ ] **SCAN-05**: User can import a palm photo from the gallery; a photo with no hand is rejected on the device with a clear message
-- [ ] **SCAN-06**: The captured or imported photo is rotated upright, cropped to the palm, resized to at most 1280 px, and stripped of EXIF/GPS before upload
+- [x] **SCAN-05**: User can import a palm photo from the gallery; a photo with no hand is rejected on the device with a clear message
+- [x] **SCAN-06**: The captured or imported photo is rotated upright, cropped to the palm, resized to at most 1280 px, and stripped of EXIF/GPS before upload
 - [ ] **SCAN-07**: The scanner runs smoothly on the reference low-end phone (2-minute session with no ANR, no visible jank, no overheating)
 
 ### Reading pipeline
@@ -142,8 +142,8 @@
 | SCAN-02 | Phase 4 | Pending |
 | SCAN-03 | Phase 4 | Pending |
 | SCAN-04 | Phase 4 | Pending |
-| SCAN-05 | Phase 4 | Pending |
-| SCAN-06 | Phase 4 | Pending |
+| SCAN-05 | Phase 4 | Complete |
+| SCAN-06 | Phase 4 | Complete |
 | SCAN-07 | Phase 4 | Pending |
 | READ-01 | Phase 6 | Pending |
 | READ-02 | Phase 2 | Complete |

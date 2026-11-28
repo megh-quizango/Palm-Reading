@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-11-28T02:43:09.757Z"
+stopped_at: Completed 04-04-PLAN.md
+last_updated: "2026-11-28T03:02:14.917Z"
 last_activity: 2026-11-28
 last_activity_desc: Phase 2 execution started
-state_head: 8dd2c630e50807cac1e038ef5925d1a99858caea
+state_head: 45a6c0b181eb38b8b3cdc9f6cd0381980a9878b3
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 24
-  completed_plans: 20
+  completed_plans: 21
   percent: 33
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-11-26)
 ## Current Position
 
 Phase: 4 (Scan Loop) — EXECUTING (Phase 3 complete 2026-11-27, hardware perf gate folded into 04-05; Phase 2: 02-08/02-09 deferred)
-Plan: 4 of 5 (waves: 04-01, 04-02+04-03+04-04, 04-05); 04-01 and 04-02 complete
+Plan: 5 of 5 (waves: 04-01, 04-02+04-03+04-04, 04-05); 04-01 and 04-02 complete
 Status: Executing on emulator-5554 ("emulator now, phone later"); real-palm, torch, focus and TalkBack checks of 04-01 and 04-02 are listed in their SUMMARYs for the 04-05 phone session
 Last activity: 2026-11-28 — 04-02 complete (stable guidance, overlay, held-palm capture, focus, torch)
 
@@ -75,6 +75,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 04 P01 | 70 min | 3 tasks | 36 files |
 | Phase 4 P02 | 30 min | 3 tasks | 49 files |
 | Phase 04 P03 | 5 min | 2 tasks | 7 files |
+| Phase 04 P04 | 12 min | 3 tasks | 26 files |
 
 ## Accumulated Context
 
@@ -138,6 +139,10 @@ Recent decisions affecting current work:
 - [Phase 4]: Guidance thresholds live in GuidanceConfig.Default (research starting values); tools/gen_landmark_fixtures.py mirrors the band values and must change with them
 - [Phase 4]: Preview semantics (description, focus onClick) sit on the overlay node because the AndroidView holder is invisible to accessibility
 - [Phase 04]: 04-03: Camera Denied vs PermanentlyDenied derived from the real request answer plus shouldShowRequestPermissionRationale, no stored has-asked flag; a saveable asked flag prevents a second in-flight request on recreation
+- [Phase 04]: 04-04: ScanResultHolder.put replaces capture.jpg with Files.move(REPLACE_EXISTING, ATOMIC_MOVE), not File.renameTo
+- [Phase 04]: 04-04: ProcessingOverlayHost(visible) does the fade; ProcessingOverlay(modifier) is the scrim
+- [Phase 04]: 04-04: a pixel-cap refusal (> 250 MP) is Unsupported for captures and imports alike
+- [Phase 04]: MediaPipe tasks-core telemetry (Google datatransport/CCT, no opt-out API) disclosure accepted by the user on 2026-11-28; must be declared in the Play Data safety form and privacy policy (REL-02/REL-03)
 
 ### Pending Todos
 
@@ -169,6 +174,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-28T02:43:09.529Z
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-11-28T03:02:05.570Z
+Stopped at: Completed 04-04-PLAN.md
 Resume file: None
