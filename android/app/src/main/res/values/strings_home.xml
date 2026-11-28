@@ -7,6 +7,9 @@
     <string name="home_explore">Explore your destiny</string>
     <string name="home_soon_badge">Soon</string>
     <string name="home_tile_soon_cd">%1$s, coming soon</string>
+    <string name="home_last_reading_overline">Your last reading</string>
+    <string name="home_last_reading_meta">%1$s · %2$s</string>
+    <string name="home_last_reading_cd">Your last reading, palm reading, %1$s, %2$s</string>
 
     <string name="feature_palm">Palm reading</string>
     <string name="feature_tarot">Tarot</string>

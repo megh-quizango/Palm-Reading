@@ -61,6 +61,7 @@ fun HomeScreen(
     onScan: () -> Unit,
     onFeature: (Feature) -> Unit,
     onGreetingLongPress: (() -> Unit)?,
+    onOpenReading: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var askExit by rememberSaveable { mutableStateOf(false) }
@@ -69,6 +70,7 @@ fun HomeScreen(
     if (askExit) ExitDialog(onStay = { askExit = false })
 
     val profile by viewModel.profile.collectAsStateWithLifecycle()
+    val lastReading by viewModel.lastReading.collectAsStateWithLifecycle()
     val p = profile ?: return
     val nocturne = LocalNocturne.current
     val type = nocturne.type
@@ -109,6 +111,11 @@ fun HomeScreen(
         }
         Spacer(Modifier.height(NocturneSpace.S16))
         HeroCard(onScan, Modifier.entryMotion(entry, index = 1))
+        lastReading?.let { reading ->
+            Spacer(Modifier.height(NocturneSpace.S16))
+            // Same stagger slot as the hero, so ENTRY_END_MS is unchanged
+            LastReadingCard(reading, onClick = { onOpenReading(reading.id) }, modifier = Modifier.entryMotion(entry, index = 1))
+        }
         Spacer(Modifier.height(NocturneSpace.S24))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(painterResource(R.drawable.ic_sparkle), null, Modifier.size(24.dp), tint = NocturneColors.AccentGold)

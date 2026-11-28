@@ -7,6 +7,9 @@
     <string name="home_explore">अपनी किस्मत जानिए</string>
     <string name="home_soon_badge">जल्द</string>
     <string name="home_tile_soon_cd">%1$s, जल्द आ रहा है</string>
+    <string name="home_last_reading_overline">आपकी पिछली रीडिंग</string>
+    <string name="home_last_reading_meta">%1$s · %2$s</string>
+    <string name="home_last_reading_cd">आपकी पिछली रीडिंग, हस्तरेखा, %1$s, %2$s</string>
 
     <string name="feature_palm">हस्तरेखा</string>
     <string name="feature_tarot">टैरो</string>
