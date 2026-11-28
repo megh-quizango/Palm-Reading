@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 05-04-PLAN.md
-last_updated: "2026-11-28T08:01:19.124Z"
+stopped_at: Completed 05-05-PLAN.md
+last_updated: "2026-11-28T08:12:51.392Z"
 last_activity: 2026-11-28
 last_activity_desc: Phase 2 execution started
-state_head: 122579c682be6eff1488d662854ab3f6fb147a35
+state_head: a252185bda6dd98692edf135988d2c57999ee31b
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 30
-  completed_plans: 26
+  completed_plans: 27
   percent: 33
 ---
 
@@ -80,6 +80,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 05 P02 | 11min | 2 tasks | 11 files |
 | Phase 05 P03 | 5min | 2 tasks | 12 files |
 | Phase 05 P04 | 14min | 2 tasks | 7 files |
+| Phase 05 P05 | 8min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -154,6 +155,7 @@ Recent decisions affecting current work:
 - [Phase 05]: Invalid verdict deletes the capture at the verdict, before InvalidPhoto opens (Pitfall 11)
 - [Phase 05]: 05-04: RESEARCH A1 confirmed on API 35, share card ships on the Compose GraphicsLayer path (Canvas fallback unused); API 26-27 capture unverified
 - [Phase 05]: 05-04: Share state is plain remember so a recreated process never re-shares by itself
+- [Phase 05]: 05-05: Lab Delete all readings closes its dialog only after store.deleteAll() completes (am start -S in scripts would kill an in-flight delete)
 
 ### Pending Todos
 
@@ -186,6 +188,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-28T08:01:18.692Z
-Stopped at: Completed 05-04-PLAN.md
+Last session: 2026-11-28T08:12:50.971Z
+Stopped at: Completed 05-05-PLAN.md
 Resume file: None
