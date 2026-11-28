@@ -108,11 +108,11 @@ Plans:
   5. A 2-minute scan session on the reference low-end phone finishes with no ANR, no visible jank and no overheating or thermal throttling.
 
 **Research flag**: Needs on-device calibration: palm-facing and handedness thresholds (rear-camera mirroring), analyzer performance on the reference phone, and which MediaPipe release ships 16 KB-aligned native libraries. Prerequisite: the same consented palm photo set (including deep skin tones, henna, indoor light) and recorded landmark fixtures (left/right x palm/back/fist/far/rotated).
-**Plans:** 1/5 plans executed
+**Plans:** 2/5 plans executed
 
 Plans:
 - [x] 04-01-PLAN.md — Tracer: consent for every new artifact and the model, then permission -> live preview -> raw palm/no-palm chip -> capture -> processed JPEG + 21 landmarks on ScanReady, checked with a real palm on the physical phone (wave 1)
-- [ ] 04-02-PLAN.md — Live guidance (back of hand, closed hand, too far, moving, palm detected, wrong-hand hint) from pure fixture-tested logic, 500 ms hold, focus-then-capture, tap-to-focus, torch (wave 2)
+- [x] 04-02-PLAN.md — Live guidance (back of hand, closed hand, too far, moving, palm detected, wrong-hand hint) from pure fixture-tested logic, 500 ms hold, focus-then-capture, tap-to-focus, torch (wave 2)
 - [ ] 04-03-PLAN.md — Camera permission states: denied, permanently denied with Open settings, resume re-check, no camera, camera error with retry, gallery from every state (wave 2)
 - [ ] 04-04-PLAN.md — Processing hardening: API 26-27 decode, 250 MP cap, no-hand / unsupported rejections, cancel, ScanReady loading and photo-gone states, instrumented EXIF, capture-rotation and HEIC proof (wave 2)
 - [ ] 04-05-PLAN.md — Phone gate: debug HUD + recorder, calibration with both hands, 2-minute release session, 16 KB record, deferred Phase 3 gates, full suites (wave 3)
@@ -161,6 +161,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6. After Phase 1,
 | 1. Foundations & Contract | 5/5 | Complete    | 2026-11-26 |
 | 2. Reading Pipeline | 7/9 | In Progress | - |
 | 3. Client Shell | 5/5 | Complete (hardware perf gate deferred) | 2026-11-27 |
-| 4. Scan Loop | 1/5 | In Progress | - |
+| 4. Scan Loop | 2/5 | In Progress | - |
 | 5. Result Against the Fixture | 0/TBD | Not started | - |
 | 6. Wire-Up & Ad Gates | 0/TBD | Not started | - |

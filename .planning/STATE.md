@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-11-28T02:01:17.851Z"
-last_activity: 2026-11-27
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-11-28T02:29:12.611Z"
+last_activity: 2026-11-28
 last_activity_desc: Phase 2 execution started
-state_head: c2bd52dd6ad7c6ebff281d8fd24383ba7e91eeaa
+state_head: c1f8b9098d84a0f5c436ce36ee3bbd95e5365b34
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 24
-  completed_plans: 18
+  completed_plans: 19
   percent: 33
 ---
 
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-11-26)
 
 ## Current Position
 
-Phase: 4 (Scan Loop) — PLANNED, ready to execute (Phase 3 complete 2026-11-27, hardware perf gate folded into 04-05; Phase 2: 02-08/02-09 deferred)
-Plan: 1 of 5 (waves: 04-01, 04-02+04-03+04-04, 04-05)
-Status: Phase 4 plans checked (2 rounds; the last blocker, heifwriter minSdk 29 vs app 26, fixed in a final revision via an androidTest-only overrideLibrary). Execution needs download consent (CameraX 1.7.0, MediaPipe 1.2.3 + hand_landmarker.task, exifinterface, heifwriter test-only) and a physical phone for 04-01 tracer and 04-05
-Last activity: 2026-11-27 — Phase 4 planned
+Phase: 4 (Scan Loop) — EXECUTING (Phase 3 complete 2026-11-27, hardware perf gate folded into 04-05; Phase 2: 02-08/02-09 deferred)
+Plan: 3 of 5 (waves: 04-01, 04-02+04-03+04-04, 04-05); 04-01 and 04-02 complete
+Status: Executing on emulator-5554 ("emulator now, phone later"); real-palm, torch, focus and TalkBack checks of 04-01 and 04-02 are listed in their SUMMARYs for the 04-05 phone session
+Last activity: 2026-11-28 — 04-02 complete (stable guidance, overlay, held-palm capture, focus, torch)
 
 Progress: [███░░░░░░░] 33%
 
@@ -73,6 +73,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 03 P03 | 135min | 2 tasks | 20 files |
 | Phase 03 P04 | 82min | 3 tasks | 24 files |
 | Phase 04 P01 | 70 min | 3 tasks | 36 files |
+| Phase 4 P02 | 30 min | 3 tasks | 49 files |
 
 ## Accumulated Context
 
@@ -132,6 +133,9 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-05 HeroOrb spin/breathe moved from graphicsLayer to draw-only transforms: per-frame layer updates fired onLayoutChange accessibility events, so uiautomator never went idle on Home
 - [Phase 04]: 04-01: MediaPipe native lib is libmediapipe_tasks_jni.so, packaged for arm64-v8a/armeabi-v7a/x86/x86_64; landmarker runs on the x86_64 emulator, so wave-2 instrumented tests can use emulator-5554
 - [Phase 04]: 04-01: real-palm checks (Task 4, capture EXIF proof, phone abilist, phone runs of the Task 2/3 device commands) deferred to the 04-05 phone session by the user's choice
+- [Phase 4]: ScannerUi emits only stabilised values; palm centre and frame size stay private in ScannerViewModel (per-frame data goes to the debug flow only, T-04-09)
+- [Phase 4]: Guidance thresholds live in GuidanceConfig.Default (research starting values); tools/gen_landmark_fixtures.py mirrors the band values and must change with them
+- [Phase 4]: Preview semantics (description, focus onClick) sit on the overlay node because the AndroidView holder is invisible to accessibility
 
 ### Pending Todos
 
@@ -163,6 +167,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-28T02:01:17.633Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-11-28T02:29:12.388Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
