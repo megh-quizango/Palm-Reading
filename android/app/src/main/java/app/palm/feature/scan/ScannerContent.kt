@@ -77,6 +77,7 @@ import app.palm.core.camera.CameraXScanCamera
 import app.palm.core.photo.PhotoSource
 import app.palm.core.vision.GuidanceState
 import app.palm.core.vision.LiveHandTracker
+import app.palm.debug.ScanDebugHud
 import app.palm.feature.handselect.handLabel
 import java.util.concurrent.Executors
 
@@ -261,6 +262,15 @@ fun ScannerContent(
                     traversalIndex = 1f
                     onClick { viewModel.focusAt(camera, previewView.width / 2f, previewView.height / 2f); true }
                 },
+        )
+        // debug builds only: raw numbers and the landmark recorder; the release twin renders nothing (04-05)
+        ScanDebugHud(
+            viewModel.debug,
+            hand,
+            Modifier
+                .align(Alignment.TopEnd)
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(top = NocturneSpace.S8 + ControlSize + NocturneSpace.S8 + NocturneSpace.S48, end = NocturneSpace.S16),
         )
         Column(
             Modifier
