@@ -40,3 +40,17 @@ fun lineFullNameRes(type: LineType): Int = when (type) {
 
 /** Drawn lines only, in contract order (heart, head, life, fate, sun). */
 fun drawnLines(lines: List<PalmLineDto>): List<PalmLineDto> = lines.filter { it.isDrawn() }.sortedBy { it.type.ordinal }
+
+enum class Badge { APPROXIMATE, NOT_VISIBLE }
+
+/** Every drawn M1 line (llm or template) is approximate; anything not drawn is not clearly visible (RESEARCH Pattern 3). */
+fun PalmLineDto.badge(): Badge = if (isDrawn()) Badge.APPROXIMATE else Badge.NOT_VISIBLE
+
+@StringRes
+fun badgeRes(badge: Badge): Int = when (badge) {
+    Badge.APPROXIMATE -> R.string.result_badge_approx
+    Badge.NOT_VISIBLE -> R.string.result_badge_not_visible
+}
+
+/** Every line of the reading, in contract order; types missing from the list get no entry. */
+fun orderedLines(lines: List<PalmLineDto>): List<PalmLineDto> = lines.sortedBy { it.type.ordinal }
