@@ -187,3 +187,8 @@ None beyond the plan's threat model. T-04-01 (no logging in core/photo and featu
 ## Self-Check: PASSED
 
 - Created files listed above exist; commits 18dba57 and c2bd52d are ancestors of HEAD.
+
+## Review fixes
+
+- **[major] Failed CameraX init crashed instead of showing "Camera not available"** (`feature/scan/ScannerContent.kt`): the `initializationFuture` listener called `hasCamera` without checking the future, which throws `IllegalStateException` on the main thread when init failed. New `cameraInitProblem(awaitInit, hasBackCamera)` maps a failed future, or a throwing `hasCamera`, to `CameraProblem.OpenFailed` and only queries the camera after a successful init. Covered by `CameraInitProblemTest` (4 cases).
+- Verified: `:app:testDebugUnitTest` green (84 tests, 0 failures); `HandSelectTest` on emulator-5554 1/1 passed, `tests="0"` guard clean; `scan-open.sh --grant right` on the emulator opens the live scanner with the no-hand chip, no crash in the crash buffer. Forcing a real init failure would need disabling the camera via device policy, which was not done (security setting); the unit test covers the mapping.

@@ -96,6 +96,19 @@ private fun selector(width: Int, height: Int, rule: Int): ResolutionSelector = R
     .setResolutionStrategy(ResolutionStrategy(Size(width, height), rule))
     .build()
 
+/**
+ * Problem to show once CameraX init has settled, or null when the back camera is ready.
+ * A failed init leaves the provider null, so hasCamera would throw on the main thread.
+ */
+internal fun cameraInitProblem(awaitInit: () -> Unit, hasBackCamera: () -> Boolean): CameraProblem? = when {
+    runCatching(awaitInit).isFailure -> CameraProblem.OpenFailed
+    else -> when (runCatching(hasBackCamera).getOrNull()) {
+        true -> null
+        false -> CameraProblem.NoBackCamera
+        null -> CameraProblem.OpenFailed
+    }
+}
+
 /** S08 live scanner: back-camera preview, hand chip, guidance chip and shutter (D-02, D-03, D-05, D-13). */
 @Composable
 fun ScannerContent(
@@ -152,8 +165,12 @@ fun ScannerContent(
         var disposed = false
         controller.initializationFuture.addListener({
             if (disposed) return@addListener
-            if (!controller.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)) {
-                problem(CameraProblem.NoBackCamera)
+            val initProblem = cameraInitProblem(
+                awaitInit = { controller.initializationFuture.get() },
+                hasBackCamera = { controller.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA) },
+            )
+            if (initProblem != null) {
+                problem(initProblem)
                 return@addListener
             }
             previewView.controller = controller
