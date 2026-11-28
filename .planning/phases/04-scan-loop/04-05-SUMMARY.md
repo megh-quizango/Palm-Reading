@@ -163,7 +163,7 @@ Run with only the reference phone attached, or `export ADB_SERIAL=<phone serial>
 - 04-02 #1-7, #9: live states with each hand, wrong-hand hint, hold gate timing, tap-to-focus, torch (Home/shutter/Back), TalkBack order and single announcements, overlay alignment on 20:9, and the pull-back test.
 - 04-03 #3-4 and the Recents→Settings camera-off walk: real Settings toggle, camera in use by another app.
 - 04-04 #2-5, #7, #9: real HEIC import + check-capture, processing scrim and Back-cancel (`run-as app.palm.dev.debug ls cache/scan` shows no capture.jpg), camera-still rejection with Retake only, photo-gone after `am kill`, photo-picker backport (API 26-29 only), and rotation/night-mode during processing.
-- STATE Phase 3 note: check the Redmi for leftover test settings (animations, font scale, battery saver).
+- ~~STATE Phase 3 note: check the Redmi for leftover test settings~~ RESOLVED 2026-11-28 (Task 1: all defaults).
 
 ## Phone session (Task 1, 100.104.73.89:43695)
 
