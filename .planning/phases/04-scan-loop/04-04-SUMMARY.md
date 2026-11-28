@@ -145,3 +145,8 @@ None beyond the plan's threat model. T-04-15 (bounds before pixels, 250 MP cap o
 ## Self-Check: PASSED
 
 - All created files listed above exist; commits 21c3d0b, ad2c3cf and 45a6c0b are ancestors of HEAD.
+
+## Review fixes
+
+- **[major] ScanViewModel called a composition-scoped `onReady` after processing.** A rotation, locale or dark-mode change during the 1-3 s of processing recreated the Activity and the saveable back stack, so the stale lambda pushed ScanReady onto the old stack (user stuck on Scan with a stored capture) and kept the dead composition alive. Fix: `process()` no longer takes a callback; it sets the one-shot `ScanUi.ready` after `holder.put`, and ScanScreen runs `LaunchedEffect(ui.ready) { if (ui.ready) { viewModel.consumeReady(); onReady() } }` with the current composition's `onReady`. `ScanScreen`'s signature is unchanged. `ScanViewModelTest` now asserts `ready` is set once on Ok, cleared by `consumeReady()`, and never set on rejection or cancel. Unit tests: 142 run, 0 failures, 1 skipped (pre-existing). No instrumented test covers ScanScreen, and the emulator cannot reach the Ok path (no real palm photo), so the device check is deferred:
+  - **Deferred to the 04-05 phone session (9):** `bash tools/scan-open.sh --grant right`, capture a real palm (or import a palm photo) and rotate the phone (or `adb -s "$ADB_SERIAL" shell cmd uimode night yes`, restore with `night no`) while "Preparing your photo…" shows. Expected: the app lands on "Your palm photo" with 21 dots, and Back from there returns to the scanner (not a second Scan entry). Restore auto-rotate/night mode afterwards.

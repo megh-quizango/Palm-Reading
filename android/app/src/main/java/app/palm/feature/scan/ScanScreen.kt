@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,9 +25,15 @@ import app.palm.core.photo.PhotoSource
 @Composable
 fun ScanScreen(hand: HandSide, onBack: () -> Unit, onReady: () -> Unit, viewModel: ScanViewModel = hiltViewModel()) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
+    LaunchedEffect(ui.ready) {
+        if (ui.ready) {
+            viewModel.consumeReady()
+            onReady()
+        }
+    }
     // The system photo picker needs no storage permission (D-11)
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        if (uri != null) viewModel.process(PhotoSource.Gallery(uri), PhotoOrigin.GALLERY, hand, onReady)
+        if (uri != null) viewModel.process(PhotoSource.Gallery(uri), PhotoOrigin.GALLERY, hand)
     }
     val openGallery = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }
     Box(Modifier.fillMaxSize().background(NocturneColors.BgCamera)) {
@@ -34,7 +41,7 @@ fun ScanScreen(hand: HandSide, onBack: () -> Unit, onReady: () -> Unit, viewMode
             ScannerContent(
                 hand = hand,
                 busy = ui.processing,
-                onCaptured = { viewModel.process(it, PhotoOrigin.CAMERA, hand, onReady) },
+                onCaptured = { viewModel.process(it, PhotoOrigin.CAMERA, hand) },
                 onGallery = openGallery,
                 onCameraProblem = onProblem,
                 onBack = onBack,

@@ -28,7 +28,8 @@ enum class RejectReason { NoHand, Unsupported, Failed }
 
 data class Rejection(val reason: RejectReason, val origin: PhotoOrigin)
 
-data class ScanUi(val processing: Boolean = false, val rejected: Rejection? = null)
+/** [ready] is a one-shot: the screen navigates and calls consumeReady(), so a config change never loses it. */
+data class ScanUi(val processing: Boolean = false, val rejected: Rejection? = null, val ready: Boolean = false)
 
 /** Runs a capture or an import through the one PhotoProcessor and hands the result to ScanReady (D-10, D-12). */
 @HiltViewModel
@@ -44,9 +45,9 @@ class ScanViewModel @Inject constructor(
     private var job: Job? = null
     private var cleanup: Job? = null
 
-    fun process(source: PhotoSource, origin: PhotoOrigin, hand: HandSide, onReady: () -> Unit) {
+    fun process(source: PhotoSource, origin: PhotoOrigin, hand: HandSide) {
         if (_ui.value.processing) return
-        _ui.update { it.copy(processing = true, rejected = null) }
+        _ui.update { it.copy(processing = true, rejected = null, ready = false) }
         val previousCleanup = cleanup
         job = viewModelScope.launch {
             previousCleanup?.join() // a cancelled photo's deletion never races this one's put()
@@ -66,8 +67,8 @@ class ScanViewModel @Inject constructor(
             }
             ensureActive()
             if (reason == null) {
-                _ui.update { it.copy(processing = false) }
-                onReady()
+                // No composition-scoped callback here: it would push onto a back stack a rotation already replaced
+                _ui.update { it.copy(processing = false, ready = true) }
             } else {
                 // Nothing is kept from a refused photo (D-12)
                 withContext(io) { holder.clear() }
@@ -88,6 +89,8 @@ class ScanViewModel @Inject constructor(
             holder.clear()
         }
     }
+
+    fun consumeReady() = _ui.update { it.copy(ready = false) }
 
     fun dismissRejection() = _ui.update { it.copy(rejected = null) }
 }
