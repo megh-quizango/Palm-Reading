@@ -49,3 +49,21 @@ fun landmarksValid(points: List<P3>): Boolean =
     points.size == 21 && points.all { p ->
         p.x.isFinite() && p.y.isFinite() && p.z.isFinite() && p.x in -0.5f..1.5f && p.y in -0.5f..1.5f
     }
+
+/** Decodes above this many pixels are refused before any pixel is read (D-10; decompression bombs). */
+const val MAX_DECODE_PIXELS = 250_000_000L
+
+/** How to make a stored image upright: rotate clockwise by [rotationDegrees], then mirror left-right if [flipHorizontal]. */
+data class ExifTransform(val rotationDegrees: Int, val flipHorizontal: Boolean)
+
+/** EXIF orientation 1-8 (incl. the mirrored 2/4/5/7) as a rotation then a flip (D-10); anything else is identity. */
+fun exifTransform(orientation: Int): ExifTransform = when (orientation) {
+    2 -> ExifTransform(0, true)
+    3 -> ExifTransform(180, false)
+    4 -> ExifTransform(180, true)
+    5 -> ExifTransform(90, true)
+    6 -> ExifTransform(90, false)
+    7 -> ExifTransform(270, true)
+    8 -> ExifTransform(270, false)
+    else -> ExifTransform(0, false)
+}
