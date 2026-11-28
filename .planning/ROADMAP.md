@@ -132,11 +132,11 @@ Plans:
   4. A reading (photo and JSON) is saved on the device and still opens after the app is killed and relaunched, and Home lets the user reopen their last reading.
   5. The user can share the reading as a branded image card through the system share sheet, can start another scan from the result, and "Ask [Guide]" shows a coming-soon state.
 
-**Plans:** 1/6 plans executed
+**Plans:** 2/6 plans executed
 
 Plans:
 - [x] 05-01-PLAN.md — Tracer: lab photo -> ScanReady "Read my palm" -> stamped fixture reading -> saved (Room v2 row + photo in filesDir) -> Result with lines, legend, disclaimer, Scan again / Ask [Guide] -> Back to Home, on emulator-5554; then store hardening (UUID names, canonical paths, insert-failure cleanup, v1 -> v2), shared fakes and seeding helper; then Home "Your last reading" reopens it after force-stop (wave 1)
-- [ ] 05-02-PLAN.md — Full S10 Result: Catmull-Rom lines with dark halo and once-per-entry draw-in, legend notes, Palm / Love / Career tabs, line cards with Approximate / Not clearly visible badges, disclaimer on every tab, loading / missing-photo / unreadable states (wave 2)
+- [x] 05-02-PLAN.md — Full S10 Result: Catmull-Rom lines with dark halo and once-per-entry draw-in, legend notes, Palm / Love / Career tabs, line cards with Approximate / Not clearly visible badges, disclaimer on every tab, loading / missing-photo / unreadable states (wave 2)
 - [ ] 05-03-PLAN.md — Unusable photo: InvalidPhoto screen for all 7 reasons with retake tip, Retake -> Scan(hand); invalid verdict saves nothing and deletes the capture; ScanReady double tap, failure and retry tested (wave 2)
 - [ ] 05-04-PLAN.md — Share: off-screen 1080 x 1350 branded card PNG, non-exported FileProvider limited to cacheDir/share, ACTION_SEND through the system chooser, Preparing / failure states, share dir cleared at start (wave 2)
 - [ ] 05-05-PLAN.md — Fixtures and lab: Hindi and invalid fixtures, 13 D-06 variants + long text guarded by drift and schema tests, app-language default, debug lab with aspect / skin / variant / Delete all readings, result-open.sh options (wave 2)
@@ -171,5 +171,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6. After Phase 1,
 | 2. Reading Pipeline | 7/9 | In Progress | - |
 | 3. Client Shell | 5/5 | Complete (hardware perf gate deferred) | 2026-11-27 |
 | 4. Scan Loop | 4/5 | In Progress | - |
-| 5. Result Against the Fixture | 1/6 | In Progress | - |
+| 5. Result Against the Fixture | 2/6 | In Progress | - |
 | 6. Wire-Up & Ad Gates | 0/TBD | Not started | - |

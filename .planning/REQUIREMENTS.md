@@ -54,9 +54,9 @@
 
 ### Result
 
-- [ ] **RES-01**: User can switch between Palm, Love and Career tabs on the result
+- [x] **RES-01**: User can switch between Palm, Love and Career tabs on the result
 - [x] **RES-02**: User sees the detected lines drawn over their own photo with a colour + text legend
-- [ ] **RES-03**: User sees a card per detected line with a short label and interpretation
+- [x] **RES-03**: User sees a card per detected line with a short label and interpretation
 - [x] **RES-04**: Every reading shows an entertainment disclaimer
 - [x] **RES-05**: The reading (photo + JSON) is saved on the device and survives app restarts
 - [ ] **RES-06**: User can share the reading as a branded image card
@@ -155,9 +155,9 @@
 | READ-08 | Phase 6 | Pending |
 | READ-09 | Phase 6 | Pending |
 | READ-10 | Phase 2 | Complete |
-| RES-01 | Phase 5 | Pending |
+| RES-01 | Phase 5 | Complete |
 | RES-02 | Phase 5 | Complete |
-| RES-03 | Phase 5 | Pending |
+| RES-03 | Phase 5 | Complete |
 | RES-04 | Phase 5 | Complete |
 | RES-05 | Phase 5 | Complete |
 | RES-06 | Phase 5 | Pending |

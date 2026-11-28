@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-11-28T07:18:08.592Z"
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-11-28T07:34:26.001Z"
 last_activity: 2026-11-28
 last_activity_desc: Phase 2 execution started
-state_head: 314e18af55ee79f476d85d940b44ca29524a7320
+state_head: f30975a4bc26b535614e6a74782ff2d875bf8a00
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 30
-  completed_plans: 23
+  completed_plans: 24
   percent: 33
 ---
 
@@ -77,6 +77,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 04 P03 | 5 min | 2 tasks | 7 files |
 | Phase 04 P04 | 12 min | 3 tasks | 26 files |
 | Phase 05 P01 | 17min | 3 tasks | 47 files |
+| Phase 05 P02 | 11min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -145,6 +146,8 @@ Recent decisions affecting current work:
 - [Phase 04]: 04-04: a pixel-cap refusal (> 250 MP) is Unsupported for captures and imports alike
 - [Phase 04]: MediaPipe tasks-core telemetry (Google datatransport/CCT, no opt-out API) disclosure accepted by the user on 2026-11-28; must be declared in the Play Data safety form and privacy policy (REL-02/REL-03)
 - [Phase 05]: 05-01: ReadingStore accepts only lower-case UUID ids and resolves photos only inside filesDir/readings; deleteAll sweeps rows via the DAO
+- [Phase 05]: 05-02: HALO_ALPHA 0.55 (BgDeep, 9 dp) deviates from D-10's about 30%; user approves or asks for 0.30 in 05-06
+- [Phase 05]: 05-02: ResultViewModel distinctUntilChanged after byId so unrelated Room writes do not re-decode the photo
 
 ### Pending Todos
 
@@ -177,6 +180,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-28T07:18:08.213Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-11-28T07:34:25.586Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None
