@@ -23,7 +23,7 @@ A=(adb -s "$ADB_SERIAL")
 temp() { "${A[@]}" shell dumpsys battery | tr -d '\r' | awk -F': *' '$1 ~ /^ *temperature$/ { print $2; exit }'; }
 thermal() { "${A[@]}" shell dumpsys thermalservice | tr -d '\r' | grep -m 1 'Thermal Status:' | grep -oE '[0-9]+' | head -n 1; }
 
-"${A[@]}" logcat -c
+"${A[@]}" logcat -b all -c
 "${A[@]}" shell dumpsys gfxinfo "$PKG" reset > /dev/null
 t0="$(temp)"
 max_thermal=-1
@@ -38,7 +38,7 @@ while :; do
 done
 
 G="$("${A[@]}" shell dumpsys gfxinfo "$PKG" | tr -d '\r')"
-num() { printf '%s\n' "$G" | grep -m 1 "^$1:" | grep -oE '[0-9]+' | head -n 1; }
+num() { printf '%s\n' "$G" | grep -m 1 "^$1:" | grep -oE '[0-9]+' | head -n 1 || true; }  # a missing line must reach the fallback, not end the script (set -e)
 total="$(num 'Total frames rendered')"
 missed="$(num 'Number Frame deadline missed')"
 metric="frame deadline missed"

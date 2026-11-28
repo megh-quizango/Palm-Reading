@@ -102,7 +102,7 @@ All 12 release libraries are 16 KB aligned and stored 16 KB aligned in the APK. 
 | Analysis rate (debug, no hand) | 47-49 frames per 5 s (≈ 9.6 fps, under the 12 fps cap), inference 25-29 ms |
 | Analysis pause on background | Home pressed: **no** `PalmScan: analyzed` line in 12 s; same process (pid unchanged); back to the app: 47 frames per 5 s again and the scanner shows "Place your palm inside the frame" |
 
-The emulator misses about 6% of frame deadlines even on idle Home (p50 27 ms, so the emulator renders at roughly 37 fps), and the scanner adds nothing measurable on top of that (5.94% vs 5.91%). These are emulator rendering numbers, not phone numbers.
+The emulator misses about 6% of frame deadlines even on idle Home (p50 27 ms, so the emulator renders at roughly 37 fps). The 5.94% debug scan session and the 5.91% release Home idle come from different builds and are not compared here; the like-for-like debug Home idle baseline is in "Review fixes" below. These are emulator rendering numbers, not phone numbers.
 
 ## Deferred checks run on the emulator
 
@@ -178,3 +178,23 @@ None beyond the plan's threat model. T-04-20 holds: the recorder is absent from 
 - FOUND: android/app/src/debug/java/app/palm/debug/ScanDebug.kt, android/app/src/release/java/app/palm/debug/ScanDebug.kt, tools/check-scan-session.sh
 - FOUND commits: db185f4, 9ea6c60
 - Acceptance greps: `class LandmarkRecorder` in debug only, `fun ScanDebugHud` in release, `ScanDebugHud` in ScannerContent, `am_anr` / `Thermal Status` / `temperature` / `deadline missed` in the script; 14 `phase4-*.png` files; font scale equals `font_scale.orig`
+
+## Review fixes
+
+Five code-review findings, all fixed in one commit (`fix(04-05): address review findings`) and rerun on emulator-5554:
+
+1. **`num()` under `set -euo pipefail` (tools/check-scan-session.sh, tools/check-jank.sh).** When grep found no line, the command substitution failed and the script exited 1 with no output. That meant the missed-vsync fallback (Android < 12, i.e. the API 26-30 phones) and the "no frame stats" message could never run. Fix: `|| true` inside `num()` in both scripts. Self-check: the `num()` line was extracted from each script and run under `set -euo pipefail` against a gfxinfo with only `Total frames rendered: 120` and `Number Missed Vsync: 3`. It returned total 120 and fell back to missed 3. An empty gfxinfo gave empty values, and the script carried on to its check. Both scripts printed `parser OK`.
+2. **`logcat -c` left the events buffer (check-scan-session.sh).** An old `am_anr` could fail a new session. Fix: `logcat -b all -c`. Rerun: the events buffer held 67 lines after the 120 s session, so only the session itself was counted.
+3. **Unsupported 5.94% vs 5.91% comparison (this summary).** The comparison mixed a debug build with a release build. It was dropped (text above) and replaced with a debug-vs-debug measurement on the same emulator *(emulator, not a gate)*:
+
+   | Debug build, emulator-5554 | Frames | Deadline missed |
+   |---|---|---|
+   | Scan session 120 s, no hand (rerun with the fixed script) | 6836 | 393 (**5.75%**), max_thermal 0, anr 0, resumed. Script verdict FAILED on > 5% |
+   | Home idle 10 s, run 1 (`check-jank.sh idle 10`) | 576 | 33 (**5.73%**), p50 27 ms |
+   | Home idle 10 s, run 2 | 571 | 35 (**6.13%**), p50 28 ms |
+
+   On the same build, the scanner sits inside the idle-Home spread (5.73-6.13%). Both are above 5% because of the emulator's renderer, so this says nothing about the phone gate.
+4. **Stale STATE position lines.** The Plan line now reads "04-01..04-04 complete, 04-05 partial (emulator part done, phone part pending)", and Last activity now names the 04-05 emulator part.
+5. **Recording cancelled silently by collapsing the HUD (ScanDebug.kt).** `recording` is hoisted into `ScanDebugHud`, and the HUD chip is `clickable(enabled = !recording)`, so the panel and its coroutine scope stay alive for the whole 3 s capture. Rerun on the emulator: expand HUD → "Record 3 s" → tapped the HUD chip twice during "Recording…". The panel stayed open, and after 3 s it showed "no hand seen, nothing saved". After that the chip collapsed the panel normally.
+
+Builds: `:app:installDebug` (update install). The emulator is left on the live debug scanner (Right hand) with CAMERA granted. The connected suite was not rerun, because no connected test covers the debug HUD and no other source changed.

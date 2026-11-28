@@ -28,9 +28,9 @@ See: .planning/PROJECT.md (updated 2026-11-26)
 ## Current Position
 
 Phase: 4 (Scan Loop) — EXECUTING (Phase 3 complete 2026-11-27, hardware perf gate folded into 04-05; Phase 2: 02-08/02-09 deferred)
-Plan: 5 of 5 (waves: 04-01, 04-02+04-03+04-04, 04-05); 04-01 and 04-02 complete
+Plan: 5 of 5 (waves: 04-01, 04-02+04-03+04-04, 04-05); 04-01..04-04 complete, 04-05 partial (emulator part done, phone part pending)
 Status: 04-05 partially done on emulator-5554 (emulator part complete 2026-11-28); waits for the reference phone for Task 2/3 and every hardware gate (see 04-05-SUMMARY "Phone session still required")
-Last activity: 2026-11-28 — 04-02 complete (stable guidance, overlay, held-palm capture, focus, torch)
+Last activity: 2026-11-28 — 04-05 emulator part done (debug scan HUD + recorder, SCAN-07 session script, 16 KB check, emulator checks) plus review fixes
 
 Progress: [███░░░░░░░] 33%
 

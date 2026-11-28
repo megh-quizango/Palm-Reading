@@ -107,21 +107,22 @@ internal class LandmarkRecorder(private val dir: File) {
 @Composable
 fun ScanDebugHud(samples: StateFlow<ScanDebugSample?>, hand: HandSide, modifier: Modifier = Modifier) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+    // Hoisted so the chip stays locked while recording: collapsing the panel would cancel the 3 s capture silently
+    var recording by remember { mutableStateOf(false) }
     Column(modifier, horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(NocturneSpace.S4)) {
-        NocturneChip("HUD", Modifier.clickable { expanded = !expanded }, textColor = NocturneColors.TextPrimary)
-        if (expanded) HudPanel(samples, hand)
+        NocturneChip("HUD", Modifier.clickable(enabled = !recording) { expanded = !expanded }, textColor = NocturneColors.TextPrimary)
+        if (expanded) HudPanel(samples, hand, recording) { recording = it }
     }
 }
 
 @Composable
-private fun HudPanel(samples: StateFlow<ScanDebugSample?>, hand: HandSide) {
+private fun HudPanel(samples: StateFlow<ScanDebugSample?>, hand: HandSide, recording: Boolean, setRecording: (Boolean) -> Unit) {
     val sample by samples.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val recorder = remember { LandmarkRecorder(File(context.filesDir, "landmarks")) }
     val scope = rememberCoroutineScope()
     var pose by rememberSaveable { mutableStateOf(Pose.palm) }
     var status by remember { mutableStateOf<String?>(null) }
-    var recording by remember { mutableStateOf(false) }
     var fps by remember { mutableFloatStateOf(0f) }
 
     // Analysed frames over the last second
@@ -176,7 +177,7 @@ private fun HudPanel(samples: StateFlow<ScanDebugSample?>, hand: HandSide) {
             Modifier
                 .background(NocturneColors.FocusRing.copy(alpha = 0.5f), RoundedCornerShape(NocturneRadius.Sm))
                 .clickable(enabled = !recording) {
-                    recording = true
+                    setRecording(true)
                     status = null
                     scope.launch {
                         val picked = pose
@@ -188,7 +189,7 @@ private fun HudPanel(samples: StateFlow<ScanDebugSample?>, hand: HandSide) {
                         }
                         val name = recorder.write(hand, picked, got)
                         status = if (name == null) "no hand seen, nothing saved" else "saved $name (${got.size} frames)"
-                        recording = false
+                        setRecording(false)
                     }
                 }
                 .padding(horizontal = NocturneSpace.S8, vertical = NocturneSpace.S4),

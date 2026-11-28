@@ -29,7 +29,7 @@ else
 fi
 G="$("${A[@]}" shell dumpsys gfxinfo "$PKG" | tr -d '\r')"
 printf '%s\n' "$G" | grep -E '^(Total frames rendered|Janky frames|50th percentile|90th percentile|99th percentile|Number Missed Vsync|Number Slow UI thread|Number Frame deadline missed):' || true
-num() { printf '%s\n' "$G" | grep -m 1 "^$1:" | grep -oE '[0-9]+' | head -n 1; }
+num() { printf '%s\n' "$G" | grep -m 1 "^$1:" | grep -oE '[0-9]+' | head -n 1 || true; }  # a missing line must reach the fallback, not end the script (set -e)
 total="$(num 'Total frames rendered')"
 missed="$(num 'Number Frame deadline missed')"
 metric="frame deadline missed"
