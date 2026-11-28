@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 05-03-PLAN.md
-last_updated: "2026-11-28T07:42:46.329Z"
+stopped_at: Completed 05-04-PLAN.md
+last_updated: "2026-11-28T08:01:19.124Z"
 last_activity: 2026-11-28
 last_activity_desc: Phase 2 execution started
-state_head: 30cc1883e6927b80c210199c4bf036a386ed434e
+state_head: 122579c682be6eff1488d662854ab3f6fb147a35
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 30
-  completed_plans: 25
+  completed_plans: 26
   percent: 33
 ---
 
@@ -79,6 +79,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 05 P01 | 17min | 3 tasks | 47 files |
 | Phase 05 P02 | 11min | 2 tasks | 11 files |
 | Phase 05 P03 | 5min | 2 tasks | 12 files |
+| Phase 05 P04 | 14min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -151,6 +152,8 @@ Recent decisions affecting current work:
 - [Phase 05]: 05-02: ResultViewModel distinctUntilChanged after byId so unrelated Room writes do not re-decode the photo
 - [Phase 05]: Phase 6: free-scan counter (BL-1) increments only inside ReadingStore.save, never on read or an invalid verdict (D-15)
 - [Phase 05]: Invalid verdict deletes the capture at the verdict, before InvalidPhoto opens (Pitfall 11)
+- [Phase 05]: 05-04: RESEARCH A1 confirmed on API 35, share card ships on the Compose GraphicsLayer path (Canvas fallback unused); API 26-27 capture unverified
+- [Phase 05]: 05-04: Share state is plain remember so a recreated process never re-shares by itself
 
 ### Pending Todos
 
@@ -183,6 +186,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-28T07:42:45.935Z
-Stopped at: Completed 05-03-PLAN.md
+Last session: 2026-11-28T08:01:18.692Z
+Stopped at: Completed 05-04-PLAN.md
 Resume file: None

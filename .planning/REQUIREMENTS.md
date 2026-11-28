@@ -59,7 +59,7 @@
 - [x] **RES-03**: User sees a card per detected line with a short label and interpretation
 - [x] **RES-04**: Every reading shows an entertainment disclaimer
 - [x] **RES-05**: The reading (photo + JSON) is saved on the device and survives app restarts
-- [ ] **RES-06**: User can share the reading as a branded image card
+- [x] **RES-06**: User can share the reading as a branded image card
 - [x] **RES-07**: User can start another scan from the result; "Ask [Guide]" shows a coming-soon state
 
 ### Monetisation stubs
@@ -160,7 +160,7 @@
 | RES-03 | Phase 5 | Complete |
 | RES-04 | Phase 5 | Complete |
 | RES-05 | Phase 5 | Complete |
-| RES-06 | Phase 5 | Pending |
+| RES-06 | Phase 5 | Complete |
 | RES-07 | Phase 5 | Complete |
 | ADS-01 | Phase 6 | Pending |
 | ADS-02 | Phase 6 | Pending |
