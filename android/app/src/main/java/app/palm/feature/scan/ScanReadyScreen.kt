@@ -44,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.palm.R
+import app.palm.contract.HandSide
+import app.palm.contract.InvalidReason
 import app.palm.core.designsystem.LocalNocturne
 import app.palm.core.designsystem.NocturneBorderWidth
 import app.palm.core.designsystem.NocturneColors
@@ -85,10 +87,15 @@ private fun PhotoGone(onRetake: () -> Unit) {
 
 /** ScanReady (D-01, D-03): the processed photo with its 21 landmarks and "Read my palm"; Back = Retake (D-12). */
 @Composable
-fun ScanReadyScreen(onRetake: () -> Unit, onSaved: (String) -> Unit, viewModel: ScanReadyViewModel = hiltViewModel()) {
+fun ScanReadyScreen(
+    onRetake: () -> Unit,
+    onSaved: (String) -> Unit,
+    onInvalid: (InvalidReason, HandSide) -> Unit,
+    viewModel: ScanReadyViewModel = hiltViewModel(),
+) {
     val capture = viewModel.capture
     val readState by viewModel.readState.collectAsStateWithLifecycle()
-    val busy = readState == ReadState.Reading || readState is ReadState.Saved
+    val busy = readState == ReadState.Reading || readState is ReadState.Saved || readState is ReadState.Invalid
     val retake = {
         if (!busy) {
             viewModel.retake()
@@ -101,6 +108,11 @@ fun ScanReadyScreen(onRetake: () -> Unit, onSaved: (String) -> Unit, viewModel: 
         val saved = readState as? ReadState.Saved ?: return@LaunchedEffect
         onSaved(saved.readingId)
         viewModel.consumeSaved()
+    }
+    LaunchedEffect(readState) {
+        val invalid = readState as? ReadState.Invalid ?: return@LaunchedEffect
+        onInvalid(invalid.reason, invalid.hand)
+        viewModel.consumeInvalid()
     }
     val gone by viewModel.gone.collectAsStateWithLifecycle()
     if (capture == null || gone) {

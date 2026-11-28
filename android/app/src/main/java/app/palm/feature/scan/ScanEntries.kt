@@ -12,6 +12,7 @@ import app.palm.core.navigation.popFrom
 import app.palm.core.navigation.popTo
 import app.palm.core.navigation.pushFrom
 import app.palm.core.navigation.replaceAll
+import app.palm.core.navigation.showInvalid
 import app.palm.feature.invalidphoto.InvalidPhotoScreen
 
 fun EntryProviderScope<NavKey>.scanEntries(backStack: NavBackStack<NavKey>) {
@@ -26,6 +27,7 @@ fun EntryProviderScope<NavKey>.scanEntries(backStack: NavBackStack<NavKey>) {
         ScanReadyScreen(
             onRetake = { backStack.popFrom(ScanReady) },
             onSaved = { id -> if (backStack.lastOrNull() == ScanReady) backStack.replaceAll(Home, Result(id)) },
+            onInvalid = { reason, hand -> backStack.showInvalid(reason, hand) },
         )
     }
     entry<InvalidPhoto> { key ->
