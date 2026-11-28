@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="scan_perm_blocked_title">Camera access is off</string>
+    <string name="scan_perm_blocked_body">Turn on the camera for [AppName] in your phone\'s settings, or pick a clear palm photo from your gallery.</string>
+    <string name="scan_perm_open_settings">Open settings</string>
+    <string name="scan_camera_error_body">Another app may be using the camera. Close it and try again, or pick a palm photo from your gallery.</string>
+    <string name="scan_camera_retry">Try camera again</string>
+</resources>

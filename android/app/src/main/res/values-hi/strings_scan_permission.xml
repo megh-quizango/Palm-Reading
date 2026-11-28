@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Claude-written Hindi, flagged for native-speaker review (UI-SPEC Copywriting Contract) -->
+<resources>
+    <string name="scan_perm_blocked_title">कैमरे की अनुमति बंद है</string>
+    <string name="scan_perm_blocked_body">अपने फ़ोन की सेटिंग में [AppName] के लिए कैमरा चालू करें, या गैलरी से अपनी हथेली की साफ़ फ़ोटो चुनें।</string>
+    <string name="scan_perm_open_settings">सेटिंग खोलें</string>
+    <string name="scan_camera_error_body">हो सकता है कोई और ऐप कैमरा इस्तेमाल कर रहा हो। उसे बंद करके फिर से कोशिश करें, या गैलरी से हथेली की फ़ोटो चुनें।</string>
+    <string name="scan_camera_retry">कैमरा फिर से आज़माएँ</string>
+</resources>
