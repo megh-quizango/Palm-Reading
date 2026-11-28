@@ -165,6 +165,31 @@ Run with only the reference phone attached, or `export ADB_SERIAL=<phone serial>
 - 04-04 #2-5, #7, #9: real HEIC import + check-capture, processing scrim and Back-cancel (`run-as app.palm.dev.debug ls cache/scan` shows no capture.jpg), camera-still rejection with Retake only, photo-gone after `am kill`, photo-picker backport (API 26-29 only), and rotation/night-mode during processing.
 - STATE Phase 3 note: check the Redmi for leftover test settings (animations, font scale, battery saver).
 
+## Phone session (Task 1, 100.104.73.89:43695)
+
+Run 2026-11-28 on the Redmi Note 10T 5G with `export ADB_SERIAL=100.104.73.89:43695` for every command (emulator-5554 and two other phones were attached and not touched). Every command ran from the repo root. Nothing was rerun, and each gate passed on its first run. Tasks 2 and 3 were not run (real hands, user decisions).
+
+**Step 1, device facts:** model `M2103K19I`, abilist `arm64-v8a,armeabi-v7a,armeabi`, Android 13 / SDK 33, MIUI V140 (MIUI 14), SoC MT6833, 1080x2400. Recorded in STATE.md.
+
+**Settings before the session:** font_scale 1.0; window / transition / animator scale 1.0 / 1.0 / 1.0; low_power 0; accelerometer_rotation 0; app locale of the debug package `[en]`. So the Phase 3 "leftover test setting" note was clean.
+
+| Step | Command | Output line | Result |
+|---|---|---|---|
+| 2 | `bash tools/device-lock.sh bash tools/gradlew.sh :app:installDebug :app:installRelease` | `Installing APK 'app-release.apk, app-release.dm' on 'M2103K19I - 13' for :app:release` / `Installed on 1 device.` / `BUILD SUCCESSFUL in 3m 46s`; lastUpdateTime debug 15:31:12, release 15:32:19 | PASS (update installs, nothing uninstalled) |
+| 3 | verify command 4 (release onboarding, `BUDGET_MS=100000 bash tools/cold-start.sh`, `bash tools/cold-start.sh --compile`, `check-jank.sh idle 10`), exit 0 | fresh: `run 1: 406 ms` … `run 5: 347 ms` (406, 353, 391, 342, 347), `median 353 ms over 5 runs (budget 100000 ms)` | recorded |
+| 3 | same run, after `--compile` (`arm64: [status=speed-profile] [reason=cmdline]`) | 311, 269, 293, 292, 305 ms, `median 293 ms over 5 runs (budget 2000 ms)` | **PASS** (< 2000 ms) |
+| 3 | same run, Home idle 10 s | `jank OK: 0 of 619 frames missed the deadline (frame deadline missed)`; p50 22 ms, p90 23 ms, p99 24 ms, missed vsync 0 | **PASS** (0.00% ≤ 5%) |
+| 4 | verify command 5 (`check-jank.sh swipe 3` on the release intro), exit 0 | `jank OK: 2 of 302 frames missed the deadline (frame deadline missed)`; p50 22 ms, p90 27 ms, p99 27 ms | **PASS** (0.66% ≤ 5%). No intro pager fix needed (the debug build measured 37.5% in Phase 3) |
+| 5 | `bash tools/device-lock.sh bash -c 'export PKG=app.palm.dev && bash tools/scan-open.sh --grant && bash tools/ui.sh expect "Place your palm inside the frame" && bash tools/check-scan-session.sh 120'`, exit 0 | `session: 120s frames=6096 missed=0 (0.00%, frame deadline missed) max_thermal=0 temp=32.8C->33.3C delta=0.5C anr=0` / `session OK: 0.00% frame deadline missed, max thermal 0, no ANR, app.palm.dev resumed` | **PASS** (no ANR, 0.00% ≤ 5%, thermal 0 ≤ 1, resumed) |
+
+After the session, the release scanner still showed "Place your palm inside the frame" with no "couldn't start" text, and the crash buffer had 0 `palm` lines. The phone camera saw no hand (dark scene).
+
+**Step 6, screenshots** (debug build, `tools/adb/shots/`, git-ignored, no hand in view). The app locale was switched with `cmd locale set-app-locales app.palm.dev.debug --locales hi|en` (API 33). Each screen was reached in English, and the locale was switched on that screen. Files: `phone-phase4-{en,hi}-{scanner,denied,permdenied}.png` and the same six with `-fs2`, 12 files in total. I reviewed hi-scanner-fs2 and hi-permdenied-fs2: the Devanagari is not clipped or truncated. At fs 2.0 the debug-only HUD chip overlaps the edge of the guidance chip, as on the emulator. `font_scale.orig` = `1.0` (re-read from the phone).
+
+**Finding (not fixed, for Task 2 / review):** on the Denied screen, after the app locale is switched to Hindi (`set-app-locales ... hi`, which recreates the activity), tapping "कैमरे की अनुमति दें" (Allow camera) does nothing. It was reproduced 3 times. MIUIInput logs the down and up events on `app.palm.dev.debug/app.palm.MainActivity`, but no permission activity starts and no permission log line appears. CAMERA flags stay `USER_SET` (one denial, so the request was not auto-denied). After switching back to `en`, the same button opens the system dialog. Whether a user changing the language from the app's Language screen hits the same thing was not checked. Code: `CameraPermissionGate.kt` `onAllow = { launcher.launch(...) }`. For the screenshots, the second denial was done in English.
+
+**Settings after the session (restored):** font_scale 1.0 (equal to `font_scale.orig`); app locale of the debug package `[en]`; animations, battery saver and rotation were never changed. CAMERA is granted for the debug package, and the debug app is left on the live scanner (Right hand, English) for Task 2. No appops or security setting was touched; MIUIOP 10021 was not needed for Task 1.
+
 ## Known Stubs
 
 None. The HUD is debug-only tooling.
