@@ -13,6 +13,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -37,6 +38,7 @@ class ResultViewModel @Inject constructor(store: ReadingStore, decoder: PhotoDec
 
     val state: StateFlow<ResultState> = id.filterNotNull()
         .flatMapLatest { store.byId(it) }
+        .distinctUntilChanged() // Room re-emits byId on any table write; the photo is decoded once per row
         .transformLatest { saved ->
             val reading = saved?.let { decodeValid(it.json) }
             if (saved == null || reading == null) {
