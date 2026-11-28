@@ -26,7 +26,7 @@
 
 - [x] **HOME-01**: User sees a time-of-day greeting with their name on Home
 - [x] **HOME-02**: User sees the hero card and feature grid; tiles outside milestone 1 open a "coming soon" state
-- [ ] **HOME-03**: User can reopen their last palm reading from Home
+- [x] **HOME-03**: User can reopen their last palm reading from Home
 - [x] **HOME-04**: Pressing Back on Home asks to confirm leaving the app
 
 ### Scan
@@ -55,12 +55,12 @@
 ### Result
 
 - [ ] **RES-01**: User can switch between Palm, Love and Career tabs on the result
-- [ ] **RES-02**: User sees the detected lines drawn over their own photo with a colour + text legend
+- [x] **RES-02**: User sees the detected lines drawn over their own photo with a colour + text legend
 - [ ] **RES-03**: User sees a card per detected line with a short label and interpretation
-- [ ] **RES-04**: Every reading shows an entertainment disclaimer
-- [ ] **RES-05**: The reading (photo + JSON) is saved on the device and survives app restarts
+- [x] **RES-04**: Every reading shows an entertainment disclaimer
+- [x] **RES-05**: The reading (photo + JSON) is saved on the device and survives app restarts
 - [ ] **RES-06**: User can share the reading as a branded image card
-- [ ] **RES-07**: User can start another scan from the result; "Ask [Guide]" shows a coming-soon state
+- [x] **RES-07**: User can start another scan from the result; "Ask [Guide]" shows a coming-soon state
 
 ### Monetisation stubs
 
@@ -136,7 +136,7 @@
 | ONB-06 | Phase 3 | Complete |
 | HOME-01 | Phase 3 | Complete |
 | HOME-02 | Phase 3 | Complete |
-| HOME-03 | Phase 5 | Pending |
+| HOME-03 | Phase 5 | Complete |
 | HOME-04 | Phase 3 | Complete |
 | SCAN-01 | Phase 3 | Complete |
 | SCAN-02 | Phase 4 | Pending |
@@ -156,12 +156,12 @@
 | READ-09 | Phase 6 | Pending |
 | READ-10 | Phase 2 | Complete |
 | RES-01 | Phase 5 | Pending |
-| RES-02 | Phase 5 | Pending |
+| RES-02 | Phase 5 | Complete |
 | RES-03 | Phase 5 | Pending |
-| RES-04 | Phase 5 | Pending |
-| RES-05 | Phase 5 | Pending |
+| RES-04 | Phase 5 | Complete |
+| RES-05 | Phase 5 | Complete |
 | RES-06 | Phase 5 | Pending |
-| RES-07 | Phase 5 | Pending |
+| RES-07 | Phase 5 | Complete |
 | ADS-01 | Phase 6 | Pending |
 | ADS-02 | Phase 6 | Pending |
 | ADS-03 | Phase 6 | Pending |

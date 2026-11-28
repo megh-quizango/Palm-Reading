@@ -3,16 +3,16 @@ gsd_state_version: "1.0"
 current_phase: 2
 current_phase_name: Reading Pipeline
 status: executing
-stopped_at: Completed 04-04-PLAN.md
-last_updated: "2026-11-28T03:02:14.917Z"
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-11-28T07:18:08.592Z"
 last_activity: 2026-11-28
 last_activity_desc: Phase 2 execution started
-state_head: 45a6c0b181eb38b8b3cdc9f6cd0381980a9878b3
+state_head: 314e18af55ee79f476d85d940b44ca29524a7320
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 24
-  completed_plans: 21
+  total_plans: 30
+  completed_plans: 23
   percent: 33
 ---
 
@@ -76,6 +76,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 4 P02 | 30 min | 3 tasks | 49 files |
 | Phase 04 P03 | 5 min | 2 tasks | 7 files |
 | Phase 04 P04 | 12 min | 3 tasks | 26 files |
+| Phase 05 P01 | 17min | 3 tasks | 47 files |
 
 ## Accumulated Context
 
@@ -143,6 +144,7 @@ Recent decisions affecting current work:
 - [Phase 04]: 04-04: ProcessingOverlayHost(visible) does the fade; ProcessingOverlay(modifier) is the scrim
 - [Phase 04]: 04-04: a pixel-cap refusal (> 250 MP) is Unsupported for captures and imports alike
 - [Phase 04]: MediaPipe tasks-core telemetry (Google datatransport/CCT, no opt-out API) disclosure accepted by the user on 2026-11-28; must be declared in the Play Data safety form and privacy policy (REL-02/REL-03)
+- [Phase 05]: 05-01: ReadingStore accepts only lower-case UUID ids and resolves photos only inside filesDir/readings; deleteAll sweeps rows via the DAO
 
 ### Pending Todos
 
@@ -175,6 +177,6 @@ Items acknowledged and deferred at milestone close, most recent first:
 
 ## Session Continuity
 
-Last session: 2026-11-28T03:02:05.570Z
-Stopped at: 04-05 emulator part done; phone session pending (Task 2 checkpoint)
-Resume file: .planning/phases/04-scan-loop/04-05-SUMMARY.md
+Last session: 2026-11-28T07:18:08.213Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: None
