@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The share PNG only: no files-path, so readings (filesDir/readings) can never be served. -->
+<paths>
+    <cache-path name="share" path="share/" />
+</paths>

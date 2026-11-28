@@ -53,5 +53,15 @@
                 android:name="photopicker_activity:0:required"
                 android:value="" />
         </service>
+        <!-- Share card only: one PNG in cacheDir/share, granted per URI, never exported (D-22, T-05-12) -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.share"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/share_paths" />
+        </provider>
     </application>
 </manifest>

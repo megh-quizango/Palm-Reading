@@ -1,5 +1,31 @@
 package app.palm.feature.result.share
 
+import android.content.ComponentName
+import android.content.Intent
+import android.net.Uri
+import android.os.ParcelFileDescriptor
+import android.view.KeyEvent
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.hasContentDescription
+import androidx.core.content.FileProvider
+import androidx.core.content.IntentCompat
+import androidx.core.os.LocaleListCompat
+import androidx.lifecycle.Lifecycle
+import androidx.test.core.app.ActivityScenario
+import androidx.test.platform.app.InstrumentationRegistry
+import app.palm.MainActivity
+import app.palm.core.data.ProfileEntryPoint
+import app.palm.core.reading.ReadingEntryPoint
+import app.palm.feature.handselect.setEnglish
+import app.palm.testing.seedReading
+import dagger.hilt.android.EntryPointAccessors
+import java.time.LocalDate
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertThrows
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.LinearGradient
@@ -15,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.hasText
@@ -36,7 +63,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** D-21, D-22: the off-screen card renders to a 1080 x 1350 PNG in one overwritten file (RESEARCH A1 gate). */
+/**
+ * D-21, D-22: the off-screen card renders to a 1080 x 1350 PNG in one overwritten file (RESEARCH A1 gate), and is shared
+ * only through a per-URI grant on the non-exported provider limited to cacheDir/share (T-05-12, T-05-13).
+ */
+@OptIn(ExperimentalTestApi::class)
 @RunWith(AndroidJUnit4::class)
 class ShareTest {
     @get:Rule val compose = createAndroidComposeRule<ComponentActivity>()
@@ -125,7 +156,93 @@ class ShareTest {
         }
     }
 
+    @Test fun sendAndChooserCarryTheUriAndTheReadGrant() {
+        val uri = Uri.parse("content://${context.packageName}.share/share/reading.png")
+        val send = shareIntent(uri, "text")
+        assertEquals(Intent.ACTION_SEND, send.action)
+        assertEquals("image/png", send.type)
+        assertEquals(uri, IntentCompat.getParcelableExtra(send, Intent.EXTRA_STREAM, Uri::class.java))
+        assertEquals("text", send.getStringExtra(Intent.EXTRA_TEXT))
+        assertEquals(uri, send.clipData!!.getItemAt(0).uri)
+        assertTrue(send.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION != 0)
+        val chooser = shareChooser(send, "title")
+        assertEquals(Intent.ACTION_CHOOSER, chooser.action)
+        assertTrue(IntentCompat.getParcelableExtra(chooser, Intent.EXTRA_INTENT, Intent::class.java)!!.filterEquals(send))
+        assertEquals(uri, chooser.clipData!!.getItemAt(0).uri)
+        assertTrue(chooser.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION != 0)
+    }
+
+    @Test fun onlyTheSharePngIsServedByAPrivateProvider() {
+        val app = InstrumentationRegistry.getInstrumentation().targetContext
+        val image = Bitmap.createBitmap(1080, 1350, Bitmap.Config.ARGB_8888).asImageBitmap()
+        val file = runBlocking { writeSharePng(app.cacheDir, image) }
+        val uri = shareUri(app, file)
+        assertEquals("content", uri.scheme)
+        assertEquals("${app.packageName}.share", uri.authority)
+        val decoded = app.contentResolver.openInputStream(uri)!!.use { BitmapFactory.decodeStream(it) }
+        assertEquals(1080 to 1350, decoded.width to decoded.height)
+        assertThrows(IllegalArgumentException::class.java) { shareUri(app, File(app.filesDir, "readings/x.jpg")) }
+        val info = app.packageManager.getProviderInfo(ComponentName(app, FileProvider::class.java), 0)
+        assertEquals("${app.packageName}.share", info.authority)
+        assertFalse(info.exported)
+        assertTrue(info.grantUriPermissions)
+    }
+
+    @Test fun tappingShareWritesTheCardAndOpensTheShareSheet() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val app = instrumentation.targetContext.applicationContext
+        val profile = EntryPointAccessors.fromApplication(app, ProfileEntryPoint::class.java).profileRepository()
+        val store = EntryPointAccessors.fromApplication(app, ReadingEntryPoint::class.java).readingStore()
+        val id = runBlocking {
+            profile.clear()
+            profile.saveName("Asha", null)
+            profile.saveBirth(LocalDate.of(1996, 3, 12), null, timeUnknown = true)
+            profile.completeOnboarding()
+            seedReading(app, store)
+        }
+        val png = File(app.cacheDir, "share/reading.png").apply { delete() }
+        setEnglish(instrumentation)
+        val scenario = ActivityScenario.launch(MainActivity::class.java)
+        try {
+            compose.waitUntilAtLeastOneExists(hasContentDescription("Your last reading", substring = true), 10_000)
+            compose.onNodeWithContentDescription("Your last reading", substring = true).performScrollTo().performClick()
+            compose.waitUntilAtLeastOneExists(hasText("Your palm reading"), 10_000)
+            compose.onNodeWithText("Share").performScrollTo().performClick()
+            compose.waitUntil(timeoutMillis = 10_000) { png.exists() }
+            val decoded = BitmapFactory.decodeFile(png.path)
+            assertEquals(1080 to 1350, decoded.width to decoded.height)
+            // The system chooser (another app; on API 35 the sheet is intentresolver's ChooserActivityLauncher) covers Result:
+            // once it is the top resumed activity close it with a
+            // shell key event, wait for Result to resume (a paused activity has no hierarchy to query), then check the button
+            assertTrue("share sheet did not open", waitFor { CHOOSER.containsMatchIn(topActivity()) })
+            instrumentation.uiAutomation.executeShellCommand("input keyevent ${KeyEvent.KEYCODE_BACK}").close()
+            assertTrue("Result did not come back", waitFor { scenario.state == Lifecycle.State.RESUMED })
+            compose.waitUntilAtLeastOneExists(hasText("Share"), 10_000)
+            assertEquals(0, compose.onAllNodes(hasText(app.getString(R.string.result_share_preparing))).fetchSemanticsNodes().size)
+        } finally {
+            scenario.close()
+            runBlocking { store.delete(id) }
+            instrumentation.runOnMainSync { AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList()) }
+        }
+    }
+
+    private fun waitFor(condition: () -> Boolean): Boolean {
+        val deadline = System.currentTimeMillis() + 10_000
+        while (System.currentTimeMillis() < deadline) {
+            if (condition()) return true
+            Thread.sleep(100)
+        }
+        return false
+    }
+
+    private fun topActivity(): String {
+        val pfd = InstrumentationRegistry.getInstrumentation().uiAutomation.executeShellCommand("dumpsys activity activities")
+        val text = ParcelFileDescriptor.AutoCloseInputStream(pfd).bufferedReader().use { it.readText() }
+        return text.lineSequence().firstOrNull { "topResumedActivity" in it }.orEmpty()
+    }
+
     private companion object {
+        val CHOOSER = Regex("""[Cc]hooser|[Rr]esolver|intentresolver""")
         const val HOST = "share-host"
     }
 }

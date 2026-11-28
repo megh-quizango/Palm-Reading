@@ -1,8 +1,13 @@
 package app.palm.feature.result.share
 
+import android.content.ClipData
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.core.content.FileProvider
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
@@ -26,4 +31,23 @@ suspend fun writeSharePng(cacheDir: File, image: ImageBitmap, io: CoroutineDispa
     } finally {
         bitmap.recycle()
     }
+}
+
+/** content:// URI from the non-exported provider; throws IllegalArgumentException outside cacheDir/share (T-05-12). */
+fun shareUri(context: Context, file: File): Uri =
+    // packageName, never a literal: debug and release ids differ by the .debug suffix
+    FileProvider.getUriForFile(context, context.packageName + ".share", file)
+
+fun shareIntent(uri: Uri, text: String): Intent = Intent(Intent.ACTION_SEND).apply {
+    type = "image/png"
+    putExtra(Intent.EXTRA_STREAM, uri)
+    putExtra(Intent.EXTRA_TEXT, text)
+    clipData = ClipData.newRawUri(null, uri)
+    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+}
+
+/** The grant is repeated on the chooser itself so it survives the hop through the system sheet (RESEARCH A2). */
+fun shareChooser(send: Intent, title: String): Intent = Intent.createChooser(send, title).apply {
+    clipData = send.clipData
+    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 }
